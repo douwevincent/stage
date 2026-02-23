@@ -1,6 +1,7 @@
 package cm.univ.maroua.enspm.stage.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,22 +17,33 @@ public class Stage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = "id_etudiant")
+    @JoinColumn(name = "etudiant_id")
     private Etudiant etudiant;
 
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = "id_localite")
+    @JoinColumn(name = "localite_id")
     private Localite localite;
 
     @ManyToOne
-    @JoinColumn(name = "id_encadreur")
+    @JoinColumn(name = "encadreur_id")
     private Encadreur encadreur;
 
-    private String typeStage;
+    @ManyToOne
+    @JoinColumn(name = "type_stage_id")
+    private TypeStage typeStage;
+
+    @NotNull
     private LocalDate dateDebut;
+
+    @NotNull
     private LocalDate dateFin;
-    private String anneeAcademique;
+
+    @ManyToOne
+    @JoinColumn(name = "annee_academique_id")
+    private AnneeAcademique anneeAcademique;
 
     @OneToOne(mappedBy = "stage")
     private SessionEvaluation sessionEvaluation;

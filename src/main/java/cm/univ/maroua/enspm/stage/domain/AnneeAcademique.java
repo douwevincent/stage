@@ -1,30 +1,23 @@
 package cm.univ.maroua.enspm.stage.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Localite {
+public class AnneeAcademique {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String ville;
-    private String adresse;
-
     @NotNull
-    @ManyToOne
-    @JoinColumn(name = "entreprise_id")
-    private Entreprise entreprise;
-
-    @OneToMany(mappedBy = "localite")
-    private List<Stage> stages;
+    private String libelle;
 }

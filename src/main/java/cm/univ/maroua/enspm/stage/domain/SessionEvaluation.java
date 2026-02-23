@@ -18,7 +18,7 @@ public class SessionEvaluation {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "id_stage")
+    @JoinColumn(name = "stage_id")
     private Stage stage;
 
     private String codeAcces;

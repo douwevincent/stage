@@ -1,6 +1,7 @@
 package cm.univ.maroua.enspm.stage.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,8 +19,9 @@ public class Specialite {
 
     private String nom;
 
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = "id_departement")
+    @JoinColumn(name = "departement_id")
     private Departement departement;
 
     @OneToMany(mappedBy = "specialite")

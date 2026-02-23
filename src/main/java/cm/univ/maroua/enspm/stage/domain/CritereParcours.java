@@ -3,35 +3,25 @@ package cm.univ.maroua.enspm.stage.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.Serializable;
-
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "id_parcours", "id_critere" }))
 public class CritereParcours {
 
-    @EmbeddedId
-    private CritereParcoursId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
-    @MapsId("idParcours")
-    @JoinColumn(name = "id_parcours")
+    @JoinColumn(name = "parcours_id")
     private Parcours parcours;
 
     @ManyToOne
-    @MapsId("idCritere")
-    @JoinColumn(name = "id_critere")
+    @JoinColumn(name = "critere_id")
     private Critere critere;
 
     private Float coefficient;
 
-    @Embeddable
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class CritereParcoursId implements Serializable {
-        private Long idParcours;
-        private Long idCritere;
-    }
 }

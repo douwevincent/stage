@@ -1,6 +1,7 @@
 package cm.univ.maroua.enspm.stage.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,12 +17,14 @@ public class Parcours {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = "id_specialite")
+    @JoinColumn(name = "specialite_id")
     private Specialite specialite;
 
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = "id_niveau")
+    @JoinColumn(name = "niveau_id")
     private Niveau niveau;
 
     @OneToMany(mappedBy = "parcours")

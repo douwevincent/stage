@@ -1,6 +1,7 @@
 package cm.univ.maroua.enspm.stage.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,12 +17,15 @@ public class Encadreur {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     private String nom;
     private String prenom;
+
+    @NotNull
     private String email;
 
     @ManyToOne
-    @JoinColumn(name = "id_entreprise")
+    @JoinColumn(name = "entreprise_id")
     private Entreprise entreprise;
 
     @OneToMany(mappedBy = "encadreur")

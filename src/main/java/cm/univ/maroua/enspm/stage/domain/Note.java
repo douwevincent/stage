@@ -16,12 +16,12 @@ public class Note {
 
     @ManyToOne
     @MapsId("idSession")
-    @JoinColumn(name = "id_session")
+    @JoinColumn(name = "session_evaluation_id")
     private SessionEvaluation session;
 
     @ManyToOne
     @MapsId("idCritere")
-    @JoinColumn(name = "id_critere")
+    @JoinColumn(name = "critere_id")
     private Critere critere;
 
     private Integer valeur;
