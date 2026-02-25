@@ -2,6 +2,8 @@ package cm.univ.maroua.enspm.stage.service;
 
 import cm.univ.maroua.enspm.stage.domain.Etudiant;
 import cm.univ.maroua.enspm.stage.repository.EtudiantRepository;
+import cm.univ.maroua.enspm.stage.service.dto.EtudiantDTO;
+import cm.univ.maroua.enspm.stage.service.mapper.EtudiantMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,21 +16,26 @@ import java.util.Optional;
 public class EtudiantService {
 
     private final EtudiantRepository etudiantRepository;
+    private final EtudiantMapper etudiantMapper;
 
-    public EtudiantService(EtudiantRepository etudiantRepository) {
+    public EtudiantService(EtudiantRepository etudiantRepository, EtudiantMapper etudiantMapper) {
         this.etudiantRepository = etudiantRepository;
+        this.etudiantMapper = etudiantMapper;
     }
 
-    public Page<Etudiant> findAll(Pageable pageable) {
-        return etudiantRepository.findAll(pageable);
+    public Page<EtudiantDTO> findAll(Pageable pageable) {
+        return etudiantRepository.findAll(pageable).map(etudiantMapper::toDto);
     }
 
-    public Optional<Etudiant> findOne(Long id) {
-        return etudiantRepository.findById(id);
+    @Transactional(readOnly = true)
+    public Optional<EtudiantDTO> findOne(Long id) {
+        return etudiantRepository.findById(id).map(etudiantMapper::toDto);
     }
 
-    public Etudiant save(Etudiant etudiant) {
-        return etudiantRepository.save(etudiant);
+    public EtudiantDTO save(EtudiantDTO etudiantDTO) {
+        Etudiant etudiant = etudiantMapper.toEntity(etudiantDTO);
+        etudiant = etudiantRepository.save(etudiant);
+        return etudiantMapper.toDto(etudiant);
     }
 
     public void delete(Long id) {

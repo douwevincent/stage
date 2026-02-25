@@ -2,6 +2,8 @@ package cm.univ.maroua.enspm.stage.service;
 
 import cm.univ.maroua.enspm.stage.domain.Encadreur;
 import cm.univ.maroua.enspm.stage.repository.EncadreurRepository;
+import cm.univ.maroua.enspm.stage.service.dto.EncadreurDTO;
+import cm.univ.maroua.enspm.stage.service.mapper.EncadreurMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,21 +16,26 @@ import java.util.Optional;
 public class EncadreurService {
 
     private final EncadreurRepository encadreurRepository;
+    private final EncadreurMapper encadreurMapper;
 
-    public EncadreurService(EncadreurRepository encadreurRepository) {
+    public EncadreurService(EncadreurRepository encadreurRepository, EncadreurMapper encadreurMapper) {
         this.encadreurRepository = encadreurRepository;
+        this.encadreurMapper = encadreurMapper;
     }
 
-    public Page<Encadreur> findAll(Pageable pageable) {
-        return encadreurRepository.findAll(pageable);
+    public Page<EncadreurDTO> findAll(Pageable pageable) {
+        return encadreurRepository.findAll(pageable).map(encadreurMapper::toDto);
     }
 
-    public Optional<Encadreur> findOne(Long id) {
-        return encadreurRepository.findById(id);
+    @Transactional(readOnly = true)
+    public Optional<EncadreurDTO> findOne(Long id) {
+        return encadreurRepository.findById(id).map(encadreurMapper::toDto);
     }
 
-    public Encadreur save(Encadreur encadreur) {
-        return encadreurRepository.save(encadreur);
+    public EncadreurDTO save(EncadreurDTO encadreurDTO) {
+        Encadreur encadreur = encadreurMapper.toEntity(encadreurDTO);
+        encadreur = encadreurRepository.save(encadreur);
+        return encadreurMapper.toDto(encadreur);
     }
 
     public void delete(Long id) {

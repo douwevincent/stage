@@ -1,7 +1,7 @@
 package cm.univ.maroua.enspm.stage.web.rest;
 
-import cm.univ.maroua.enspm.stage.domain.Note;
 import cm.univ.maroua.enspm.stage.service.NoteService;
+import cm.univ.maroua.enspm.stage.service.dto.NoteDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/api/notes")
+@RequestMapping("/notes")
 public class NoteController {
 
     private final NoteService noteService;
@@ -22,35 +22,35 @@ public class NoteController {
     }
 
     @GetMapping
-    public Page<Note> getAllNotes(Pageable pageable) {
+    public Page<NoteDTO> getAllNotes(Pageable pageable) {
         return noteService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Note> getNote(@PathVariable Long id) {
+    public ResponseEntity<NoteDTO> getNote(@PathVariable Long id) {
         return noteService.findOne(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Note> createNote(@Valid @RequestBody Note note) throws URISyntaxException {
-        if (note.getId() != null) {
+    public ResponseEntity<NoteDTO> createNote(@Valid @RequestBody NoteDTO noteDTO) throws URISyntaxException {
+        if (noteDTO.id() != null) {
             return ResponseEntity.badRequest().build();
         }
-        Note result = noteService.save(note);
-        return ResponseEntity.created(new URI("/api/notes/" + result.getId()))
+        NoteDTO result = noteService.save(noteDTO);
+        return ResponseEntity.created(new URI("/notes/" + result.id()))
                 .body(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Note> updateNote(
+    public ResponseEntity<NoteDTO> updateNote(
             @PathVariable(value = "id", required = false) final Long id,
-            @Valid @RequestBody Note note) {
-        if (note.getId() == null || !id.equals(note.getId())) {
+            @Valid @RequestBody NoteDTO noteDTO) {
+        if (noteDTO.id() == null || !id.equals(noteDTO.id())) {
             return ResponseEntity.badRequest().build();
         }
-        Note result = noteService.save(note);
+        NoteDTO result = noteService.save(noteDTO);
         return ResponseEntity.ok()
                 .body(result);
     }

@@ -1,7 +1,7 @@
 package cm.univ.maroua.enspm.stage.web.rest;
 
-import cm.univ.maroua.enspm.stage.domain.Niveau;
 import cm.univ.maroua.enspm.stage.service.NiveauService;
+import cm.univ.maroua.enspm.stage.service.dto.NiveauDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/api/niveaus")
+@RequestMapping("/niveaus")
 public class NiveauController {
 
     private final NiveauService niveauService;
@@ -22,35 +22,35 @@ public class NiveauController {
     }
 
     @GetMapping
-    public Page<Niveau> getAllNiveaus(Pageable pageable) {
+    public Page<NiveauDTO> getAllNiveaus(Pageable pageable) {
         return niveauService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Niveau> getNiveau(@PathVariable Long id) {
+    public ResponseEntity<NiveauDTO> getNiveau(@PathVariable Long id) {
         return niveauService.findOne(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Niveau> createNiveau(@Valid @RequestBody Niveau niveau) throws URISyntaxException {
-        if (niveau.getId() != null) {
+    public ResponseEntity<NiveauDTO> createNiveau(@Valid @RequestBody NiveauDTO niveauDTO) throws URISyntaxException {
+        if (niveauDTO.id() != null) {
             return ResponseEntity.badRequest().build();
         }
-        Niveau result = niveauService.save(niveau);
-        return ResponseEntity.created(new URI("/api/niveaus/" + result.getId()))
+        NiveauDTO result = niveauService.save(niveauDTO);
+        return ResponseEntity.created(new URI("/niveaus/" + result.id()))
                 .body(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Niveau> updateNiveau(
+    public ResponseEntity<NiveauDTO> updateNiveau(
             @PathVariable(value = "id", required = false) final Long id,
-            @Valid @RequestBody Niveau niveau) {
-        if (niveau.getId() == null || !id.equals(niveau.getId())) {
+            @Valid @RequestBody NiveauDTO niveauDTO) {
+        if (niveauDTO.id() == null || !id.equals(niveauDTO.id())) {
             return ResponseEntity.badRequest().build();
         }
-        Niveau result = niveauService.save(niveau);
+        NiveauDTO result = niveauService.save(niveauDTO);
         return ResponseEntity.ok()
                 .body(result);
     }

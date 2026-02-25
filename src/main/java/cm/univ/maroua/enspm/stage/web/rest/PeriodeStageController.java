@@ -1,7 +1,7 @@
 package cm.univ.maroua.enspm.stage.web.rest;
 
-import cm.univ.maroua.enspm.stage.domain.PeriodeStage;
 import cm.univ.maroua.enspm.stage.service.PeriodeStageService;
+import cm.univ.maroua.enspm.stage.service.dto.PeriodeStageDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/api/periode-stages")
+@RequestMapping("/periode-stages")
 public class PeriodeStageController {
 
     private final PeriodeStageService periodeStageService;
@@ -22,36 +22,36 @@ public class PeriodeStageController {
     }
 
     @GetMapping
-    public Page<PeriodeStage> getAllPeriodeStages(Pageable pageable) {
+    public Page<PeriodeStageDTO> getAllPeriodeStages(Pageable pageable) {
         return periodeStageService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PeriodeStage> getPeriodeStage(@PathVariable Long id) {
+    public ResponseEntity<PeriodeStageDTO> getPeriodeStage(@PathVariable Long id) {
         return periodeStageService.findOne(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<PeriodeStage> createPeriodeStage(@Valid @RequestBody PeriodeStage periodeStage)
+    public ResponseEntity<PeriodeStageDTO> createPeriodeStage(@Valid @RequestBody PeriodeStageDTO periodeStageDTO)
             throws URISyntaxException {
-        if (periodeStage.getId() != null) {
+        if (periodeStageDTO.id() != null) {
             return ResponseEntity.badRequest().build();
         }
-        PeriodeStage result = periodeStageService.save(periodeStage);
-        return ResponseEntity.created(new URI("/api/periode-stages/" + result.getId()))
+        PeriodeStageDTO result = periodeStageService.save(periodeStageDTO);
+        return ResponseEntity.created(new URI("/periode-stages/" + result.id()))
                 .body(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PeriodeStage> updatePeriodeStage(
+    public ResponseEntity<PeriodeStageDTO> updatePeriodeStage(
             @PathVariable(value = "id", required = false) final Long id,
-            @Valid @RequestBody PeriodeStage periodeStage) {
-        if (periodeStage.getId() == null || !id.equals(periodeStage.getId())) {
+            @Valid @RequestBody PeriodeStageDTO periodeStageDTO) {
+        if (periodeStageDTO.id() == null || !id.equals(periodeStageDTO.id())) {
             return ResponseEntity.badRequest().build();
         }
-        PeriodeStage result = periodeStageService.save(periodeStage);
+        PeriodeStageDTO result = periodeStageService.save(periodeStageDTO);
         return ResponseEntity.ok()
                 .body(result);
     }

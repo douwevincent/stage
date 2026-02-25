@@ -1,7 +1,7 @@
 package cm.univ.maroua.enspm.stage.web.rest;
 
-import cm.univ.maroua.enspm.stage.domain.Localite;
 import cm.univ.maroua.enspm.stage.service.LocaliteService;
+import cm.univ.maroua.enspm.stage.service.dto.LocaliteDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/api/localites")
+@RequestMapping("/localites")
 public class LocaliteController {
 
     private final LocaliteService localiteService;
@@ -22,35 +22,36 @@ public class LocaliteController {
     }
 
     @GetMapping
-    public Page<Localite> getAllLocalites(Pageable pageable) {
+    public Page<LocaliteDTO> getAllLocalites(Pageable pageable) {
         return localiteService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Localite> getLocalite(@PathVariable Long id) {
+    public ResponseEntity<LocaliteDTO> getLocalite(@PathVariable Long id) {
         return localiteService.findOne(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Localite> createLocalite(@Valid @RequestBody Localite localite) throws URISyntaxException {
-        if (localite.getId() != null) {
+    public ResponseEntity<LocaliteDTO> createLocalite(@Valid @RequestBody LocaliteDTO localiteDTO)
+            throws URISyntaxException {
+        if (localiteDTO.id() != null) {
             return ResponseEntity.badRequest().build();
         }
-        Localite result = localiteService.save(localite);
-        return ResponseEntity.created(new URI("/api/localites/" + result.getId()))
+        LocaliteDTO result = localiteService.save(localiteDTO);
+        return ResponseEntity.created(new URI("/localites/" + result.id()))
                 .body(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Localite> updateLocalite(
+    public ResponseEntity<LocaliteDTO> updateLocalite(
             @PathVariable(value = "id", required = false) final Long id,
-            @Valid @RequestBody Localite localite) {
-        if (localite.getId() == null || !id.equals(localite.getId())) {
+            @Valid @RequestBody LocaliteDTO localiteDTO) {
+        if (localiteDTO.id() == null || !id.equals(localiteDTO.id())) {
             return ResponseEntity.badRequest().build();
         }
-        Localite result = localiteService.save(localite);
+        LocaliteDTO result = localiteService.save(localiteDTO);
         return ResponseEntity.ok()
                 .body(result);
     }

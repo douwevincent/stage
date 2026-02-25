@@ -1,7 +1,7 @@
 package cm.univ.maroua.enspm.stage.web.rest;
 
-import cm.univ.maroua.enspm.stage.domain.Entreprise;
 import cm.univ.maroua.enspm.stage.service.EntrepriseService;
+import cm.univ.maroua.enspm.stage.service.dto.EntrepriseDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/api/entreprises")
+@RequestMapping("/entreprises")
 public class EntrepriseController {
 
     private final EntrepriseService entrepriseService;
@@ -22,36 +22,36 @@ public class EntrepriseController {
     }
 
     @GetMapping
-    public Page<Entreprise> getAllEntreprises(Pageable pageable) {
+    public Page<EntrepriseDTO> getAllEntreprises(Pageable pageable) {
         return entrepriseService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Entreprise> getEntreprise(@PathVariable Long id) {
+    public ResponseEntity<EntrepriseDTO> getEntreprise(@PathVariable Long id) {
         return entrepriseService.findOne(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Entreprise> createEntreprise(@Valid @RequestBody Entreprise entreprise)
+    public ResponseEntity<EntrepriseDTO> createEntreprise(@Valid @RequestBody EntrepriseDTO entrepriseDTO)
             throws URISyntaxException {
-        if (entreprise.getId() != null) {
+        if (entrepriseDTO.id() != null) {
             return ResponseEntity.badRequest().build();
         }
-        Entreprise result = entrepriseService.save(entreprise);
-        return ResponseEntity.created(new URI("/api/entreprises/" + result.getId()))
+        EntrepriseDTO result = entrepriseService.save(entrepriseDTO);
+        return ResponseEntity.created(new URI("/entreprises/" + result.id()))
                 .body(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Entreprise> updateEntreprise(
+    public ResponseEntity<EntrepriseDTO> updateEntreprise(
             @PathVariable(value = "id", required = false) final Long id,
-            @Valid @RequestBody Entreprise entreprise) {
-        if (entreprise.getId() == null || !id.equals(entreprise.getId())) {
+            @Valid @RequestBody EntrepriseDTO entrepriseDTO) {
+        if (entrepriseDTO.id() == null || !id.equals(entrepriseDTO.id())) {
             return ResponseEntity.badRequest().build();
         }
-        Entreprise result = entrepriseService.save(entreprise);
+        EntrepriseDTO result = entrepriseService.save(entrepriseDTO);
         return ResponseEntity.ok()
                 .body(result);
     }

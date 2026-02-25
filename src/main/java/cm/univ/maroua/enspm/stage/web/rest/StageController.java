@@ -1,7 +1,7 @@
 package cm.univ.maroua.enspm.stage.web.rest;
 
-import cm.univ.maroua.enspm.stage.domain.Stage;
 import cm.univ.maroua.enspm.stage.service.StageService;
+import cm.univ.maroua.enspm.stage.service.dto.StageDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/api/stages")
+@RequestMapping("/stages")
 public class StageController {
 
     private final StageService stageService;
@@ -22,35 +22,35 @@ public class StageController {
     }
 
     @GetMapping
-    public Page<Stage> getAllStages(Pageable pageable) {
+    public Page<StageDTO> getAllStages(Pageable pageable) {
         return stageService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Stage> getStage(@PathVariable Long id) {
+    public ResponseEntity<StageDTO> getStage(@PathVariable Long id) {
         return stageService.findOne(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Stage> createStage(@Valid @RequestBody Stage stage) throws URISyntaxException {
-        if (stage.getId() != null) {
+    public ResponseEntity<StageDTO> createStage(@Valid @RequestBody StageDTO stageDTO) throws URISyntaxException {
+        if (stageDTO.id() != null) {
             return ResponseEntity.badRequest().build();
         }
-        Stage result = stageService.save(stage);
-        return ResponseEntity.created(new URI("/api/stages/" + result.getId()))
+        StageDTO result = stageService.save(stageDTO);
+        return ResponseEntity.created(new URI("/stages/" + result.id()))
                 .body(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Stage> updateStage(
+    public ResponseEntity<StageDTO> updateStage(
             @PathVariable(value = "id", required = false) final Long id,
-            @Valid @RequestBody Stage stage) {
-        if (stage.getId() == null || !id.equals(stage.getId())) {
+            @Valid @RequestBody StageDTO stageDTO) {
+        if (stageDTO.id() == null || !id.equals(stageDTO.id())) {
             return ResponseEntity.badRequest().build();
         }
-        Stage result = stageService.save(stage);
+        StageDTO result = stageService.save(stageDTO);
         return ResponseEntity.ok()
                 .body(result);
     }

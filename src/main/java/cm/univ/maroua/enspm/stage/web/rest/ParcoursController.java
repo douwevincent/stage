@@ -1,7 +1,7 @@
 package cm.univ.maroua.enspm.stage.web.rest;
 
-import cm.univ.maroua.enspm.stage.domain.Parcours;
 import cm.univ.maroua.enspm.stage.service.ParcoursService;
+import cm.univ.maroua.enspm.stage.service.dto.ParcoursDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/api/parcours")
+@RequestMapping("/parcours")
 public class ParcoursController {
 
     private final ParcoursService parcoursService;
@@ -22,35 +22,36 @@ public class ParcoursController {
     }
 
     @GetMapping
-    public Page<Parcours> getAllParcours(Pageable pageable) {
+    public Page<ParcoursDTO> getAllParcours(Pageable pageable) {
         return parcoursService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Parcours> getParcours(@PathVariable Long id) {
+    public ResponseEntity<ParcoursDTO> getParcours(@PathVariable Long id) {
         return parcoursService.findOne(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Parcours> createParcours(@Valid @RequestBody Parcours parcours) throws URISyntaxException {
-        if (parcours.getId() != null) {
+    public ResponseEntity<ParcoursDTO> createParcours(@Valid @RequestBody ParcoursDTO parcoursDTO)
+            throws URISyntaxException {
+        if (parcoursDTO.id() != null) {
             return ResponseEntity.badRequest().build();
         }
-        Parcours result = parcoursService.save(parcours);
-        return ResponseEntity.created(new URI("/api/parcours/" + result.getId()))
+        ParcoursDTO result = parcoursService.save(parcoursDTO);
+        return ResponseEntity.created(new URI("/parcours/" + result.id()))
                 .body(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Parcours> updateParcours(
+    public ResponseEntity<ParcoursDTO> updateParcours(
             @PathVariable(value = "id", required = false) final Long id,
-            @Valid @RequestBody Parcours parcours) {
-        if (parcours.getId() == null || !id.equals(parcours.getId())) {
+            @Valid @RequestBody ParcoursDTO parcoursDTO) {
+        if (parcoursDTO.id() == null || !id.equals(parcoursDTO.id())) {
             return ResponseEntity.badRequest().build();
         }
-        Parcours result = parcoursService.save(parcours);
+        ParcoursDTO result = parcoursService.save(parcoursDTO);
         return ResponseEntity.ok()
                 .body(result);
     }

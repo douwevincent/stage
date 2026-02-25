@@ -1,7 +1,7 @@
 package cm.univ.maroua.enspm.stage.web.rest;
 
-import cm.univ.maroua.enspm.stage.domain.SessionEvaluation;
 import cm.univ.maroua.enspm.stage.service.SessionEvaluationService;
+import cm.univ.maroua.enspm.stage.service.dto.SessionEvaluationDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/api/session-evaluations")
+@RequestMapping("/session-evaluations")
 public class SessionEvaluationController {
 
     private final SessionEvaluationService sessionEvaluationService;
@@ -22,36 +22,36 @@ public class SessionEvaluationController {
     }
 
     @GetMapping
-    public Page<SessionEvaluation> getAllSessionEvaluations(Pageable pageable) {
+    public Page<SessionEvaluationDTO> getAllSessionEvaluations(Pageable pageable) {
         return sessionEvaluationService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SessionEvaluation> getSessionEvaluation(@PathVariable Long id) {
+    public ResponseEntity<SessionEvaluationDTO> getSessionEvaluation(@PathVariable Long id) {
         return sessionEvaluationService.findOne(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<SessionEvaluation> createSessionEvaluation(
-            @Valid @RequestBody SessionEvaluation sessionEvaluation) throws URISyntaxException {
-        if (sessionEvaluation.getId() != null) {
+    public ResponseEntity<SessionEvaluationDTO> createSessionEvaluation(
+            @Valid @RequestBody SessionEvaluationDTO sessionEvaluationDTO) throws URISyntaxException {
+        if (sessionEvaluationDTO.id() != null) {
             return ResponseEntity.badRequest().build();
         }
-        SessionEvaluation result = sessionEvaluationService.save(sessionEvaluation);
-        return ResponseEntity.created(new URI("/api/session-evaluations/" + result.getId()))
+        SessionEvaluationDTO result = sessionEvaluationService.save(sessionEvaluationDTO);
+        return ResponseEntity.created(new URI("/session-evaluations/" + result.id()))
                 .body(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SessionEvaluation> updateSessionEvaluation(
+    public ResponseEntity<SessionEvaluationDTO> updateSessionEvaluation(
             @PathVariable(value = "id", required = false) final Long id,
-            @Valid @RequestBody SessionEvaluation sessionEvaluation) {
-        if (sessionEvaluation.getId() == null || !id.equals(sessionEvaluation.getId())) {
+            @Valid @RequestBody SessionEvaluationDTO sessionEvaluationDTO) {
+        if (sessionEvaluationDTO.id() == null || !id.equals(sessionEvaluationDTO.id())) {
             return ResponseEntity.badRequest().build();
         }
-        SessionEvaluation result = sessionEvaluationService.save(sessionEvaluation);
+        SessionEvaluationDTO result = sessionEvaluationService.save(sessionEvaluationDTO);
         return ResponseEntity.ok()
                 .body(result);
     }

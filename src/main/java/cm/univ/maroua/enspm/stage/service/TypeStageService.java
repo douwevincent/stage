@@ -2,6 +2,8 @@ package cm.univ.maroua.enspm.stage.service;
 
 import cm.univ.maroua.enspm.stage.domain.TypeStage;
 import cm.univ.maroua.enspm.stage.repository.TypeStageRepository;
+import cm.univ.maroua.enspm.stage.service.dto.TypeStageDTO;
+import cm.univ.maroua.enspm.stage.service.mapper.TypeStageMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,21 +16,26 @@ import java.util.Optional;
 public class TypeStageService {
 
     private final TypeStageRepository typeStageRepository;
+    private final TypeStageMapper typeStageMapper;
 
-    public TypeStageService(TypeStageRepository typeStageRepository) {
+    public TypeStageService(TypeStageRepository typeStageRepository, TypeStageMapper typeStageMapper) {
         this.typeStageRepository = typeStageRepository;
+        this.typeStageMapper = typeStageMapper;
     }
 
-    public Page<TypeStage> findAll(Pageable pageable) {
-        return typeStageRepository.findAll(pageable);
+    public Page<TypeStageDTO> findAll(Pageable pageable) {
+        return typeStageRepository.findAll(pageable).map(typeStageMapper::toDto);
     }
 
-    public Optional<TypeStage> findOne(Long id) {
-        return typeStageRepository.findById(id);
+    @Transactional(readOnly = true)
+    public Optional<TypeStageDTO> findOne(Long id) {
+        return typeStageRepository.findById(id).map(typeStageMapper::toDto);
     }
 
-    public TypeStage save(TypeStage typeStage) {
-        return typeStageRepository.save(typeStage);
+    public TypeStageDTO save(TypeStageDTO typeStageDTO) {
+        TypeStage typeStage = typeStageMapper.toEntity(typeStageDTO);
+        typeStage = typeStageRepository.save(typeStage);
+        return typeStageMapper.toDto(typeStage);
     }
 
     public void delete(Long id) {

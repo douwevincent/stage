@@ -1,7 +1,7 @@
 package cm.univ.maroua.enspm.stage.web.rest;
 
-import cm.univ.maroua.enspm.stage.domain.Inscription;
 import cm.univ.maroua.enspm.stage.service.InscriptionService;
+import cm.univ.maroua.enspm.stage.service.dto.InscriptionDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/api/inscriptions")
+@RequestMapping("/inscriptions")
 public class InscriptionController {
 
     private final InscriptionService inscriptionService;
@@ -22,36 +22,36 @@ public class InscriptionController {
     }
 
     @GetMapping
-    public Page<Inscription> getAllInscriptions(Pageable pageable) {
+    public Page<InscriptionDTO> getAllInscriptions(Pageable pageable) {
         return inscriptionService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Inscription> getInscription(@PathVariable Long id) {
+    public ResponseEntity<InscriptionDTO> getInscription(@PathVariable Long id) {
         return inscriptionService.findOne(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Inscription> createInscription(@Valid @RequestBody Inscription inscription)
+    public ResponseEntity<InscriptionDTO> createInscription(@Valid @RequestBody InscriptionDTO inscriptionDTO)
             throws URISyntaxException {
-        if (inscription.getId() != null) {
+        if (inscriptionDTO.id() != null) {
             return ResponseEntity.badRequest().build();
         }
-        Inscription result = inscriptionService.save(inscription);
-        return ResponseEntity.created(new URI("/api/inscriptions/" + result.getId()))
+        InscriptionDTO result = inscriptionService.save(inscriptionDTO);
+        return ResponseEntity.created(new URI("/inscriptions/" + result.id()))
                 .body(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Inscription> updateInscription(
+    public ResponseEntity<InscriptionDTO> updateInscription(
             @PathVariable(value = "id", required = false) final Long id,
-            @Valid @RequestBody Inscription inscription) {
-        if (inscription.getId() == null || !id.equals(inscription.getId())) {
+            @Valid @RequestBody InscriptionDTO inscriptionDTO) {
+        if (inscriptionDTO.id() == null || !id.equals(inscriptionDTO.id())) {
             return ResponseEntity.badRequest().build();
         }
-        Inscription result = inscriptionService.save(inscription);
+        InscriptionDTO result = inscriptionService.save(inscriptionDTO);
         return ResponseEntity.ok()
                 .body(result);
     }

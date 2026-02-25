@@ -1,7 +1,7 @@
 package cm.univ.maroua.enspm.stage.web.rest;
 
-import cm.univ.maroua.enspm.stage.domain.Specialite;
 import cm.univ.maroua.enspm.stage.service.SpecialiteService;
+import cm.univ.maroua.enspm.stage.service.dto.SpecialiteDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/api/specialites")
+@RequestMapping("/specialites")
 public class SpecialiteController {
 
     private final SpecialiteService specialiteService;
@@ -22,36 +22,36 @@ public class SpecialiteController {
     }
 
     @GetMapping
-    public Page<Specialite> getAllSpecialites(Pageable pageable) {
+    public Page<SpecialiteDTO> getAllSpecialites(Pageable pageable) {
         return specialiteService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Specialite> getSpecialite(@PathVariable Long id) {
+    public ResponseEntity<SpecialiteDTO> getSpecialite(@PathVariable Long id) {
         return specialiteService.findOne(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Specialite> createSpecialite(@Valid @RequestBody Specialite specialite)
+    public ResponseEntity<SpecialiteDTO> createSpecialite(@Valid @RequestBody SpecialiteDTO specialiteDTO)
             throws URISyntaxException {
-        if (specialite.getId() != null) {
+        if (specialiteDTO.id() != null) {
             return ResponseEntity.badRequest().build();
         }
-        Specialite result = specialiteService.save(specialite);
-        return ResponseEntity.created(new URI("/api/specialites/" + result.getId()))
+        SpecialiteDTO result = specialiteService.save(specialiteDTO);
+        return ResponseEntity.created(new URI("/specialites/" + result.id()))
                 .body(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Specialite> updateSpecialite(
+    public ResponseEntity<SpecialiteDTO> updateSpecialite(
             @PathVariable(value = "id", required = false) final Long id,
-            @Valid @RequestBody Specialite specialite) {
-        if (specialite.getId() == null || !id.equals(specialite.getId())) {
+            @Valid @RequestBody SpecialiteDTO specialiteDTO) {
+        if (specialiteDTO.id() == null || !id.equals(specialiteDTO.id())) {
             return ResponseEntity.badRequest().build();
         }
-        Specialite result = specialiteService.save(specialite);
+        SpecialiteDTO result = specialiteService.save(specialiteDTO);
         return ResponseEntity.ok()
                 .body(result);
     }

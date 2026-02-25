@@ -1,7 +1,7 @@
 package cm.univ.maroua.enspm.stage.web.rest;
 
-import cm.univ.maroua.enspm.stage.domain.TypeStage;
 import cm.univ.maroua.enspm.stage.service.TypeStageService;
+import cm.univ.maroua.enspm.stage.service.dto.TypeStageDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/api/type-stages")
+@RequestMapping("/type-stages")
 public class TypeStageController {
 
     private final TypeStageService typeStageService;
@@ -22,36 +22,36 @@ public class TypeStageController {
     }
 
     @GetMapping
-    public Page<TypeStage> getAllTypeStages(Pageable pageable) {
+    public Page<TypeStageDTO> getAllTypeStages(Pageable pageable) {
         return typeStageService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TypeStage> getTypeStage(@PathVariable Long id) {
+    public ResponseEntity<TypeStageDTO> getTypeStage(@PathVariable Long id) {
         return typeStageService.findOne(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<TypeStage> createTypeStage(@Valid @RequestBody TypeStage typeStage)
+    public ResponseEntity<TypeStageDTO> createTypeStage(@Valid @RequestBody TypeStageDTO typeStageDTO)
             throws URISyntaxException {
-        if (typeStage.getId() != null) {
+        if (typeStageDTO.id() != null) {
             return ResponseEntity.badRequest().build();
         }
-        TypeStage result = typeStageService.save(typeStage);
-        return ResponseEntity.created(new URI("/api/type-stages/" + result.getId()))
+        TypeStageDTO result = typeStageService.save(typeStageDTO);
+        return ResponseEntity.created(new URI("/type-stages/" + result.id()))
                 .body(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TypeStage> updateTypeStage(
+    public ResponseEntity<TypeStageDTO> updateTypeStage(
             @PathVariable(value = "id", required = false) final Long id,
-            @Valid @RequestBody TypeStage typeStage) {
-        if (typeStage.getId() == null || !id.equals(typeStage.getId())) {
+            @Valid @RequestBody TypeStageDTO typeStageDTO) {
+        if (typeStageDTO.id() == null || !id.equals(typeStageDTO.id())) {
             return ResponseEntity.badRequest().build();
         }
-        TypeStage result = typeStageService.save(typeStage);
+        TypeStageDTO result = typeStageService.save(typeStageDTO);
         return ResponseEntity.ok()
                 .body(result);
     }

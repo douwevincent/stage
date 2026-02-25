@@ -2,6 +2,8 @@ package cm.univ.maroua.enspm.stage.service;
 
 import cm.univ.maroua.enspm.stage.domain.Localite;
 import cm.univ.maroua.enspm.stage.repository.LocaliteRepository;
+import cm.univ.maroua.enspm.stage.service.dto.LocaliteDTO;
+import cm.univ.maroua.enspm.stage.service.mapper.LocaliteMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,21 +16,26 @@ import java.util.Optional;
 public class LocaliteService {
 
     private final LocaliteRepository localiteRepository;
+    private final LocaliteMapper localiteMapper;
 
-    public LocaliteService(LocaliteRepository localiteRepository) {
+    public LocaliteService(LocaliteRepository localiteRepository, LocaliteMapper localiteMapper) {
         this.localiteRepository = localiteRepository;
+        this.localiteMapper = localiteMapper;
     }
 
-    public Page<Localite> findAll(Pageable pageable) {
-        return localiteRepository.findAll(pageable);
+    public Page<LocaliteDTO> findAll(Pageable pageable) {
+        return localiteRepository.findAll(pageable).map(localiteMapper::toDto);
     }
 
-    public Optional<Localite> findOne(Long id) {
-        return localiteRepository.findById(id);
+    @Transactional(readOnly = true)
+    public Optional<LocaliteDTO> findOne(Long id) {
+        return localiteRepository.findById(id).map(localiteMapper::toDto);
     }
 
-    public Localite save(Localite localite) {
-        return localiteRepository.save(localite);
+    public LocaliteDTO save(LocaliteDTO localiteDTO) {
+        Localite localite = localiteMapper.toEntity(localiteDTO);
+        localite = localiteRepository.save(localite);
+        return localiteMapper.toDto(localite);
     }
 
     public void delete(Long id) {

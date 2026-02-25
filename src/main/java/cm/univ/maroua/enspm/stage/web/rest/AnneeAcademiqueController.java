@@ -1,7 +1,7 @@
 package cm.univ.maroua.enspm.stage.web.rest;
 
-import cm.univ.maroua.enspm.stage.domain.AnneeAcademique;
 import cm.univ.maroua.enspm.stage.service.AnneeAcademiqueService;
+import cm.univ.maroua.enspm.stage.service.dto.AnneeAcademiqueDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/api/annee-academiques")
+@RequestMapping("/annee-academiques")
 public class AnneeAcademiqueController {
 
     private final AnneeAcademiqueService anneeAcademiqueService;
@@ -22,36 +22,37 @@ public class AnneeAcademiqueController {
     }
 
     @GetMapping
-    public Page<AnneeAcademique> getAllAnneeAcademiques(Pageable pageable) {
+    public Page<AnneeAcademiqueDTO> getAllAnneeAcademiques(Pageable pageable) {
         return anneeAcademiqueService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AnneeAcademique> getAnneeAcademique(@PathVariable Long id) {
+    public ResponseEntity<AnneeAcademiqueDTO> getAnneeAcademique(@PathVariable Long id) {
         return anneeAcademiqueService.findOne(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<AnneeAcademique> createAnneeAcademique(@Valid @RequestBody AnneeAcademique anneeAcademique)
+    public ResponseEntity<AnneeAcademiqueDTO> createAnneeAcademique(
+            @Valid @RequestBody AnneeAcademiqueDTO anneeAcademiqueDTO)
             throws URISyntaxException {
-        if (anneeAcademique.getId() != null) {
+        if (anneeAcademiqueDTO.id() != null) {
             return ResponseEntity.badRequest().build();
         }
-        AnneeAcademique result = anneeAcademiqueService.save(anneeAcademique);
-        return ResponseEntity.created(new URI("/api/annee-academiques/" + result.getId()))
+        AnneeAcademiqueDTO result = anneeAcademiqueService.save(anneeAcademiqueDTO);
+        return ResponseEntity.created(new URI("/annee-academiques/" + result.id()))
                 .body(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AnneeAcademique> updateAnneeAcademique(
+    public ResponseEntity<AnneeAcademiqueDTO> updateAnneeAcademique(
             @PathVariable(value = "id", required = false) final Long id,
-            @Valid @RequestBody AnneeAcademique anneeAcademique) {
-        if (anneeAcademique.getId() == null || !id.equals(anneeAcademique.getId())) {
+            @Valid @RequestBody AnneeAcademiqueDTO anneeAcademiqueDTO) {
+        if (anneeAcademiqueDTO.id() == null || !id.equals(anneeAcademiqueDTO.id())) {
             return ResponseEntity.badRequest().build();
         }
-        AnneeAcademique result = anneeAcademiqueService.save(anneeAcademique);
+        AnneeAcademiqueDTO result = anneeAcademiqueService.save(anneeAcademiqueDTO);
         return ResponseEntity.ok()
                 .body(result);
     }

@@ -2,6 +2,8 @@ package cm.univ.maroua.enspm.stage.service;
 
 import cm.univ.maroua.enspm.stage.domain.PeriodeStage;
 import cm.univ.maroua.enspm.stage.repository.PeriodeStageRepository;
+import cm.univ.maroua.enspm.stage.service.dto.PeriodeStageDTO;
+import cm.univ.maroua.enspm.stage.service.mapper.PeriodeStageMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,21 +16,26 @@ import java.util.Optional;
 public class PeriodeStageService {
 
     private final PeriodeStageRepository periodeStageRepository;
+    private final PeriodeStageMapper periodeStageMapper;
 
-    public PeriodeStageService(PeriodeStageRepository periodeStageRepository) {
+    public PeriodeStageService(PeriodeStageRepository periodeStageRepository, PeriodeStageMapper periodeStageMapper) {
         this.periodeStageRepository = periodeStageRepository;
+        this.periodeStageMapper = periodeStageMapper;
     }
 
-    public Page<PeriodeStage> findAll(Pageable pageable) {
-        return periodeStageRepository.findAll(pageable);
+    public Page<PeriodeStageDTO> findAll(Pageable pageable) {
+        return periodeStageRepository.findAll(pageable).map(periodeStageMapper::toDto);
     }
 
-    public Optional<PeriodeStage> findOne(Long id) {
-        return periodeStageRepository.findById(id);
+    @Transactional(readOnly = true)
+    public Optional<PeriodeStageDTO> findOne(Long id) {
+        return periodeStageRepository.findById(id).map(periodeStageMapper::toDto);
     }
 
-    public PeriodeStage save(PeriodeStage periodeStage) {
-        return periodeStageRepository.save(periodeStage);
+    public PeriodeStageDTO save(PeriodeStageDTO periodeStageDTO) {
+        PeriodeStage periodeStage = periodeStageMapper.toEntity(periodeStageDTO);
+        periodeStage = periodeStageRepository.save(periodeStage);
+        return periodeStageMapper.toDto(periodeStage);
     }
 
     public void delete(Long id) {

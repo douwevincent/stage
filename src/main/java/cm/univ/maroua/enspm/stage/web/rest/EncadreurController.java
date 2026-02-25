@@ -1,7 +1,7 @@
 package cm.univ.maroua.enspm.stage.web.rest;
 
-import cm.univ.maroua.enspm.stage.domain.Encadreur;
 import cm.univ.maroua.enspm.stage.service.EncadreurService;
+import cm.univ.maroua.enspm.stage.service.dto.EncadreurDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/api/encadreurs")
+@RequestMapping("/encadreurs")
 public class EncadreurController {
 
     private final EncadreurService encadreurService;
@@ -22,36 +22,36 @@ public class EncadreurController {
     }
 
     @GetMapping
-    public Page<Encadreur> getAllEncadreurs(Pageable pageable) {
+    public Page<EncadreurDTO> getAllEncadreurs(Pageable pageable) {
         return encadreurService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Encadreur> getEncadreur(@PathVariable Long id) {
+    public ResponseEntity<EncadreurDTO> getEncadreur(@PathVariable Long id) {
         return encadreurService.findOne(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Encadreur> createEncadreur(@Valid @RequestBody Encadreur encadreur)
+    public ResponseEntity<EncadreurDTO> createEncadreur(@Valid @RequestBody EncadreurDTO encadreurDTO)
             throws URISyntaxException {
-        if (encadreur.getId() != null) {
+        if (encadreurDTO.id() != null) {
             return ResponseEntity.badRequest().build();
         }
-        Encadreur result = encadreurService.save(encadreur);
-        return ResponseEntity.created(new URI("/api/encadreurs/" + result.getId()))
+        EncadreurDTO result = encadreurService.save(encadreurDTO);
+        return ResponseEntity.created(new URI("/encadreurs/" + result.id()))
                 .body(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Encadreur> updateEncadreur(
+    public ResponseEntity<EncadreurDTO> updateEncadreur(
             @PathVariable(value = "id", required = false) final Long id,
-            @Valid @RequestBody Encadreur encadreur) {
-        if (encadreur.getId() == null || !id.equals(encadreur.getId())) {
+            @Valid @RequestBody EncadreurDTO encadreurDTO) {
+        if (encadreurDTO.id() == null || !id.equals(encadreurDTO.id())) {
             return ResponseEntity.badRequest().build();
         }
-        Encadreur result = encadreurService.save(encadreur);
+        EncadreurDTO result = encadreurService.save(encadreurDTO);
         return ResponseEntity.ok()
                 .body(result);
     }

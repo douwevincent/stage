@@ -1,7 +1,7 @@
 package cm.univ.maroua.enspm.stage.web.rest;
 
-import cm.univ.maroua.enspm.stage.domain.Departement;
 import cm.univ.maroua.enspm.stage.service.DepartementService;
+import cm.univ.maroua.enspm.stage.service.dto.DepartementDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/api/departements")
+@RequestMapping("/departements")
 public class DepartementController {
 
     private final DepartementService departementService;
@@ -22,36 +22,36 @@ public class DepartementController {
     }
 
     @GetMapping
-    public Page<Departement> getAllDepartements(Pageable pageable) {
+    public Page<DepartementDTO> getAllDepartements(Pageable pageable) {
         return departementService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Departement> getDepartement(@PathVariable Long id) {
+    public ResponseEntity<DepartementDTO> getDepartement(@PathVariable Long id) {
         return departementService.findOne(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Departement> createDepartement(@Valid @RequestBody Departement departement)
+    public ResponseEntity<DepartementDTO> createDepartement(@Valid @RequestBody DepartementDTO departementDTO)
             throws URISyntaxException {
-        if (departement.getId() != null) {
+        if (departementDTO.id() != null) {
             return ResponseEntity.badRequest().build();
         }
-        Departement result = departementService.save(departement);
-        return ResponseEntity.created(new URI("/api/departements/" + result.getId()))
+        DepartementDTO result = departementService.save(departementDTO);
+        return ResponseEntity.created(new URI("/departements/" + result.id()))
                 .body(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Departement> updateDepartement(
+    public ResponseEntity<DepartementDTO> updateDepartement(
             @PathVariable(value = "id", required = false) final Long id,
-            @Valid @RequestBody Departement departement) {
-        if (departement.getId() == null || !id.equals(departement.getId())) {
+            @Valid @RequestBody DepartementDTO departementDTO) {
+        if (departementDTO.id() == null || !id.equals(departementDTO.id())) {
             return ResponseEntity.badRequest().build();
         }
-        Departement result = departementService.save(departement);
+        DepartementDTO result = departementService.save(departementDTO);
         return ResponseEntity.ok()
                 .body(result);
     }

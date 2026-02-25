@@ -1,7 +1,7 @@
 package cm.univ.maroua.enspm.stage.web.rest;
 
-import cm.univ.maroua.enspm.stage.domain.Etudiant;
 import cm.univ.maroua.enspm.stage.service.EtudiantService;
+import cm.univ.maroua.enspm.stage.service.dto.EtudiantDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/api/etudiants")
+@RequestMapping("/etudiants")
 public class EtudiantController {
 
     private final EtudiantService etudiantService;
@@ -22,35 +22,36 @@ public class EtudiantController {
     }
 
     @GetMapping
-    public Page<Etudiant> getAllEtudiants(Pageable pageable) {
+    public Page<EtudiantDTO> getAllEtudiants(Pageable pageable) {
         return etudiantService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Etudiant> getEtudiant(@PathVariable Long id) {
+    public ResponseEntity<EtudiantDTO> getEtudiant(@PathVariable Long id) {
         return etudiantService.findOne(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Etudiant> createEtudiant(@Valid @RequestBody Etudiant etudiant) throws URISyntaxException {
-        if (etudiant.getId() != null) {
+    public ResponseEntity<EtudiantDTO> createEtudiant(@Valid @RequestBody EtudiantDTO etudiantDTO)
+            throws URISyntaxException {
+        if (etudiantDTO.id() != null) {
             return ResponseEntity.badRequest().build();
         }
-        Etudiant result = etudiantService.save(etudiant);
-        return ResponseEntity.created(new URI("/api/etudiants/" + result.getId()))
+        EtudiantDTO result = etudiantService.save(etudiantDTO);
+        return ResponseEntity.created(new URI("/etudiants/" + result.id()))
                 .body(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Etudiant> updateEtudiant(
+    public ResponseEntity<EtudiantDTO> updateEtudiant(
             @PathVariable(value = "id", required = false) final Long id,
-            @Valid @RequestBody Etudiant etudiant) {
-        if (etudiant.getId() == null || !id.equals(etudiant.getId())) {
+            @Valid @RequestBody EtudiantDTO etudiantDTO) {
+        if (etudiantDTO.id() == null || !id.equals(etudiantDTO.id())) {
             return ResponseEntity.badRequest().build();
         }
-        Etudiant result = etudiantService.save(etudiant);
+        EtudiantDTO result = etudiantService.save(etudiantDTO);
         return ResponseEntity.ok()
                 .body(result);
     }

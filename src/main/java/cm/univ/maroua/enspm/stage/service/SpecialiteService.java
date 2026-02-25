@@ -2,6 +2,8 @@ package cm.univ.maroua.enspm.stage.service;
 
 import cm.univ.maroua.enspm.stage.domain.Specialite;
 import cm.univ.maroua.enspm.stage.repository.SpecialiteRepository;
+import cm.univ.maroua.enspm.stage.service.dto.SpecialiteDTO;
+import cm.univ.maroua.enspm.stage.service.mapper.SpecialiteMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,21 +16,26 @@ import java.util.Optional;
 public class SpecialiteService {
 
     private final SpecialiteRepository specialiteRepository;
+    private final SpecialiteMapper specialiteMapper;
 
-    public SpecialiteService(SpecialiteRepository specialiteRepository) {
+    public SpecialiteService(SpecialiteRepository specialiteRepository, SpecialiteMapper specialiteMapper) {
         this.specialiteRepository = specialiteRepository;
+        this.specialiteMapper = specialiteMapper;
     }
 
-    public Page<Specialite> findAll(Pageable pageable) {
-        return specialiteRepository.findAll(pageable);
+    public Page<SpecialiteDTO> findAll(Pageable pageable) {
+        return specialiteRepository.findAll(pageable).map(specialiteMapper::toDto);
     }
 
-    public Optional<Specialite> findOne(Long id) {
-        return specialiteRepository.findById(id);
+    @Transactional(readOnly = true)
+    public Optional<SpecialiteDTO> findOne(Long id) {
+        return specialiteRepository.findById(id).map(specialiteMapper::toDto);
     }
 
-    public Specialite save(Specialite specialite) {
-        return specialiteRepository.save(specialite);
+    public SpecialiteDTO save(SpecialiteDTO specialiteDTO) {
+        Specialite specialite = specialiteMapper.toEntity(specialiteDTO);
+        specialite = specialiteRepository.save(specialite);
+        return specialiteMapper.toDto(specialite);
     }
 
     public void delete(Long id) {
