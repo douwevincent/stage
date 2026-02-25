@@ -3,12 +3,13 @@ package cm.univ.maroua.enspm.stage.web.rest;
 import cm.univ.maroua.enspm.stage.domain.Etudiant;
 import cm.univ.maroua.enspm.stage.service.EtudiantService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/etudiants")
@@ -21,8 +22,8 @@ public class EtudiantController {
     }
 
     @GetMapping
-    public List<Etudiant> getAllEtudiants() {
-        return etudiantService.findAll();
+    public Page<Etudiant> getAllEtudiants(Pageable pageable) {
+        return etudiantService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
