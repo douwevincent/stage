@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 @Entity
@@ -16,7 +17,11 @@ public class Departement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nom;
+    @NotBlank
+    @Column(unique = true, nullable = false)
+    private String code;
+
+    private String intitule;
 
     @OneToMany(mappedBy = "departement")
     private List<Specialite> specialites;

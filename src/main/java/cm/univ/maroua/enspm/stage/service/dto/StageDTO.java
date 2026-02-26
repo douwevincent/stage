@@ -4,13 +4,13 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 public record StageDTO(
-        Long id,
-        EtudiantDTO etudiant,
-        LocaliteDTO localite,
-        EncadreurDTO encadreur,
-        TypeStageDTO typeStage,
-        LocalDate dateDebut,
-        LocalDate dateFin,
-        AnneeAcademiqueDTO anneeAcademique,
-        SessionEvaluationDTO sessionEvaluation) implements Serializable {
+                Long id,
+                Long etudiantId,
+                Long localiteId,
+                Long encadreurId,
+                Long typeStageId,
+                LocalDate dateDebut,
+                LocalDate dateFin,
+                Long anneeAcademiqueId,
+                Long sessionEvaluationId) implements Serializable {
 }

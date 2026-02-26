@@ -17,7 +17,11 @@ public class Specialite {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nom;
+    @Column(unique = true, nullable = false)
+    @jakarta.validation.constraints.NotBlank
+    private String code;
+
+    private String intitule;
 
     @NotNull
     @ManyToOne
