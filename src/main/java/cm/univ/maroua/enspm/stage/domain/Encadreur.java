@@ -19,7 +19,8 @@ public class Encadreur {
 
     @NotNull
     private String nom;
-    private String prenom;
+
+    private String telephone;
 
     @NotNull
     private String email;
