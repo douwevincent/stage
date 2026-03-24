@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stage Manager | ENSPM Maroua</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Google Fonts: Manrope & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i data-lucide="layers" class="logo-icon"></i>
+                    <span class="logo-text">Stage Manager</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" title="Tableau de Bord">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Tableau de Bord</span>
+                </a>
+                <a href="#" class="nav-item" title="Départements">
+                    <i data-lucide="building-2"></i>
+                    <span>Départements</span>
+                </a>
+                <a href="#" class="nav-item" title="Spécialités">
+                    <i data-lucide="graduation-cap"></i>
+                    <span>Spécialités</span>
+                </a>
+                <a href="#" class="nav-item" title="Étudiants">
+                    <i data-lucide="users"></i>
+                    <span>Étudiants</span>
+                </a>
+                <a href="#" class="nav-item" title="Stages">
+                    <i data-lucide="briefcase"></i>
+                    <span>Stages</span>
+                </a>
+                <a href="#" class="nav-item" title="Entreprises">
+                    <i data-lucide="factory"></i>
+                    <span>Entreprises</span>
+                </a>
+                <a href="#" class="nav-item" title="Années Académiques">
+                    <i data-lucide="calendar"></i>
+                    <span>Années Académiques</span>
+                </a>
+                <a href="#" class="nav-item" title="Notes">
+                    <i data-lucide="scroll-text"></i>
+                    <span>Notes</span>
+                </a>
+                <div class="nav-divider"></div>
+                <a href="#" class="nav-item" title="Paramètres">
+                    <i data-lucide="settings"></i>
+                    <span>Paramètres</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <button class="icon-button" id="sidebar-toggle" aria-label="Toggle Sidebar">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div class="search-bar">
+                        <i data-lucide="search"></i>
+                        <input type="text" placeholder="Rechercher...">
+                    </div>
+                </div>
+                
+                <div class="header-right">
+                    <button class="icon-button" id="theme-toggle" aria-label="Toggle Theme">
+                        <i data-lucide="sun" class="sun-icon"></i>
+                        <i data-lucide="moon" class="moon-icon"></i>
+                    </button>
+                    <button class="icon-button notification-button">
+                        <i data-lucide="bell"></i>
+                        <span class="notification-badge"></span>
+                    </button>
+                    <div class="user-profile">
+                        <img src="https://ui-avatars.com/api/?name=Sarah&background=06b6d4&color=fff" alt="Sarah" class="user-avatar">
+                        <div class="user-info">
+                            <span class="user-name">Sarah</span>
+                            <span class="user-role">Admin</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-viewport">
+                <div class="welcome-section">
+                    <h1>Bienvenue, Sarah !</h1>
+                    <p>Voici un aperçu de l'activité du système aujourd'hui.</p>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon students">
+                            <i data-lucide="users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Étudiants</h3>
+                            <div class="stat-value">1,200</div>
+                            <div class="stat-trend up">
+                                <i data-lucide="trending-up"></i>
+                                <span>+12%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon stages">
+                            <i data-lucide="briefcase"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Stages Actifs</h3>
+                            <div class="stat-value">450</div>
+                            <div class="stat-badge info">En cours</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon empresas">
+                            <i data-lucide="factory"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Entreprises</h3>
+                            <div class="stat-value">150</div>
+                            <div class="stat-badge global">Global</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon alerts">
+                            <i data-lucide="alert-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>En Attente</h3>
+                            <div class="stat-value">85</div>
+                            <div class="stat-badge warning">Action requise</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-section">
+                    <div class="chart-card large">
+                        <div class="card-header">
+                            <h2>Évolution des Stages</h2>
+                            <button class="text-button">Voir détails</button>
+                        </div>
+                        <div class="chart-placeholder">
+                            <div class="mock-line-chart"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card small">
+                        <div class="card-header">
+                            <h2>Par Département</h2>
+                        </div>
+                        <div class="chart-placeholder">
+                            <div class="mock-bar-chart">
+                                <div class="bar" style="height: 80%" title="Informatique"></div>
+                                <div class="bar" style="height: 40%" title="Génie Civil"></div>
+                                <div class="bar" style="height: 30%" title="Électronique"></div>
+                                <div class="bar" style="height: 55%" title="Marketing"></div>
+                            </div>
+                        </div>
+                        <button class="primary-button full-width">Rapport détaillé</button>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="activity-section">
+                    <div class="card-header">
+                        <h2>Dernières Activités</h2>
+                    </div>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <div class="activity-icon info">
+                                <i data-lucide="file-check"></i>
+                            </div>
+                            <div class="activity-info">
+                                <p><strong>Convention signée</strong> - Lucas Martin</p>
+                                <span>Département Informatique • Il y a 2 heures</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon success">
+                                <i data-lucide="plus-circle"></i>
+                            </div>
+                            <div class="activity-info">
+                                <p><strong>Nouveau partenaire</strong> : TechFlux Solutions</p>
+                                <span>Vérification complétée • Il y a 5 heures</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <footer class="footer">
+                <p>&copy; 2026 ENSPM Stage Manager. Tous droits réservés.</p>
+            </footer>
+        </main>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
