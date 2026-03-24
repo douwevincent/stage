@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/session-evaluations")
+@RequestMapping("/api/v1/session-evaluations")
 public class SessionEvaluationController {
 
     private final SessionEvaluationService sessionEvaluationService;

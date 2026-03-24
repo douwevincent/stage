@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/encadreurs")
+@RequestMapping("/api/v1/encadreurs")
 public class EncadreurController {
 
     private final EncadreurService encadreurService;

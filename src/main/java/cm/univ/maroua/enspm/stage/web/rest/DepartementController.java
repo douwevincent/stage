@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/departements")
+@RequestMapping("/api/v1/departements")
 public class DepartementController {
 
     private final DepartementService departementService;

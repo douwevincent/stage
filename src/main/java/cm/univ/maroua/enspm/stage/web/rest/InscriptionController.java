@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/inscriptions")
+@RequestMapping("/api/v1/inscriptions")
 public class InscriptionController {
 
     private final InscriptionService inscriptionService;

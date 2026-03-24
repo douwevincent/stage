@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/criteres")
+@RequestMapping("/api/v1/criteres")
 public class CritereController {
 
     private final CritereService critereService;

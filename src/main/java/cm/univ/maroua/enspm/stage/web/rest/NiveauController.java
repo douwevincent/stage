@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/niveaus")
+@RequestMapping("/api/v1/niveaus")
 public class NiveauController {
 
     private final NiveauService niveauService;

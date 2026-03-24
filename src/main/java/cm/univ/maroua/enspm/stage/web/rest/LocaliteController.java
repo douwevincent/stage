@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/localites")
+@RequestMapping("/api/v1/localites")
 public class LocaliteController {
 
     private final LocaliteService localiteService;

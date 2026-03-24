@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/parcours")
+@RequestMapping("/api/v1/parcours")
 public class ParcoursController {
 
     private final ParcoursService parcoursService;

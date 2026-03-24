@@ -12,7 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/annee-academiques")
+@RequestMapping("/api/v1/annee-academiques")
 public class AnneeAcademiqueController {
 
     private final AnneeAcademiqueService anneeAcademiqueService;
