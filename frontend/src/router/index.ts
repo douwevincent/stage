@@ -34,6 +34,21 @@ const router = createRouter({
       name: 'stages',
       component: () => import('@/views/stages/StageList.vue'),
     },
+    {
+      path: '/annees-academiques',
+      name: 'annees-academiques',
+      component: () => import('@/views/annees-academiques/AnneeAcademiqueList.vue'),
+    },
+    {
+      path: '/niveaux',
+      name: 'niveaux',
+      component: () => import('@/views/niveaux/NiveauList.vue'),
+    },
+    {
+      path: '/type-stages',
+      name: 'type-stages',
+      component: () => import('@/views/type-stages/TypeStageList.vue'),
+    },
   ],
 })
 

@@ -5,7 +5,9 @@ import cm.univ.maroua.enspm.stage.repository.EntrepriseRepository;
 import cm.univ.maroua.enspm.stage.service.dto.EntrepriseDTO;
 import cm.univ.maroua.enspm.stage.service.mapper.EntrepriseMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +26,8 @@ public class EntrepriseService {
     }
 
     public Page<EntrepriseDTO> findAll(Pageable pageable) {
-        return entrepriseRepository.findAll(pageable).map(entrepriseMapper::toDto);
+        Pageable pg = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("nom"));
+        return entrepriseRepository.findAll(pg).map(entrepriseMapper::toDto);
     }
 
     @Transactional(readOnly = true)

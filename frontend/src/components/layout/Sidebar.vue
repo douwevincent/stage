@@ -14,7 +14,9 @@ import {
   Calendar,
   ScrollText,
   Settings,
-  Layers
+  Layers,
+  School,
+  Tags
 } from 'lucide-vue-next'
 
 const props = defineProps<{
@@ -57,9 +59,19 @@ const menuOptions: MenuOption[] = [
     icon: renderIcon(Factory)
   },
   {
-    label: 'Années Académiques',
-    key: 'annees',
+    label: () => h(RouterLink, { to: { name: 'annees-academiques' } }, { default: () => 'Années Académiques' }),
+    key: 'annees-academiques',
     icon: renderIcon(Calendar)
+  },
+  {
+    label: () => h(RouterLink, { to: { name: 'niveaux' } }, { default: () => 'Niveaux' }),
+    key: 'niveaux',
+    icon: renderIcon(School)
+  },
+  {
+    label: () => h(RouterLink, { to: { name: 'type-stages' } }, { default: () => 'Types de Stage' }),
+    key: 'type-stages',
+    icon: renderIcon(Tags)
   },
   {
     label: 'Notes',

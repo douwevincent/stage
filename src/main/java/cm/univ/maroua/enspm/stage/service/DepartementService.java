@@ -5,7 +5,9 @@ import cm.univ.maroua.enspm.stage.repository.DepartementRepository;
 import cm.univ.maroua.enspm.stage.service.dto.DepartementDTO;
 import cm.univ.maroua.enspm.stage.service.mapper.DepartementMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +26,8 @@ public class DepartementService {
     }
 
     public Page<DepartementDTO> findAll(Pageable pageable) {
-        return departementRepository.findAll(pageable).map(departementMapper::toDto);
+        Pageable pg = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("code"));
+        return departementRepository.findAll(pg).map(departementMapper::toDto);
     }
 
     @Transactional(readOnly = true)

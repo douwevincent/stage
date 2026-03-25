@@ -4,8 +4,11 @@ import cm.univ.maroua.enspm.stage.domain.Specialite;
 import cm.univ.maroua.enspm.stage.repository.SpecialiteRepository;
 import cm.univ.maroua.enspm.stage.service.dto.SpecialiteDTO;
 import cm.univ.maroua.enspm.stage.service.mapper.SpecialiteMapper;
+
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,10 +27,12 @@ public class SpecialiteService {
     }
 
     public Page<SpecialiteDTO> findAll(Long departementId, Pageable pageable) {
+        Pageable pg = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                Sort.by("departement.code", "code"));
         if (departementId != null) {
-            return specialiteRepository.findAllByDepartementId(departementId, pageable).map(specialiteMapper::toDto);
+            return specialiteRepository.findAllByDepartementId(departementId, pg).map(specialiteMapper::toDto);
         }
-        return specialiteRepository.findAll(pageable).map(specialiteMapper::toDto);
+        return specialiteRepository.findAll(pg).map(specialiteMapper::toDto);
     }
 
     @Transactional(readOnly = true)
