@@ -65,14 +65,14 @@ const toggleSidebar = () => {
           <div class="app-container flex min-h-screen bg-app-light dark:bg-app-dark font-inter transition-colors duration-300">
             <Sidebar :collapsed="collapsed" />
             <div 
-              class="flex-1 flex flex-col min-w-0 transition-all duration-300"
+              class="flex-1 flex flex-col min-w-0 w-full transition-all duration-300"
               :style="{ marginLeft: collapsed ? '80px' : '280px' }"
             >
-              <Header :is-dark="isDark" @toggle-theme="toggleTheme" @toggle-sidebar="toggleSidebar" />
-              <main class="flex-1 p-8 overflow-y-auto">
+              <Header class="w-full" :is-dark="isDark" @toggle-theme="toggleTheme" @toggle-sidebar="toggleSidebar" />
+              <main class="flex-1 w-full p-8 overflow-y-auto">
                 <RouterView />
               </main>
-              <footer class="p-6 text-center border-t border-gray-100 dark:border-gray-800 text-gray-500 text-sm">
+              <footer class="w-full p-6 text-center border-t border-gray-100 dark:border-gray-800 text-gray-500 text-sm">
                 <p>&copy; 2026 ENSPM Stage Manager. Tous droits réservés.</p>
               </footer>
             </div>
@@ -93,4 +93,5 @@ const toggleSidebar = () => {
 h1, h2, h3 {
   font-family: 'Manrope', sans-serif;
 }
+
 </style>
