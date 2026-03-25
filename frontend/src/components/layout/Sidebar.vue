@@ -32,12 +32,12 @@ const menuOptions: MenuOption[] = [
     icon: renderIcon(LayoutDashboard)
   },
   {
-    label: 'Départements',
+    label: () => h(RouterLink, { to: { name: 'departements' } }, { default: () => 'Départements' }),
     key: 'departements',
     icon: renderIcon(Building2)
   },
   {
-    label: 'Spécialités',
+    label: () => h(RouterLink, { to: { name: 'specialites' } }, { default: () => 'Spécialités' }),
     key: 'specialites',
     icon: renderIcon(GraduationCap)
   },

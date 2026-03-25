@@ -20,6 +20,16 @@ const router = createRouter({
       component: () => import('@/views/entreprises/EntrepriseList.vue'),
     },
     {
+      path: '/departements',
+      name: 'departements',
+      component: () => import('@/views/departements/DepartementList.vue'),
+    },
+    {
+      path: '/specialites',
+      name: 'specialites',
+      component: () => import('@/views/specialites/SpecialiteList.vue'),
+    },
+    {
       path: '/stages',
       name: 'stages',
       component: () => import('@/views/stages/StageList.vue'),

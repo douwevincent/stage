@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { 
   NCard, NDataTable, NButton, NSpace, NInput, NIcon, NTooltip, NPopconfirm, 
-  NModal, NForm, NFormItem, useMessage 
+  NModal, NForm, NFormItem, useMessage, NSelect
 } from 'naive-ui'
 import type { FormInst, FormRules, DataTableColumns } from 'naive-ui'
-import { PlusOutlined, SearchOutlined } from '@vicons/antd'
+import { PlusOutlined } from '@vicons/antd'
 import { Edit, Trash2 } from 'lucide-vue-next'
-import { ref, h, onMounted, computed, reactive } from 'vue'
-import { EntrepriseService, type EntrepriseDTO } from '@/api/EntrepriseService'
+import { ref, h, onMounted, computed, reactive, watch } from 'vue'
+import { SpecialiteService, type SpecialiteDTO } from '@/api/SpecialiteService'
+import { DepartementService } from '@/api/DepartementService'
 
 const message = useMessage()
 const formRef = ref<FormInst | null>(null)
@@ -15,19 +16,33 @@ const showModal = ref(false)
 const modalTitle = ref('')
 const saving = ref(false)
 
-const formModel = reactive<EntrepriseDTO>({
-  nom: '',
-  secteur: ''
+const formModel = reactive<SpecialiteDTO>({
+  code: '',
+  intitule: '',
+  departementId: null
 })
 
+const departementOptions = ref<{ label: string, value: number }[]>([])
+const selectedDepartementId = ref<number | null>(null)
+
 const rules: FormRules = {
-  nom: { required: true, message: 'Le nom est requis', trigger: 'blur' },
-  secteur: { required: true, message: 'Le secteur est requis', trigger: 'blur' }
+  code: { required: true, message: 'Le code est requis', trigger: 'blur' },
+  intitule: { required: true, message: 'L\'intitulé est requis', trigger: 'blur' },
+  departementId: { required: true, type: 'number', message: 'Le département est requis', trigger: 'change' }
 }
 
-const columns: DataTableColumns<EntrepriseDTO> = [
-  { title: 'Nom', key: 'nom', minWidth: 200 },
-  { title: 'Secteur', key: 'secteur', minWidth: 200 },
+const columns: DataTableColumns<SpecialiteDTO> = [
+  { title: 'Code', key: 'code', minWidth: 100 },
+  { title: 'Intitulé', key: 'intitule', minWidth: 250 },
+  { 
+    title: 'Département', 
+    key: 'departementId', 
+    minWidth: 150,
+    render (row) {
+      const dept = departementOptions.value.find(d => d.value === row.departementId)
+      return dept ? dept.label : row.departementId
+    }
+  },
   {
     title: 'Actions',
     key: 'actions',
@@ -56,7 +71,7 @@ const columns: DataTableColumns<EntrepriseDTO> = [
                 type: 'error',
                 circle: true
               }, { default: () => h(NIcon, null, { default: () => h(Trash2) }) }),
-              default: () => 'Voulez-vous vraiment supprimer cette entreprise ?'
+              default: () => 'Voulez-vous vraiment supprimer cette spécialité ?'
             }),
             default: () => 'Supprimer'
           })
@@ -66,7 +81,7 @@ const columns: DataTableColumns<EntrepriseDTO> = [
   }
 ]
 
-const data = ref<EntrepriseDTO[]>([])
+const data = ref<SpecialiteDTO[]>([])
 const loading = ref(false)
 const page = ref(1)
 const pageSize = ref(10)
@@ -92,7 +107,7 @@ const pagination = computed(() => ({
 const fetchData = async () => {
   loading.value = true
   try {
-    const res = await EntrepriseService.getAll(page.value - 1, pageSize.value)
+    const res = await SpecialiteService.getAll(page.value - 1, pageSize.value, selectedDepartementId.value)
     data.value = res.data.content || []
     itemCount.value = res.data.totalElements || res.data.page?.totalElements || 0
   } catch (err) {
@@ -102,18 +117,37 @@ const fetchData = async () => {
   }
 }
 
+watch(selectedDepartementId, () => {
+  page.value = 1
+  fetchData()
+})
+
+const fetchDepartements = async () => {
+  try {
+    const res = await DepartementService.getAll(0, 100)
+    const depts = res.data.content || []
+    departementOptions.value = depts.map((d: any) => ({
+      label: d.code,
+      value: d.id
+    }))
+  } catch (err) {
+    console.error('Erreur lors du chargement des départements')
+  }
+}
+
 const handleAdd = () => {
-  modalTitle.value = 'Ajouter une Entreprise'
+  modalTitle.value = 'Ajouter une Spécialité'
   Object.assign(formModel, {
     id: undefined,
-    nom: '',
-    secteur: ''
+    code: '',
+    intitule: '',
+    departementId: null
   })
   showModal.value = true
 }
 
-const handleEdit = (row: EntrepriseDTO) => {
-  modalTitle.value = 'Modifier une Entreprise'
+const handleEdit = (row: SpecialiteDTO) => {
+  modalTitle.value = 'Modifier une Spécialité'
   Object.assign(formModel, row)
   showModal.value = true
 }
@@ -124,11 +158,11 @@ const handleSave = async () => {
       saving.value = true
       try {
         if (formModel.id) {
-          await EntrepriseService.update(formModel.id, formModel)
-          message.success('Entreprise modifiée avec succès')
+          await SpecialiteService.update(formModel.id, formModel)
+          message.success('Spécialité modifiée avec succès')
         } else {
-          await EntrepriseService.create(formModel)
-          message.success('Entreprise ajoutée avec succès')
+          await SpecialiteService.create(formModel)
+          message.success('Spécialité ajoutée avec succès')
         }
         showModal.value = false
         fetchData()
@@ -143,36 +177,42 @@ const handleSave = async () => {
 
 const handleDelete = async (id: number) => {
   try {
-    await EntrepriseService.delete(id)
-    message.success('Entreprise supprimée avec succès')
+    await SpecialiteService.delete(id)
+    message.success('Spécialité supprimée avec succès')
     fetchData()
   } catch (err) {
     message.error('Erreur lors de la suppression')
   }
 }
 
-onMounted(fetchData)
+onMounted(() => {
+  fetchData()
+  fetchDepartements()
+})
 </script>
 
 <template>
   <div class="space-y-4">
     <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-bold">Gestion des Entreprises</h1>
+      <h1 class="text-2xl font-bold">Gestion des Spécialités</h1>
       <n-button type="primary" @click="handleAdd">
         <template #icon>
           <n-icon><PlusOutlined /></n-icon>
         </template>
-        Ajouter une entreprise
+        Ajouter une spécialité
       </n-button>
     </div>
 
     <n-card>
       <div class="mb-4 flex items-center space-x-4">
-        <n-input placeholder="Rechercher une entreprise..." class="max-w-xs">
-          <template #prefix>
-            <n-icon><SearchOutlined /></n-icon>
-          </template>
-        </n-input>
+        <div class="w-full max-w-xs">
+          <n-select
+            v-model:value="selectedDepartementId"
+            :options="departementOptions"
+            placeholder="Filtrer par département"
+            clearable
+          />
+        </div>
       </div>
       <n-data-table
         remote
@@ -197,16 +237,23 @@ onMounted(fetchData)
         :model="formModel"
         :rules="rules"
         label-placement="left"
-        label-width="100"
+        label-width="120"
         label-align="left"
         require-mark-placement="right-hanging"
       >
         <div class="space-y-4">
-          <n-form-item label="Nom" path="nom">
-            <n-input v-model:value="formModel.nom" placeholder="Ex: CAMTEL" />
+          <n-form-item label="Code" path="code">
+            <n-input v-model:value="formModel.code" placeholder="Ex: INFO" />
           </n-form-item>
-          <n-form-item label="Secteur" path="secteur">
-            <n-input v-model:value="formModel.secteur" placeholder="Ex: Télécommunications" />
+          <n-form-item label="Intitulé" path="intitule">
+            <n-input v-model:value="formModel.intitule" placeholder="Ex: Informatique" />
+          </n-form-item>
+          <n-form-item label="Département" path="departementId">
+            <n-select
+              v-model:value="formModel.departementId"
+              :options="departementOptions"
+              placeholder="Sélectionner un département"
+            />
           </n-form-item>
         </div>
       </n-form>

@@ -7,7 +7,7 @@ import type { FormInst, FormRules, DataTableColumns } from 'naive-ui'
 import { PlusOutlined, SearchOutlined } from '@vicons/antd'
 import { Edit, Trash2 } from 'lucide-vue-next'
 import { ref, h, onMounted, computed, reactive } from 'vue'
-import { EntrepriseService, type EntrepriseDTO } from '@/api/EntrepriseService'
+import { DepartementService, type DepartementDTO } from '@/api/DepartementService'
 
 const message = useMessage()
 const formRef = ref<FormInst | null>(null)
@@ -15,19 +15,19 @@ const showModal = ref(false)
 const modalTitle = ref('')
 const saving = ref(false)
 
-const formModel = reactive<EntrepriseDTO>({
-  nom: '',
-  secteur: ''
+const formModel = reactive<DepartementDTO>({
+  code: '',
+  intitule: ''
 })
 
 const rules: FormRules = {
-  nom: { required: true, message: 'Le nom est requis', trigger: 'blur' },
-  secteur: { required: true, message: 'Le secteur est requis', trigger: 'blur' }
+  code: { required: true, message: 'Le code est requis', trigger: 'blur' },
+  intitule: { required: true, message: 'L\'intitulé est requis', trigger: 'blur' }
 }
 
-const columns: DataTableColumns<EntrepriseDTO> = [
-  { title: 'Nom', key: 'nom', minWidth: 200 },
-  { title: 'Secteur', key: 'secteur', minWidth: 200 },
+const columns: DataTableColumns<DepartementDTO> = [
+  { title: 'Code', key: 'code', minWidth: 100 },
+  { title: 'Intitulé', key: 'intitule', minWidth: 300 },
   {
     title: 'Actions',
     key: 'actions',
@@ -56,7 +56,7 @@ const columns: DataTableColumns<EntrepriseDTO> = [
                 type: 'error',
                 circle: true
               }, { default: () => h(NIcon, null, { default: () => h(Trash2) }) }),
-              default: () => 'Voulez-vous vraiment supprimer cette entreprise ?'
+              default: () => 'Voulez-vous vraiment supprimer ce département ?'
             }),
             default: () => 'Supprimer'
           })
@@ -66,7 +66,7 @@ const columns: DataTableColumns<EntrepriseDTO> = [
   }
 ]
 
-const data = ref<EntrepriseDTO[]>([])
+const data = ref<DepartementDTO[]>([])
 const loading = ref(false)
 const page = ref(1)
 const pageSize = ref(10)
@@ -92,7 +92,7 @@ const pagination = computed(() => ({
 const fetchData = async () => {
   loading.value = true
   try {
-    const res = await EntrepriseService.getAll(page.value - 1, pageSize.value)
+    const res = await DepartementService.getAll(page.value - 1, pageSize.value)
     data.value = res.data.content || []
     itemCount.value = res.data.totalElements || res.data.page?.totalElements || 0
   } catch (err) {
@@ -103,17 +103,17 @@ const fetchData = async () => {
 }
 
 const handleAdd = () => {
-  modalTitle.value = 'Ajouter une Entreprise'
+  modalTitle.value = 'Ajouter un Département'
   Object.assign(formModel, {
     id: undefined,
-    nom: '',
-    secteur: ''
+    code: '',
+    intitule: ''
   })
   showModal.value = true
 }
 
-const handleEdit = (row: EntrepriseDTO) => {
-  modalTitle.value = 'Modifier une Entreprise'
+const handleEdit = (row: DepartementDTO) => {
+  modalTitle.value = 'Modifier un Département'
   Object.assign(formModel, row)
   showModal.value = true
 }
@@ -124,11 +124,11 @@ const handleSave = async () => {
       saving.value = true
       try {
         if (formModel.id) {
-          await EntrepriseService.update(formModel.id, formModel)
-          message.success('Entreprise modifiée avec succès')
+          await DepartementService.update(formModel.id, formModel)
+          message.success('Département modifié avec succès')
         } else {
-          await EntrepriseService.create(formModel)
-          message.success('Entreprise ajoutée avec succès')
+          await DepartementService.create(formModel)
+          message.success('Département ajouté avec succès')
         }
         showModal.value = false
         fetchData()
@@ -143,8 +143,8 @@ const handleSave = async () => {
 
 const handleDelete = async (id: number) => {
   try {
-    await EntrepriseService.delete(id)
-    message.success('Entreprise supprimée avec succès')
+    await DepartementService.delete(id)
+    message.success('Département supprimé avec succès')
     fetchData()
   } catch (err) {
     message.error('Erreur lors de la suppression')
@@ -157,18 +157,18 @@ onMounted(fetchData)
 <template>
   <div class="space-y-4">
     <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-bold">Gestion des Entreprises</h1>
+      <h1 class="text-2xl font-bold">Gestion des Départements</h1>
       <n-button type="primary" @click="handleAdd">
         <template #icon>
           <n-icon><PlusOutlined /></n-icon>
         </template>
-        Ajouter une entreprise
+        Ajouter un département
       </n-button>
     </div>
 
     <n-card>
       <div class="mb-4 flex items-center space-x-4">
-        <n-input placeholder="Rechercher une entreprise..." class="max-w-xs">
+        <n-input placeholder="Rechercher un département..." class="max-w-xs">
           <template #prefix>
             <n-icon><SearchOutlined /></n-icon>
           </template>
@@ -202,11 +202,11 @@ onMounted(fetchData)
         require-mark-placement="right-hanging"
       >
         <div class="space-y-4">
-          <n-form-item label="Nom" path="nom">
-            <n-input v-model:value="formModel.nom" placeholder="Ex: CAMTEL" />
+          <n-form-item label="Code" path="code">
+            <n-input v-model:value="formModel.code" placeholder="Ex: Informatique" />
           </n-form-item>
-          <n-form-item label="Secteur" path="secteur">
-            <n-input v-model:value="formModel.secteur" placeholder="Ex: Télécommunications" />
+          <n-form-item label="Intitulé" path="intitule">
+            <n-input v-model:value="formModel.intitule" placeholder="Ex: Département de Génie Informatique" />
           </n-form-item>
         </div>
       </n-form>

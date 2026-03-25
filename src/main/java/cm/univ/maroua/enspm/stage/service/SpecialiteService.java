@@ -23,7 +23,10 @@ public class SpecialiteService {
         this.specialiteMapper = specialiteMapper;
     }
 
-    public Page<SpecialiteDTO> findAll(Pageable pageable) {
+    public Page<SpecialiteDTO> findAll(Long departementId, Pageable pageable) {
+        if (departementId != null) {
+            return specialiteRepository.findAllByDepartementId(departementId, pageable).map(specialiteMapper::toDto);
+        }
         return specialiteRepository.findAll(pageable).map(specialiteMapper::toDto);
     }
 

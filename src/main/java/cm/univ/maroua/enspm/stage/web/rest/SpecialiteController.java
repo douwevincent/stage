@@ -22,8 +22,10 @@ public class SpecialiteController {
     }
 
     @GetMapping
-    public Page<SpecialiteDTO> getAllSpecialites(Pageable pageable) {
-        return specialiteService.findAll(pageable);
+    public Page<SpecialiteDTO> getAllSpecialites(
+            @RequestParam(required = false) Long departementId,
+            Pageable pageable) {
+        return specialiteService.findAll(departementId, pageable);
     }
 
     @GetMapping("/{id}")
