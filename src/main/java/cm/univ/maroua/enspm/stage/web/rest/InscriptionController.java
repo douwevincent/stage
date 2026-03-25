@@ -22,8 +22,13 @@ public class InscriptionController {
     }
 
     @GetMapping
-    public Page<InscriptionDTO> getAllInscriptions(Pageable pageable) {
-        return inscriptionService.findAll(pageable);
+    public Page<InscriptionDTO> getAllInscriptions(
+            Pageable pageable,
+            @RequestParam(name = "anneeAcademiqueId", required = false) Long anneeAcademiqueId,
+            @RequestParam(name = "etudiantId", required = false) Long etudiantId,
+            @RequestParam(name = "parcoursId", required = false) Long parcoursId,
+            @RequestParam(name = "q", required = false) String q) {
+        return inscriptionService.findAll(pageable, anneeAcademiqueId, etudiantId, parcoursId, q);
     }
 
     @GetMapping("/{id}")

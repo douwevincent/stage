@@ -16,7 +16,9 @@ import {
   Settings,
   Layers,
   School,
-  Tags
+  Tags,
+  Route,
+  NotebookPen
 } from 'lucide-vue-next'
 
 const props = defineProps<{
@@ -72,6 +74,16 @@ const menuOptions: MenuOption[] = [
     label: () => h(RouterLink, { to: { name: 'type-stages' } }, { default: () => 'Types de Stage' }),
     key: 'type-stages',
     icon: renderIcon(Tags)
+  },
+  {
+    label: () => h(RouterLink, { to: { name: 'parcours' } }, { default: () => 'Parcours' }),
+    key: 'parcours',
+    icon: renderIcon(Route)
+  },
+  {
+    label: () => h(RouterLink, { to: { name: 'inscriptions' } }, { default: () => 'Inscriptions' }),
+    key: 'inscriptions',
+    icon: renderIcon(NotebookPen)
   },
   {
     label: 'Notes',

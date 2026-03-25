@@ -49,6 +49,16 @@ const router = createRouter({
       name: 'type-stages',
       component: () => import('@/views/type-stages/TypeStageList.vue'),
     },
+    {
+      path: '/parcours',
+      name: 'parcours',
+      component: () => import('@/views/parcours/ParcoursList.vue'),
+    },
+    {
+      path: '/inscriptions',
+      name: 'inscriptions',
+      component: () => import('@/views/inscriptions/InscriptionList.vue'),
+    },
   ],
 })
 

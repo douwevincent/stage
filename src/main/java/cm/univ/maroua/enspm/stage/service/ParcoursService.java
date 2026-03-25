@@ -6,6 +6,7 @@ import cm.univ.maroua.enspm.stage.service.dto.ParcoursDTO;
 import cm.univ.maroua.enspm.stage.service.mapper.ParcoursMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,29 @@ public class ParcoursService {
 
     public Page<ParcoursDTO> findAll(Pageable pageable) {
         return parcoursRepository.findAll(pageable).map(parcoursMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ParcoursDTO> findAll(Pageable pageable, Long specialiteId, Long niveauId, String q) {
+        Specification<Parcours> spec = (root, query, cb) -> cb.conjunction();
+
+        if (specialiteId != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("specialite").get("id"), specialiteId));
+        }
+
+        if (niveauId != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("niveau").get("id"), niveauId));
+        }
+
+        if (q != null && !q.isBlank()) {
+            String search = "%" + q.trim().toLowerCase() + "%";
+            spec = spec.and((root, query, cb) -> cb.or(
+                    cb.like(cb.lower(root.get("specialite").get("code")), search),
+                    cb.like(cb.lower(root.get("specialite").get("intitule")), search),
+                    cb.like(cb.lower(root.get("niveau").get("libelle")), search)));
+        }
+
+        return parcoursRepository.findAll(spec, pageable).map(parcoursMapper::toDto);
     }
 
     @Transactional(readOnly = true)

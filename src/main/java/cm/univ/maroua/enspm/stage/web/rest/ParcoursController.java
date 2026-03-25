@@ -22,8 +22,12 @@ public class ParcoursController {
     }
 
     @GetMapping
-    public Page<ParcoursDTO> getAllParcours(Pageable pageable) {
-        return parcoursService.findAll(pageable);
+    public Page<ParcoursDTO> getAllParcours(
+            Pageable pageable,
+            @RequestParam(name = "specialiteId", required = false) Long specialiteId,
+            @RequestParam(name = "niveauId", required = false) Long niveauId,
+            @RequestParam(name = "q", required = false) String q) {
+        return parcoursService.findAll(pageable, specialiteId, niveauId, q);
     }
 
     @GetMapping("/{id}")
