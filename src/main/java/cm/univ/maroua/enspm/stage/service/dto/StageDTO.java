@@ -6,7 +6,9 @@ import java.time.LocalDate;
 public record StageDTO(
                 Long id,
                 Long etudiantId,
-                Long localiteId,
+                Long entrepriseId,
+                String ville,
+                String adresse,
                 Long encadreurId,
                 Long typeStageId,
                 LocalDate dateDebut,

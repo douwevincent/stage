@@ -20,8 +20,8 @@ public class Entreprise {
     private String secteur;
 
     @OneToMany(mappedBy = "entreprise")
-    private List<Localite> localites;
+    private List<Encadreur> encadreurs;
 
     @OneToMany(mappedBy = "entreprise")
-    private List<Encadreur> encadreurs;
+    private List<Stage> stages;
 }

@@ -24,8 +24,11 @@ public class Stage {
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "localite_id")
-    private Localite localite;
+    @JoinColumn(name = "entreprise_id")
+    private Entreprise entreprise;
+
+    private String ville;
+    private String adresse;
 
     @ManyToOne
     @JoinColumn(name = "encadreur_id")
