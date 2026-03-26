@@ -26,6 +26,18 @@ public class AnneeAcademiqueController {
         return anneeAcademiqueService.findAll(pageable);
     }
 
+    @GetMapping("/active")
+    public ResponseEntity<AnneeAcademiqueDTO> getAnneeActive() {
+        return anneeAcademiqueService.findActive()
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PatchMapping("/{id}/activer")
+    public ResponseEntity<AnneeAcademiqueDTO> activerAnneeAcademique(@PathVariable Long id) {
+        return ResponseEntity.ok(anneeAcademiqueService.activate(id));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<AnneeAcademiqueDTO> getAnneeAcademique(@PathVariable Long id) {
         return anneeAcademiqueService.findOne(id)

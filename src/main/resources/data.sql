@@ -41,10 +41,10 @@ INSERT INTO specialite (id, code, intitule, departement_id) VALUES (1, 'CRYP','C
                                                                    (30, 'IHN','Ingénierie des Humanités Numériques', 9),
                                                                    (31, 'GPT','Génie des Procédés Textiles', 10),
                                                                    (32, 'GMT','Génie Mécanique Textiles', 10);
-INSERT INTO annee_academique VALUES (1, '2022-2023'),
-                                    (2, '2023-2024'),
-                                    (3, '2024-2025'),
-                                    (4, '2025-2026');
+INSERT INTO annee_academique VALUES (1, false, '2022-2023'),
+                                    (2, false, '2023-2024'),
+                                    (3, false, '2024-2025'),
+                                    (4, true, '2025-2026');
 
 INSERT INTO niveau VALUES (1, 'Niveau 1'),
                         (2, 'Niveau 2'),

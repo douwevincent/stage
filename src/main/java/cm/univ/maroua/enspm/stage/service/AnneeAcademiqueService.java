@@ -4,6 +4,7 @@ import cm.univ.maroua.enspm.stage.domain.AnneeAcademique;
 import cm.univ.maroua.enspm.stage.repository.AnneeAcademiqueRepository;
 import cm.univ.maroua.enspm.stage.service.dto.AnneeAcademiqueDTO;
 import cm.univ.maroua.enspm.stage.service.mapper.AnneeAcademiqueMapper;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,10 +34,23 @@ public class AnneeAcademiqueService {
         return anneeAcademiqueRepository.findById(id).map(anneeAcademiqueMapper::toDto);
     }
 
+    @Transactional(readOnly = true)
+    public Optional<AnneeAcademiqueDTO> findActive() {
+        return anneeAcademiqueRepository.findByActifTrue().map(anneeAcademiqueMapper::toDto);
+    }
+
     public AnneeAcademiqueDTO save(AnneeAcademiqueDTO anneeAcademiqueDTO) {
         AnneeAcademique anneeAcademique = anneeAcademiqueMapper.toEntity(anneeAcademiqueDTO);
         anneeAcademique = anneeAcademiqueRepository.save(anneeAcademique);
         return anneeAcademiqueMapper.toDto(anneeAcademique);
+    }
+
+    public AnneeAcademiqueDTO activate(Long id) {
+        anneeAcademiqueRepository.deactivateAll();
+        AnneeAcademique annee = anneeAcademiqueRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Année académique introuvable : " + id));
+        annee.setActif(true);
+        return anneeAcademiqueMapper.toDto(anneeAcademiqueRepository.save(annee));
     }
 
     public void delete(Long id) {

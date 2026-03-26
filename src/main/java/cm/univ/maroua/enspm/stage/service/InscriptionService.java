@@ -1,6 +1,8 @@
 package cm.univ.maroua.enspm.stage.service;
 
+import cm.univ.maroua.enspm.stage.domain.AnneeAcademique;
 import cm.univ.maroua.enspm.stage.domain.Inscription;
+import cm.univ.maroua.enspm.stage.repository.AnneeAcademiqueRepository;
 import cm.univ.maroua.enspm.stage.repository.InscriptionRepository;
 import cm.univ.maroua.enspm.stage.service.dto.InscriptionDTO;
 import cm.univ.maroua.enspm.stage.service.mapper.InscriptionMapper;
@@ -18,10 +20,13 @@ public class InscriptionService {
 
     private final InscriptionRepository inscriptionRepository;
     private final InscriptionMapper inscriptionMapper;
+    private final AnneeAcademiqueRepository anneeAcademiqueRepository;
 
-    public InscriptionService(InscriptionRepository inscriptionRepository, InscriptionMapper inscriptionMapper) {
+    public InscriptionService(InscriptionRepository inscriptionRepository, InscriptionMapper inscriptionMapper,
+            AnneeAcademiqueRepository anneeAcademiqueRepository) {
         this.inscriptionRepository = inscriptionRepository;
         this.inscriptionMapper = inscriptionMapper;
+        this.anneeAcademiqueRepository = anneeAcademiqueRepository;
     }
 
     public Page<InscriptionDTO> findAll(Pageable pageable) {
@@ -66,6 +71,11 @@ public class InscriptionService {
 
     public InscriptionDTO save(InscriptionDTO inscriptionDTO) {
         Inscription inscription = inscriptionMapper.toEntity(inscriptionDTO);
+        if (inscription.getAnneeAcademique() == null || inscription.getAnneeAcademique().getId() == null) {
+            AnneeAcademique active = anneeAcademiqueRepository.findByActifTrue()
+                    .orElseThrow(() -> new IllegalStateException("Aucune année académique active"));
+            inscription.setAnneeAcademique(active);
+        }
         inscription = inscriptionRepository.save(inscription);
         return inscriptionMapper.toDto(inscription);
     }

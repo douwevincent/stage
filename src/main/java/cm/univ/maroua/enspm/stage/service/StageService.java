@@ -1,6 +1,8 @@
 package cm.univ.maroua.enspm.stage.service;
 
+import cm.univ.maroua.enspm.stage.domain.AnneeAcademique;
 import cm.univ.maroua.enspm.stage.domain.Stage;
+import cm.univ.maroua.enspm.stage.repository.AnneeAcademiqueRepository;
 import cm.univ.maroua.enspm.stage.repository.StageRepository;
 import cm.univ.maroua.enspm.stage.service.dto.StageDTO;
 import cm.univ.maroua.enspm.stage.service.mapper.StageMapper;
@@ -17,10 +19,13 @@ public class StageService {
 
     private final StageRepository stageRepository;
     private final StageMapper stageMapper;
+    private final AnneeAcademiqueRepository anneeAcademiqueRepository;
 
-    public StageService(StageRepository stageRepository, StageMapper stageMapper) {
+    public StageService(StageRepository stageRepository, StageMapper stageMapper,
+            AnneeAcademiqueRepository anneeAcademiqueRepository) {
         this.stageRepository = stageRepository;
         this.stageMapper = stageMapper;
+        this.anneeAcademiqueRepository = anneeAcademiqueRepository;
     }
 
     public Page<StageDTO> findAll(Pageable pageable) {
@@ -34,6 +39,11 @@ public class StageService {
 
     public StageDTO save(StageDTO stageDTO) {
         Stage stage = stageMapper.toEntity(stageDTO);
+        if (stage.getAnneeAcademique() == null || stage.getAnneeAcademique().getId() == null) {
+            AnneeAcademique active = anneeAcademiqueRepository.findByActifTrue()
+                    .orElseThrow(() -> new IllegalStateException("Aucune année académique active"));
+            stage.setAnneeAcademique(active);
+        }
         stage = stageRepository.save(stage);
         return stageMapper.toDto(stage);
     }

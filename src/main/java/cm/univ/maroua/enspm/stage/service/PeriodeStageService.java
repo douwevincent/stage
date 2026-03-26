@@ -1,6 +1,8 @@
 package cm.univ.maroua.enspm.stage.service;
 
+import cm.univ.maroua.enspm.stage.domain.AnneeAcademique;
 import cm.univ.maroua.enspm.stage.domain.PeriodeStage;
+import cm.univ.maroua.enspm.stage.repository.AnneeAcademiqueRepository;
 import cm.univ.maroua.enspm.stage.repository.PeriodeStageRepository;
 import cm.univ.maroua.enspm.stage.service.dto.PeriodeStageDTO;
 import cm.univ.maroua.enspm.stage.service.mapper.PeriodeStageMapper;
@@ -17,10 +19,13 @@ public class PeriodeStageService {
 
     private final PeriodeStageRepository periodeStageRepository;
     private final PeriodeStageMapper periodeStageMapper;
+    private final AnneeAcademiqueRepository anneeAcademiqueRepository;
 
-    public PeriodeStageService(PeriodeStageRepository periodeStageRepository, PeriodeStageMapper periodeStageMapper) {
+    public PeriodeStageService(PeriodeStageRepository periodeStageRepository, PeriodeStageMapper periodeStageMapper,
+            AnneeAcademiqueRepository anneeAcademiqueRepository) {
         this.periodeStageRepository = periodeStageRepository;
         this.periodeStageMapper = periodeStageMapper;
+        this.anneeAcademiqueRepository = anneeAcademiqueRepository;
     }
 
     public Page<PeriodeStageDTO> findAll(Pageable pageable) {
@@ -34,6 +39,11 @@ public class PeriodeStageService {
 
     public PeriodeStageDTO save(PeriodeStageDTO periodeStageDTO) {
         PeriodeStage periodeStage = periodeStageMapper.toEntity(periodeStageDTO);
+        if (periodeStage.getAnneeAcademique() == null || periodeStage.getAnneeAcademique().getId() == null) {
+            AnneeAcademique active = anneeAcademiqueRepository.findByActifTrue()
+                    .orElseThrow(() -> new IllegalStateException("Aucune année académique active"));
+            periodeStage.setAnneeAcademique(active);
+        }
         periodeStage = periodeStageRepository.save(periodeStage);
         return periodeStageMapper.toDto(periodeStage);
     }
