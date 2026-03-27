@@ -12,13 +12,13 @@
     "@vicons/antd": "^0.13.0",
     "@vicons/utils": "^0.1.4",
     "axios": "^1.13.6",
+    "exceljs": "^4.4.0",
     "lucide-vue-next": "^1.0.0",
     "naive-ui": "^2.44.1",
     "pinia": "^3.0.4",
     "vfonts": "^0.0.3",
     "vue": "^3.5.30",
-    "vue-router": "^5.0.4",
-    "xlsx": "^0.18.5"
+    "vue-router": "^5.0.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.2",

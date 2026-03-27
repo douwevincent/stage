@@ -14,7 +14,7 @@ import {
 import { Upload, ArrowLeft } from 'lucide-vue-next'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import * as XLSX from 'xlsx'
+import ExcelJS from 'exceljs'
 import {
   EtudiantService,
   type EtudiantImportResultDTO,
@@ -37,8 +37,8 @@ const expectedHeaders = [
   'Email',
   'Telephone',
   'Libellé niveau',
-  'code département',
-  'code spécialité',
+  'Code département',
+  'Code spécialité',
 ]
 
 const detailsColumns: DataTableColumns<ImportRowMessageDTO> = [
@@ -67,6 +67,21 @@ const getCell = (row: Record<string, unknown>, keys: string[]): string => {
   return ''
 }
 
+const formatCellValue = (value: unknown): string => {
+  if (value === undefined || value === null) {
+    return ''
+  }
+  if (typeof value === 'object') {
+    if ('text' in (value as Record<string, unknown>) && typeof (value as Record<string, unknown>).text === 'string') {
+      return ((value as Record<string, unknown>).text as string).trim()
+    }
+    if ('result' in (value as Record<string, unknown>) && (value as Record<string, unknown>).result !== undefined) {
+      return String((value as Record<string, unknown>).result).trim()
+    }
+  }
+  return String(value).trim()
+}
+
 const onFileSelected = async (event: Event) => {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
@@ -79,8 +94,8 @@ const onFileSelected = async (event: Event) => {
   }
 
   const lowerName = file.name.toLowerCase()
-  if (!lowerName.endsWith('.xlsx') && !lowerName.endsWith('.xls')) {
-    message.error('Le fichier doit être au format .xlsx ou .xls')
+  if (!lowerName.endsWith('.xlsx')) {
+    message.error('Le fichier doit être au format .xlsx')
     selectedFileName.value = ''
     input.value = ''
     return
@@ -90,24 +105,21 @@ const onFileSelected = async (event: Event) => {
 
   try {
     const buffer = await file.arrayBuffer()
-    const workbook = XLSX.read(buffer, { type: 'array' })
-    const firstSheetName = workbook.SheetNames[0]
+    const workbook = new ExcelJS.Workbook()
+    await workbook.xlsx.load(buffer)
+    const worksheet = workbook.worksheets[0]
 
-    if (!firstSheetName) {
+    if (!worksheet) {
       message.error('Le fichier ne contient aucune feuille')
       return
     }
 
-    const worksheet = workbook.Sheets[firstSheetName]
-    const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet, { defval: '' })
-
-    if (rows.length === 0) {
-      message.error('Le fichier ne contient aucune ligne de données')
-      return
-    }
-
-    const rawHeaders = Object.keys(rows[0] || {})
-    const normalizedHeaders = new Set(rawHeaders.map((header) => normalizeHeader(header)))
+    const firstRowValues = worksheet.getRow(1).values
+    const headerValues: unknown[] = Array.isArray(firstRowValues)
+      ? firstRowValues.slice(1)
+      : []
+    const headers = headerValues.map((header: unknown) => normalizeHeader(formatCellValue(header)))
+    const normalizedHeaders = new Set(headers.filter(Boolean))
 
     const missingHeaders = expectedHeaders.filter(
       (header) => !normalizedHeaders.has(normalizeHeader(header)),
@@ -118,13 +130,25 @@ const onFileSelected = async (event: Event) => {
       return
     }
 
-    importRows.value = rows.map((row: Record<string, unknown>) => {
-      const normalizedRow: Record<string, unknown> = {}
-      for (const [key, value] of Object.entries(row)) {
-        normalizedRow[normalizeHeader(key)] = value
+    const parsedRows: EtudiantImportRowDTO[] = []
+    worksheet.eachRow((row: ExcelJS.Row, rowNumber: number) => {
+      if (rowNumber === 1) {
+        return
       }
 
-      return {
+      const normalizedRow: Record<string, unknown> = {}
+      headers.forEach((header: string, index: number) => {
+        if (!header) {
+          return
+        }
+        normalizedRow[header] = formatCellValue(row.getCell(index + 1).value)
+      })
+
+      if (Object.values(normalizedRow).every((value) => String(value).trim() === '')) {
+        return
+      }
+
+      parsedRows.push({
         no: Number(getCell(normalizedRow, ['no'])) || undefined,
         matricule: getCell(normalizedRow, ['matricule']),
         nom: getCell(normalizedRow, ['nom']),
@@ -133,8 +157,15 @@ const onFileSelected = async (event: Event) => {
         libelleNiveau: getCell(normalizedRow, ['libelle niveau']),
         codeDepartement: getCell(normalizedRow, ['code departement']),
         codeSpecialite: getCell(normalizedRow, ['code specialite']),
-      }
+      })
     })
+
+    if (parsedRows.length === 0) {
+      message.error('Le fichier ne contient aucune ligne de données')
+      return
+    }
+
+    importRows.value = parsedRows
 
     message.success(`${importRows.value.length} ligne(s) prête(s) pour l'import`) 
   } catch (error) {
@@ -186,7 +217,7 @@ const runImport = async () => {
             <input
               class="hidden"
               type="file"
-              accept=".xlsx,.xls"
+              accept=".xlsx"
               @change="onFileSelected"
             >
           </label>
@@ -220,23 +251,27 @@ const runImport = async () => {
 
         <n-divider />
 
-        <h3 class="text-base font-semibold">Détails des erreurs</h3>
-        <n-data-table
-          :columns="detailsColumns"
-          :data="result.detailsErreurs || []"
-          :bordered="false"
-          :max-height="280"
-          :scroll-x="720"
-        />
+        <template v-if="result.erreurs > 0">
+          <h3 class="text-base font-semibold">Détails des erreurs</h3>
+          <n-data-table
+            :columns="detailsColumns"
+            :data="result.detailsErreurs || []"
+            :bordered="false"
+            :max-height="280"
+            :scroll-x="720"
+          />
+        </template>
 
-        <h3 class="text-base font-semibold">Détails des avertissements</h3>
-        <n-data-table
-          :columns="detailsColumns"
-          :data="result.detailsAvertissements || []"
-          :bordered="false"
-          :max-height="280"
-          :scroll-x="720"
-        />
+        <template v-if="result.avertissements > 0">
+          <h3 class="text-base font-semibold">Détails des avertissements</h3>
+          <n-data-table
+            :columns="detailsColumns"
+            :data="result.detailsAvertissements || []"
+            :bordered="false"
+            :max-height="280"
+            :scroll-x="720"
+          />
+        </template>
       </n-space>
     </n-card>
   </div>
