@@ -11,8 +11,17 @@ const router = createRouter({
     },
     {
       path: '/etudiants',
-      name: 'etudiants',
+      redirect: '/etudiants/liste',
+    },
+    {
+      path: '/etudiants/liste',
+      name: 'etudiants-list',
       component: () => import('@/views/etudiants/EtudiantList.vue'),
+    },
+    {
+      path: '/etudiants/importer',
+      name: 'etudiants-import',
+      component: () => import('@/views/etudiants/EtudiantImport.vue'),
     },
     {
       path: '/entreprises',

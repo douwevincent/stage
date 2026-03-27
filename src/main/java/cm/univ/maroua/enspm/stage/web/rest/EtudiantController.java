@@ -2,6 +2,8 @@ package cm.univ.maroua.enspm.stage.web.rest;
 
 import cm.univ.maroua.enspm.stage.service.EtudiantService;
 import cm.univ.maroua.enspm.stage.service.dto.EtudiantDTO;
+import cm.univ.maroua.enspm.stage.service.dto.EtudiantImportResultDTO;
+import cm.univ.maroua.enspm.stage.service.dto.EtudiantImportRowDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/etudiants")
@@ -54,6 +58,16 @@ public class EtudiantController {
         EtudiantDTO result = etudiantService.save(etudiantDTO);
         return ResponseEntity.ok()
                 .body(result);
+    }
+
+    @PostMapping("/import")
+    public ResponseEntity<?> importEtudiants(@RequestBody List<EtudiantImportRowDTO> rows) {
+        try {
+            EtudiantImportResultDTO result = etudiantService.importRows(rows);
+            return ResponseEntity.ok(result);
+        } catch (IllegalStateException ex) {
+            return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
+        }
     }
 
     @DeleteMapping("/{id}")

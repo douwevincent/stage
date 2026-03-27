@@ -7,9 +7,11 @@ import type { FormInst, FormRules, DataTableColumns } from 'naive-ui'
 import { PlusOutlined, SearchOutlined } from '@vicons/antd'
 import { Edit, Trash2 } from 'lucide-vue-next'
 import { ref, h, onMounted, computed, reactive } from 'vue'
+import { useRouter } from 'vue-router'
 import { EtudiantService, type EtudiantDTO } from '@/api/EtudiantService'
 
 const message = useMessage()
+const router = useRouter()
 const formRef = ref<FormInst | null>(null)
 const showModal = ref(false)
 const modalTitle = ref('')
@@ -174,12 +176,17 @@ onMounted(fetchData)
   <div class="space-y-4">
     <div class="flex items-center justify-between">
       <h1 class="text-2xl font-bold">Gestion des Étudiants</h1>
-      <n-button type="primary" @click="handleAdd">
-        <template #icon>
-          <n-icon><PlusOutlined /></n-icon>
-        </template>
-        Ajouter un étudiant
-      </n-button>
+      <n-space>
+        <n-button @click="router.push({ name: 'etudiants-import' })">
+          Importer des étudiants
+        </n-button>
+        <n-button type="primary" @click="handleAdd">
+          <template #icon>
+            <n-icon><PlusOutlined /></n-icon>
+          </template>
+          Ajouter un étudiant
+        </n-button>
+      </n-space>
     </div>
 
     <n-card>

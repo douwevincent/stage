@@ -46,8 +46,13 @@ const menuOptions: MenuOption[] = [
     icon: renderIcon(GraduationCap)
   },
   {
-    label: () => h(RouterLink, { to: { name: 'etudiants' } }, { default: () => 'Étudiants' }),
-    key: 'etudiants',
+    label: () => h(RouterLink, { to: { name: 'etudiants-list' } }, { default: () => 'Étudiants' }),
+    key: 'etudiants-list',
+    icon: renderIcon(Users)
+  },
+  {
+    label: () => h(RouterLink, { to: { name: 'etudiants-import' } }, { default: () => 'Importer Étudiants' }),
+    key: 'etudiants-import',
     icon: renderIcon(Users)
   },
   {

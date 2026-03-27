@@ -6,7 +6,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface SpecialiteRepository extends JpaRepository<Specialite, Long> {
     Page<Specialite> findAllByDepartementId(Long departementId, Pageable pageable);
+
+    Optional<Specialite> findByCodeIgnoreCaseAndDepartementId(String code, Long departementId);
 }

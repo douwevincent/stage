@@ -12,6 +12,34 @@ export interface EtudiantDTO {
   lieuNaissance: string
 }
 
+export interface EtudiantImportRowDTO {
+  no?: number
+  matricule: string
+  nom: string
+  email: string
+  telephone: string
+  libelleNiveau: string
+  codeDepartement: string
+  codeSpecialite: string
+}
+
+export interface ImportRowMessageDTO {
+  no: number
+  matricule: string
+  message: string
+}
+
+export interface EtudiantImportResultDTO {
+  totalLignes: number
+  etudiantsCrees: number
+  etudiantsExistants: number
+  inscriptionsCreees: number
+  avertissements: number
+  erreurs: number
+  detailsErreurs: ImportRowMessageDTO[]
+  detailsAvertissements: ImportRowMessageDTO[]
+}
+
 export const EtudiantService = {
   getAll (page = 0, size = 20) {
     return api.get('/api/etudiants', {
@@ -29,6 +57,10 @@ export const EtudiantService = {
 
   update (id: number, etudiant: EtudiantDTO) {
     return api.put(`/api/etudiants/${id}`, etudiant)
+  },
+
+  importRows (rows: EtudiantImportRowDTO[]) {
+    return api.post<EtudiantImportResultDTO>('/api/etudiants/import', rows)
   },
 
   delete (id: number) {
