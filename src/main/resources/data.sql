@@ -32,7 +32,7 @@ INSERT INTO specialite (id, code, intitule, departement_id) VALUES (1, 'CRYP','C
                                                                    (21, 'EAME','Economie et Management des Entreprises', 7),
                                                                    (22, 'INFOTEL','Informatique et Télécommunications', 8),
                                                                    (23, 'ENREN','Energies Renouvelables', 8),
-                                                                   (24, 'GCA1','Génie Civil', 8),
+                                                                   (24, 'GCA','Génie Civil', 8),
                                                                    (25, 'HYMAE','Hydraulique et Maitrise des Eaux', 8),
                                                                    (26, 'SCIENV','Sciences Environnementales', 8),
                                                                    (27, 'MC','Météorologie et Climatologie', 8),
@@ -58,7 +58,7 @@ INSERT INTO niveau (id, libelle, type_stage_id) VALUES (1, 'Niveau 1', 1),
                                                        (4, 'Niveau 4', 4),
                                                        (5, 'Niveau 5', 5);
 
-INSERT INTO Parcours (id, specialite_id, niveau_id) VALUES (1, 22, 1),
+INSERT INTO parcours (id, specialite_id, niveau_id) VALUES (1, 22, 1),
                                                             (2, 23, 1),
                                                             (3, 24, 1),
                                                             (4, 25, 1),
@@ -246,4 +246,12 @@ INSERT INTO entreprise (id, nom) VALUES (1, 'VIVA-BENOUE'),
 					 (31, 'IRAD MAROUA'),
 					 (32, 'COMITÉ DE DIOCÉSAINE DE DÉVELOPPEMENT (CDD)'),
 					 (33, 'CARITAS MAROUA-MOKOLO');
-					 
+alter table departement alter column ID restart with 11;
+alter table specialite alter column ID restart with 33;
+alter table annee_academique alter column ID restart with 5;
+alter table type_stage alter column ID restart with 6;
+alter table niveau alter column ID restart with 6;
+alter table parcours alter column ID restart with 100;
+alter table etudiant alter column ID restart with 56;
+alter table periode_stage alter column ID restart with 6;
+alter table entreprise alter column ID restart with 34;
