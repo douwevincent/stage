@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import {
   NCard, NDataTable, NButton, NSpace, NInput, NIcon, NTooltip, NPopconfirm,
-  NModal, NForm, NFormItem, useMessage
+  NModal, NForm, NFormItem, NSelect, useMessage
 } from 'naive-ui'
 import type { FormInst, FormRules, DataTableColumns } from 'naive-ui'
 import { PlusOutlined, SearchOutlined } from '@vicons/antd'
 import { Edit, Trash2 } from 'lucide-vue-next'
 import { ref, h, onMounted, computed, reactive } from 'vue'
 import { NiveauService, type NiveauDTO } from '@/api/NiveauService'
+import { TypeStageService } from '@/api/TypeStageService'
 
 const message = useMessage()
 const formRef = ref<FormInst | null>(null)
@@ -16,7 +17,9 @@ const modalTitle = ref('')
 const saving = ref(false)
 
 const formModel = reactive<NiveauDTO>({
-  libelle: ''
+  libelle: '',
+  typeStageId: null,
+  typeStageLibelle: null
 })
 
 const rules: FormRules = {
@@ -25,6 +28,14 @@ const rules: FormRules = {
 
 const columns: DataTableColumns<NiveauDTO> = [
   { title: 'Libellé', key: 'libelle', minWidth: 300 },
+  {
+    title: 'Type de stage',
+    key: 'typeStageLibelle',
+    minWidth: 220,
+    render (row) {
+      return row.typeStageLibelle || row.typeStageId || '-'
+    }
+  },
   {
     title: 'Actions',
     key: 'actions',
@@ -68,6 +79,7 @@ const loading = ref(false)
 const page = ref(1)
 const pageSize = ref(10)
 const itemCount = ref(0)
+const typeStageOptions = ref<{ label: string, value: number }[]>([])
 
 const pagination = computed(() => ({
   page: page.value,
@@ -99,11 +111,25 @@ const fetchData = async () => {
   }
 }
 
+const fetchTypeStages = async () => {
+  try {
+    const res = await TypeStageService.getAll(0, 200)
+    typeStageOptions.value = (res.data.content || []).map((typeStage: { id: number, libelle: string }) => ({
+      label: typeStage.libelle,
+      value: typeStage.id
+    }))
+  } catch {
+    message.error('Erreur lors du chargement des types de stage')
+  }
+}
+
 const handleAdd = () => {
   modalTitle.value = 'Ajouter un Niveau'
   Object.assign(formModel, {
     id: undefined,
-    libelle: ''
+    libelle: '',
+    typeStageId: null,
+    typeStageLibelle: null
   })
   showModal.value = true
 }
@@ -148,6 +174,7 @@ const handleDelete = async (id: number) => {
 }
 
 onMounted(fetchData)
+onMounted(fetchTypeStages)
 </script>
 
 <template>
@@ -200,6 +227,14 @@ onMounted(fetchData)
         <div class="space-y-4">
           <n-form-item label="Libellé" path="libelle">
             <n-input v-model:value="formModel.libelle" placeholder="Ex: Licence 3" />
+          </n-form-item>
+          <n-form-item label="Type de stage" path="typeStageId">
+            <n-select
+              v-model:value="formModel.typeStageId"
+              :options="typeStageOptions"
+              placeholder="Sélectionner un type de stage"
+              clearable
+            />
           </n-form-item>
         </div>
       </n-form>

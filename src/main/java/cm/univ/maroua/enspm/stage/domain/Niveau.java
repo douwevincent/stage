@@ -20,6 +20,10 @@ public class Niveau {
     @NotNull
     private String libelle;
 
+    @ManyToOne
+    @JoinColumn(name = "type_stage_id")
+    private TypeStage typeStage;
+
     @OneToMany(mappedBy = "niveau")
     private List<Parcours> parcours;
 }

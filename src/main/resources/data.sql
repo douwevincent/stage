@@ -46,17 +46,17 @@ INSERT INTO annee_academique VALUES (1, false, '2022-2023'),
                                     (3, false, '2024-2025'),
                                     (4, true, '2025-2026');
 
-INSERT INTO niveau VALUES (1, 'Niveau 1'),
-                        (2, 'Niveau 2'),
-                        (3, 'Niveau 3'),
-                        (4, 'Niveau 4'),
-                        (5, 'Niveau 5');
-
 INSERT INTO type_stage VALUES (1, 'Stage Ouvrier'),
                               (2, 'Stage d''imprégnation'),
                               (3, 'Stage d''insertion professionnelle'),
                               (4, 'Stage pre-ingénieur'),
                               (5, 'Stage de fin de formation');
+
+INSERT INTO niveau (id, libelle, type_stage_id) VALUES (1, 'Niveau 1', 1),
+                                                       (2, 'Niveau 2', 2),
+                                                       (3, 'Niveau 3', 3),
+                                                       (4, 'Niveau 4', 4),
+                                                       (5, 'Niveau 5', 5);
 
 INSERT INTO Parcours (id, specialite_id, niveau_id) VALUES (1, 22, 1),
                                                             (2, 23, 1),

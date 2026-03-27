@@ -3,6 +3,8 @@ import api from './index'
 export interface NiveauDTO {
   id?: number
   libelle: string
+  typeStageId?: number | null
+  typeStageLibelle?: string | null
 }
 
 export const NiveauService = {

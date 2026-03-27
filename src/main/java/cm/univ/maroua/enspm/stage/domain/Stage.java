@@ -34,10 +34,6 @@ public class Stage {
     @JoinColumn(name = "encadreur_id")
     private Encadreur encadreur;
 
-    @ManyToOne
-    @JoinColumn(name = "type_stage_id")
-    private TypeStage typeStage;
-
     @NotNull
     private LocalDate dateDebut;
 
