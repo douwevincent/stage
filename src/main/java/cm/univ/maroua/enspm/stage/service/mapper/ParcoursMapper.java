@@ -7,6 +7,9 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface ParcoursMapper extends EntityMapper<ParcoursDTO, Parcours> {
+    @Mapping(source = "specialite.departement.id", target = "departementId")
+    @Mapping(source = "specialite.departement.code", target = "departementCode")
+    @Mapping(source = "specialite.departement.intitule", target = "departementIntitule")
     @Mapping(source = "specialite.id", target = "specialiteId")
     @Mapping(source = "specialite.code", target = "specialiteCode")
     @Mapping(source = "specialite.intitule", target = "specialiteIntitule")

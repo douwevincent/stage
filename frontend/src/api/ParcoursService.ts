@@ -2,6 +2,9 @@ import api from './index'
 
 export interface ParcoursDTO {
   id?: number
+  departementId?: number | null
+  departementCode?: string | null
+  departementIntitule?: string | null
   specialiteId: number | null
   niveauId: number | null
   specialiteCode?: string | null
@@ -15,6 +18,7 @@ export const ParcoursService = {
     page = 0,
     size = 20,
     filters?: {
+      departementId?: number | null
       specialiteId?: number | null
       niveauId?: number | null
       q?: string
@@ -22,6 +26,7 @@ export const ParcoursService = {
     }
   ) {
     const params: Record<string, string | number> = { page, size }
+    if (filters?.departementId != null) params.departementId = filters.departementId
     if (filters?.specialiteId != null) params.specialiteId = filters.specialiteId
     if (filters?.niveauId != null) params.niveauId = filters.niveauId
     if (filters?.q) params.q = filters.q

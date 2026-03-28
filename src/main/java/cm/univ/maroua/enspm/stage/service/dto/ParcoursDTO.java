@@ -4,6 +4,9 @@ import java.io.Serializable;
 
 public record ParcoursDTO(
 				Long id,
+				Long departementId,
+				String departementCode,
+				String departementIntitule,
 				Long specialiteId,
 				Long niveauId,
 				String specialiteCode,

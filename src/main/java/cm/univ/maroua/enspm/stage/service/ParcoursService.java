@@ -29,8 +29,12 @@ public class ParcoursService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ParcoursDTO> findAll(Pageable pageable, Long specialiteId, Long niveauId, String q) {
+    public Page<ParcoursDTO> findAll(Pageable pageable, Long departementId, Long specialiteId, Long niveauId, String q) {
         Specification<Parcours> spec = (root, query, cb) -> cb.conjunction();
+
+        if (departementId != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("specialite").get("departement").get("id"), departementId));
+        }
 
         if (specialiteId != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("specialite").get("id"), specialiteId));
@@ -43,6 +47,8 @@ public class ParcoursService {
         if (q != null && !q.isBlank()) {
             String search = "%" + q.trim().toLowerCase() + "%";
             spec = spec.and((root, query, cb) -> cb.or(
+                    cb.like(cb.lower(root.get("specialite").get("departement").get("code")), search),
+                    cb.like(cb.lower(root.get("specialite").get("departement").get("intitule")), search),
                     cb.like(cb.lower(root.get("specialite").get("code")), search),
                     cb.like(cb.lower(root.get("specialite").get("intitule")), search),
                     cb.like(cb.lower(root.get("niveau").get("libelle")), search)));
