@@ -44,6 +44,12 @@ const router = createRouter({
       component: () => import('@/views/stages/StageList.vue'),
     },
     {
+      path: '/declaration-stage',
+      name: 'declaration-stage',
+      component: () => import('@/views/stages/StudentStageDeclare.vue'),
+      meta: { layout: 'public' },
+    },
+    {
       path: '/annees-academiques',
       name: 'annees-academiques',
       component: () => import('@/views/annees-academiques/AnneeAcademiqueList.vue'),

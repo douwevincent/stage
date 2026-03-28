@@ -65,6 +65,18 @@ public class EtudiantService {
     }
 
     @Transactional(readOnly = true)
+    public Page<EtudiantDTO> search(String q, Pageable pageable) {
+        if (q == null || q.isBlank()) {
+            return findAll(pageable);
+        }
+        String query = q.trim();
+        return etudiantRepository
+                .findByMatriculeContainingIgnoreCaseOrNomContainingIgnoreCase(
+                        query, query, pageable)
+                .map(etudiantMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
     public Optional<EtudiantDTO> findOne(Long id) {
         return etudiantRepository.findById(id).map(etudiantMapper::toDto);
     }
@@ -253,5 +265,10 @@ public class EtudiantService {
 
     public void delete(Long id) {
         etudiantRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<EtudiantDTO> findByMatricule(String matricule) {
+        return etudiantRepository.findByMatricule(matricule).map(etudiantMapper::toDto);
     }
 }

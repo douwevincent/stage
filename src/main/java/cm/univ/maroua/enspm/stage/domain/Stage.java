@@ -17,7 +17,6 @@ public class Stage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "etudiant_id")
     private Etudiant etudiant;
@@ -46,4 +45,12 @@ public class Stage {
 
     @OneToOne(mappedBy = "stage")
     private SessionEvaluation sessionEvaluation;
+
+    @Enumerated(EnumType.STRING)
+    private Source source;
+
+    @Enumerated(EnumType.STRING)
+    private Statut statut;
+
+    private String cheminAutorisation;
 }

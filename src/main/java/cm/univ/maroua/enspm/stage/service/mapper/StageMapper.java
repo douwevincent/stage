@@ -8,7 +8,10 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface StageMapper extends EntityMapper<StageDTO, Stage> {
     @Mapping(source = "etudiant.id", target = "etudiantId")
+    @Mapping(source = "etudiant.matricule", target = "etudiantMatricule")
+    @Mapping(source = "etudiant.nom", target = "etudiantNom")
     @Mapping(source = "entreprise.id", target = "entrepriseId")
+    @Mapping(source = "entreprise.nom", target = "entrepriseNom")
     @Mapping(source = "encadreur.id", target = "encadreurId")
     @Mapping(source = "anneeAcademique.id", target = "anneeAcademiqueId")
     @Mapping(source = "sessionEvaluation.id", target = "sessionEvaluationId")

@@ -30,6 +30,13 @@ public class EtudiantController {
         return etudiantService.findAll(pageable);
     }
 
+    @GetMapping("/recherche")
+    public Page<EtudiantDTO> rechercheEtudiants(
+            @RequestParam(defaultValue = "") String q,
+            Pageable pageable) {
+        return etudiantService.search(q, pageable);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<EtudiantDTO> getEtudiant(@PathVariable Long id) {
         return etudiantService.findOne(id)
@@ -68,6 +75,13 @@ public class EtudiantController {
         } catch (IllegalStateException ex) {
             return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
         }
+    }
+
+    @GetMapping("/validate-matricule/{matricule}")
+    public ResponseEntity<EtudiantDTO> validateMatricule(@PathVariable String matricule) {
+        return etudiantService.findByMatricule(matricule)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")

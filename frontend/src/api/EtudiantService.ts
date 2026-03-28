@@ -47,6 +47,12 @@ export const EtudiantService = {
     })
   },
 
+  search (q = '', page = 0, size = 20) {
+    return api.get('/api/etudiants/recherche', {
+      params: { q, page, size }
+    })
+  },
+
   getOne (id: number) {
     return api.get(`/api/etudiants/${id}`)
   },
@@ -65,5 +71,9 @@ export const EtudiantService = {
 
   delete (id: number) {
     return api.delete(`/api/etudiants/${id}`)
+  },
+
+  validateMatricule (matricule: string) {
+    return api.get<EtudiantDTO>(`/api/etudiants/validate-matricule/${encodeURIComponent(matricule)}`)
   }
 }

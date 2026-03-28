@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -43,5 +44,22 @@ public class EntrepriseService {
 
     public void delete(Long id) {
         entrepriseRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<EntrepriseDTO> rechercheParNom(String q) {
+        return entrepriseRepository.findByNomContainingIgnoreCase(q)
+                .stream().map(entrepriseMapper::toDto).toList();
+    }
+
+    public EntrepriseDTO rechercheOuCree(String nom, String secteur) {
+        return entrepriseRepository.findByNomIgnoreCase(nom.trim())
+                .map(entrepriseMapper::toDto)
+                .orElseGet(() -> {
+                    Entreprise e = new Entreprise();
+                    e.setNom(nom.trim());
+                    e.setSecteur(secteur);
+                    return entrepriseMapper.toDto(entrepriseRepository.save(e));
+                });
     }
 }

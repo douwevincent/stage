@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/entreprises")
@@ -60,5 +62,20 @@ public class EntrepriseController {
     public ResponseEntity<Void> deleteEntreprise(@PathVariable Long id) {
         entrepriseService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/recherche")
+    public List<EntrepriseDTO> rechercheParNom(@RequestParam(defaultValue = "") String q) {
+        return entrepriseService.rechercheParNom(q);
+    }
+
+    @PostMapping("/recherche-ou-cree")
+    public ResponseEntity<EntrepriseDTO> rechercheOuCree(@RequestBody Map<String, String> body) {
+        String nom = body.getOrDefault("nom", "").trim();
+        String secteur = body.getOrDefault("secteur", "");
+        if (nom.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(entrepriseService.rechercheOuCree(nom, secteur));
     }
 }

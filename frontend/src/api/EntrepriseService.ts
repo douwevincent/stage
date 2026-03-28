@@ -27,5 +27,13 @@ export const EntrepriseService = {
 
   delete (id: number) {
     return api.delete(`/api/entreprises/${id}`)
+  },
+
+  rechercheParNom (q: string) {
+    return api.get<EntrepriseDTO[]>('/api/entreprises/recherche', { params: { q } })
+  },
+
+  rechercheOuCree (nom: string, secteur: string) {
+    return api.post<EntrepriseDTO>('/api/entreprises/recherche-ou-cree', { nom, secteur })
   }
 }

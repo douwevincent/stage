@@ -2,9 +2,12 @@
 import { ref, onMounted, computed } from 'vue'
 import { NConfigProvider, NMessageProvider, NDialogProvider, NNotificationProvider, NGlobalStyle, darkTheme } from 'naive-ui'
 import type { GlobalThemeOverrides } from 'naive-ui'
-import { RouterView } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
 import Sidebar from '@/components/layout/Sidebar.vue'
 import Header from '@/components/layout/Header.vue'
+
+const route = useRoute()
+const isPublicLayout = computed(() => route.meta.layout === 'public')
 
 const isDark = ref(localStorage.getItem('theme') === 'dark')
 
@@ -63,10 +66,10 @@ const toggleSidebar = () => {
         <n-notification-provider>
           <n-global-style />
           <div class="app-container flex min-h-screen bg-app-light dark:bg-app-dark font-inter transition-colors duration-300">
-            <Sidebar :collapsed="collapsed" />
+            <Sidebar v-if="!isPublicLayout" :collapsed="collapsed" />
             <div 
               class="flex-1 flex flex-col min-w-0 w-full transition-all duration-300"
-              :style="{ marginLeft: collapsed ? '80px' : '280px' }"
+              :style="{ marginLeft: isPublicLayout ? '0' : (collapsed ? '80px' : '280px') }"
             >
               <Header class="w-full" :is-dark="isDark" @toggle-theme="toggleTheme" @toggle-sidebar="toggleSidebar" />
               <main class="flex-1 w-full p-8 overflow-y-auto">
