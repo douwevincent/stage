@@ -32,6 +32,11 @@ public class PeriodeStageService {
         return periodeStageRepository.findAll(pageable).map(periodeStageMapper::toDto);
     }
 
+    public Page<PeriodeStageDTO> findAllByAnneeAcademiqueId(Long anneeAcademiqueId, Pageable pageable) {
+        return periodeStageRepository.findByAnneeAcademiqueId(anneeAcademiqueId, pageable)
+                .map(periodeStageMapper::toDto);
+    }
+
     @Transactional(readOnly = true)
     public Optional<PeriodeStageDTO> findOne(Long id) {
         return periodeStageRepository.findById(id).map(periodeStageMapper::toDto);

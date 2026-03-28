@@ -59,6 +59,11 @@ const router = createRouter({
       component: () => import('@/views/type-stages/TypeStageList.vue'),
     },
     {
+      path: '/periode-stages',
+      name: 'periode-stages',
+      component: () => import('@/views/periode-stages/PeriodeStageList.vue'),
+    },
+    {
       path: '/parcours',
       name: 'parcours',
       component: () => import('@/views/parcours/ParcoursList.vue'),

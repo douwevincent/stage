@@ -22,7 +22,12 @@ public class PeriodeStageController {
     }
 
     @GetMapping
-    public Page<PeriodeStageDTO> getAllPeriodeStages(Pageable pageable) {
+    public Page<PeriodeStageDTO> getAllPeriodeStages(
+            @RequestParam(value = "anneeAcademiqueId", required = false) Long anneeAcademiqueId,
+            Pageable pageable) {
+        if (anneeAcademiqueId != null) {
+            return periodeStageService.findAllByAnneeAcademiqueId(anneeAcademiqueId, pageable);
+        }
         return periodeStageService.findAll(pageable);
     }
 

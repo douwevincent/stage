@@ -47,12 +47,12 @@ defineEmits<{
       
       <div class="flex items-center gap-3 pl-4 border-l border-gray-100 dark:border-gray-800">
         <img 
-          src="https://ui-avatars.com/api/?name=Sarah&background=06b6d4&color=fff" 
-          alt="Sarah" 
+          src="https://ui-avatars.com/api/?name=Vincent&background=06b6d4&color=fff" 
+          alt="Vincent" 
           class="w-9 h-9 rounded-full object-cover ring-2 ring-gray-100 dark:ring-gray-800"
         >
         <div class="hidden sm:flex flex-col leading-tight">
-          <span class="text-sm font-semibold text-gray-900 dark:text-white">Sarah</span>
+          <span class="text-sm font-semibold text-gray-900 dark:text-white">Vincent</span>
           <span class="text-xs text-gray-400">Admin</span>
         </div>
       </div>

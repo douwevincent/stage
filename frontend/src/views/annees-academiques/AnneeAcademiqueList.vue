@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import {
   NCard, NDataTable, NButton, NSpace, NInput, NIcon, NTooltip, NPopconfirm,
-  NModal, NForm, NFormItem, useMessage
+  NModal, NForm, NFormItem, NTag, useMessage
 } from 'naive-ui'
 import type { FormInst, FormRules, DataTableColumns } from 'naive-ui'
 import { PlusOutlined, SearchOutlined } from '@vicons/antd'
-import { Edit, Trash2 } from 'lucide-vue-next'
+import { Edit, Trash2, Power } from 'lucide-vue-next'
 import { ref, h, onMounted, computed, reactive } from 'vue'
 import { AnneeAcademiqueService, type AnneeAcademiqueDTO } from '@/api/AnneeAcademiqueService'
 
@@ -24,15 +24,35 @@ const rules: FormRules = {
 }
 
 const columns: DataTableColumns<AnneeAcademiqueDTO> = [
-  { title: 'Libellé', key: 'libelle', minWidth: 300 },
+  { title: 'Libellé', key: 'libelle', minWidth: 120 },
+  {
+    title: 'Statut',
+    key: 'actif',
+    width: 150,
+    render (row) {
+      return h(NTag, { type: row.actif ? 'success' : 'default', size: 'small' }, { default: () => row.actif ? 'Actif' : 'Inactif' })
+    }
+  },
   {
     title: 'Actions',
     key: 'actions',
-    width: 100,
+    width: 150,
     fixed: 'right',
     render (row) {
       return h(NSpace, null, {
         default: () => [
+          ...(!row.actif ? [
+            h(NTooltip, null, {
+              trigger: () => h(NButton, {
+                size: 'small',
+                quaternary: true,
+                type: 'success',
+                circle: true,
+                onClick: () => handleActivate(row.id!)
+              }, { default: () => h(NIcon, null, { default: () => h(Power) }) }),
+              default: () => 'Activer'
+            })
+          ] : []),
           h(NTooltip, null, {
             trigger: () => h(NButton, {
               size: 'small',
@@ -144,6 +164,16 @@ const handleDelete = async (id: number) => {
     fetchData()
   } catch {
     message.error('Erreur lors de la suppression')
+  }
+}
+
+const handleActivate = async (id: number) => {
+  try {
+    await AnneeAcademiqueService.activate(id)
+    message.success('Année académique activée avec succès')
+    fetchData()
+  } catch {
+    message.error('Erreur lors de l\'activation')
   }
 }
 

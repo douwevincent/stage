@@ -81,6 +81,11 @@ const menuOptions: MenuOption[] = [
     icon: renderIcon(Tags)
   },
   {
+    label: () => h(RouterLink, { to: { name: 'periode-stages' } }, { default: () => 'Périodes de Stage' }),
+    key: 'periode-stages',
+    icon: renderIcon(Calendar)
+  },
+  {
     label: () => h(RouterLink, { to: { name: 'parcours' } }, { default: () => 'Parcours' }),
     key: 'parcours',
     icon: renderIcon(Route)

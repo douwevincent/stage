@@ -3,6 +3,7 @@ import api from './index'
 export interface AnneeAcademiqueDTO {
   id?: number
   libelle: string
+  actif?: boolean
 }
 
 export const AnneeAcademiqueService = {
@@ -16,6 +17,10 @@ export const AnneeAcademiqueService = {
     return api.get(`/api/annee-academiques/${id}`)
   },
 
+  getActive () {
+    return api.get<AnneeAcademiqueDTO>('/api/annee-academiques/active')
+  },
+
   create (anneeAcademique: AnneeAcademiqueDTO) {
     return api.post('/api/annee-academiques', anneeAcademique)
   },
@@ -26,5 +31,9 @@ export const AnneeAcademiqueService = {
 
   delete (id: number) {
     return api.delete(`/api/annee-academiques/${id}`)
+  },
+
+  activate (id: number) {
+    return api.patch(`/api/annee-academiques/${id}/activer`)
   }
 }
