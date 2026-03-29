@@ -105,8 +105,8 @@ const menuOptions: MenuOption[] = [
     key: 'd1'
   },
   {
-    label: 'Paramètres',
-    key: 'settings',
+    label: () => h(RouterLink, { to: { name: 'parametres' } }, { default: () => 'Paramètres' }),
+    key: 'parametres',
     icon: renderIcon(Settings)
   }
 ]

@@ -246,6 +246,25 @@ INSERT INTO entreprise (id, nom) VALUES (1, 'VIVA-BENOUE'),
 					 (31, 'IRAD MAROUA'),
 					 (32, 'COMITÉ DE DIOCÉSAINE DE DÉVELOPPEMENT (CDD)'),
 					 (33, 'CARITAS MAROUA-MOKOLO');
+INSERT INTO app_setting (id, cle, valeur, type, description, secret, modifiable, updated_at) VALUES
+                                         (1, 'SMTP_HOST', 'smtp.example.com', 'STRING', 'Hote SMTP', false, true, CURRENT_TIMESTAMP),
+                                         (2, 'SMTP_PORT', '587', 'INTEGER', 'Port SMTP', false, true, CURRENT_TIMESTAMP),
+                                         (11, 'SMTP_SECURITY_MODE', 'STARTTLS', 'STRING', 'Mode de securite SMTP: NONE, STARTTLS, SSL_TLS', false, true, CURRENT_TIMESTAMP),
+                                         (12, 'SMTP_AUTH_ENABLED', 'true', 'STRING', 'Active ou desactive l''authentification SMTP', false, true, CURRENT_TIMESTAMP),
+                                         (13, 'SMTP_AUTH_MECHANISMS', 'LOGIN PLAIN', 'STRING', 'Mecanismes SMTP autorises (LOGIN, PLAIN, NTLM, CRAM-MD5)', false, true, CURRENT_TIMESTAMP),
+                                         (14, 'SMTP_SSL_TRUST', '*', 'STRING', 'Serveur(s) SMTP de confiance pour SSL/TLS', false, true, CURRENT_TIMESTAMP),
+                                         (15, 'SMTP_CONNECTION_TIMEOUT_MS', '10000', 'INTEGER', 'Timeout de connexion SMTP en millisecondes', false, true, CURRENT_TIMESTAMP),
+                                         (16, 'SMTP_TIMEOUT_MS', '10000', 'INTEGER', 'Timeout de lecture SMTP en millisecondes', false, true, CURRENT_TIMESTAMP),
+                                         (17, 'SMTP_WRITE_TIMEOUT_MS', '10000', 'INTEGER', 'Timeout d''ecriture SMTP en millisecondes', false, true, CURRENT_TIMESTAMP),
+                                         (18, 'SMTP_FROM_ADDRESS', 'no-reply@example.com', 'STRING', 'Adresse expediteur SMTP', false, true, CURRENT_TIMESTAMP),
+                                         (3, 'SMTP_USERNAME', 'no-reply@example.com', 'STRING', 'Utilisateur SMTP', false, true, CURRENT_TIMESTAMP),
+                                         (4, 'SMTP_PASSWORD', 'change-me', 'STRING', 'Mot de passe SMTP', true, true, CURRENT_TIMESTAMP),
+                                         (5, 'MAIL_TEMPLATE_BODY', 'Bonjour ${nomEtudiant},\n\nVotre stage est en cours de traitement.\n\nCordialement.', 'TEXT', 'Template principal des mails', false, true, CURRENT_TIMESTAMP),
+                                         (6, 'LETTRE_STAGE_TEMPLATE_PATH', 'templates/lettre-mise-en-stage.docx', 'STRING', 'Chemin du template de lettre de mise en stage', false, true, CURRENT_TIMESTAMP),
+                                         (7, 'EVALUATION_DELAY_DAYS', '14', 'INTEGER', 'Nombre de jours apres la fin du stage pour evaluer', false, true, CURRENT_TIMESTAMP),
+                                         (8, 'MAIL_SUBJECT_DECLARATION', 'Declaration de stage recue', 'STRING', 'Objet du mail de declaration de stage', false, true, CURRENT_TIMESTAMP),
+                                         (9, 'MAIL_SUBJECT_VALIDATION', 'Validation de stage', 'STRING', 'Objet du mail de validation de stage', false, true, CURRENT_TIMESTAMP),
+                                         (10, 'MAIL_SUBJECT_RAPPEL', 'Rappel evaluation de stage', 'STRING', 'Objet du mail de rappel d''evaluation', false, true, CURRENT_TIMESTAMP);
 alter table departement alter column ID restart with 11;
 alter table specialite alter column ID restart with 33;
 alter table annee_academique alter column ID restart with 5;
@@ -255,3 +274,4 @@ alter table parcours alter column ID restart with 100;
 alter table etudiant alter column ID restart with 56;
 alter table periode_stage alter column ID restart with 6;
 alter table entreprise alter column ID restart with 34;
+alter table app_setting alter column ID restart with 19;

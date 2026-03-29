@@ -79,6 +79,11 @@ const router = createRouter({
       name: 'inscriptions',
       component: () => import('@/views/inscriptions/InscriptionList.vue'),
     },
+    {
+      path: '/parametres',
+      name: 'parametres',
+      component: () => import('@/views/parametres/ParametresList.vue'),
+    },
   ],
 })
 
