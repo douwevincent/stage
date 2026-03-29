@@ -6,31 +6,27 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Parcours {
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "bareme_id", "critere_id" }))
+public class BaremeCritere {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "specialite_id")
-    private Specialite specialite;
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "niveau_id")
-    private Niveau niveau;
-
-    @ManyToOne
     @JoinColumn(name = "bareme_id")
     private Bareme bareme;
 
-    @OneToMany(mappedBy = "parcours")
-    private List<Inscription> inscriptions;
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "critere_id")
+    private Critere critere;
+
+    @NotNull
+    private Float coefficient;
 }

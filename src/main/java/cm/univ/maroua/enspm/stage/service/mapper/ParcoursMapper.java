@@ -15,13 +15,15 @@ public interface ParcoursMapper extends EntityMapper<ParcoursDTO, Parcours> {
     @Mapping(source = "specialite.intitule", target = "specialiteIntitule")
     @Mapping(source = "niveau.id", target = "niveauId")
     @Mapping(source = "niveau.libelle", target = "niveauLibelle")
+    @Mapping(source = "bareme.id", target = "baremeId")
+    @Mapping(source = "bareme.code", target = "baremeCode")
     @Mapping(target = "libelle", expression = "java(buildParcoursLibelle(entity))")
     ParcoursDTO toDto(Parcours entity);
 
     @Mapping(source = "specialiteId", target = "specialite.id")
     @Mapping(source = "niveauId", target = "niveau.id")
+    @Mapping(source = "baremeId", target = "bareme.id")
     @Mapping(target = "inscriptions", ignore = true)
-    @Mapping(target = "critereParcours", ignore = true)
     Parcours toEntity(ParcoursDTO dto);
 
     default String buildParcoursLibelle(Parcours entity) {

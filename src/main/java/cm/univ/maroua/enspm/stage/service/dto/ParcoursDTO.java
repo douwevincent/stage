@@ -9,6 +9,8 @@ public record ParcoursDTO(
 				String departementIntitule,
 				Long specialiteId,
 				Long niveauId,
+				Long baremeId,
+				String baremeCode,
 				String specialiteCode,
 				String specialiteIntitule,
 				String niveauLibelle,

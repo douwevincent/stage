@@ -7,7 +7,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "id_parcours", "id_critere" }))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "parcours_id", "critere_id" }))
 public class CritereParcours {
 
     @Id

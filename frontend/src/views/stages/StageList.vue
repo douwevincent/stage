@@ -8,6 +8,7 @@ import type { FormInst, FormRules, DataTableColumns, SelectOption } from 'naive-
 import { PlusOutlined } from '@vicons/antd'
 import { Edit, Trash2, CheckCircle, XCircle, FileText, UserPlus } from 'lucide-vue-next'
 import { ref, h, onMounted, computed, reactive, watch } from 'vue'
+import type { VNodeChild } from 'vue'
 import { StageService, type StageDTO, type Statut } from '@/api/StageService'
 import { EntrepriseService, type EntrepriseDTO } from '@/api/EntrepriseService'
 import { EtudiantService } from '@/api/EtudiantService'
@@ -226,7 +227,7 @@ const columns: DataTableColumns<StageDTO> = [
     width: 200,
     fixed: 'right',
     render (row) {
-      const buttons = []
+      const buttons: VNodeChild[] = []
 
       // Edit
       buttons.push(h(NTooltip, null, {

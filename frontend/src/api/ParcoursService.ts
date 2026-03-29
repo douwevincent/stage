@@ -7,6 +7,8 @@ export interface ParcoursDTO {
   departementIntitule?: string | null
   specialiteId: number | null
   niveauId: number | null
+  baremeId?: number | null
+  baremeCode?: string | null
   specialiteCode?: string | null
   specialiteIntitule?: string | null
   niveauLibelle?: string | null
@@ -21,6 +23,7 @@ export const ParcoursService = {
       departementId?: number | null
       specialiteId?: number | null
       niveauId?: number | null
+      baremeId?: number | null
       q?: string
       sort?: string
     }
@@ -29,6 +32,7 @@ export const ParcoursService = {
     if (filters?.departementId != null) params.departementId = filters.departementId
     if (filters?.specialiteId != null) params.specialiteId = filters.specialiteId
     if (filters?.niveauId != null) params.niveauId = filters.niveauId
+    if (filters?.baremeId != null) params.baremeId = filters.baremeId
     if (filters?.q) params.q = filters.q
     if (filters?.sort) params.sort = filters.sort
 

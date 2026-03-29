@@ -27,8 +27,9 @@ public class ParcoursController {
             @RequestParam(name = "departementId", required = false) Long departementId,
             @RequestParam(name = "specialiteId", required = false) Long specialiteId,
             @RequestParam(name = "niveauId", required = false) Long niveauId,
+            @RequestParam(name = "baremeId", required = false) Long baremeId,
             @RequestParam(name = "q", required = false) String q) {
-        return parcoursService.findAll(pageable, departementId, specialiteId, niveauId, q);
+        return parcoursService.findAll(pageable, departementId, specialiteId, niveauId, baremeId, q);
     }
 
     @GetMapping("/{id}")

@@ -21,6 +21,10 @@ public class Note {
     @JoinColumn(name = "critere_id")
     private Critere critere;
 
+    @ManyToOne
+    @JoinColumn(name = "bareme_critere_id")
+    private BaremeCritere baremeCritere;
+
     private Integer valeur;
     private String commentaire;
 }

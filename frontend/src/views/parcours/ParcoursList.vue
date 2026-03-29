@@ -11,6 +11,7 @@ import { ParcoursService, type ParcoursDTO } from '@/api/ParcoursService'
 import { SpecialiteService, type SpecialiteDTO } from '@/api/SpecialiteService'
 import { NiveauService, type NiveauDTO } from '@/api/NiveauService'
 import { DepartementService, type DepartementDTO } from '@/api/DepartementService'
+import { BaremeService, type BaremeDTO } from '@/api/BaremeService'
 
 const message = useMessage()
 const formRef = ref<FormInst | null>(null)
@@ -29,10 +30,12 @@ const formModel = reactive<ParcoursDTO>({
 const departementOptions = ref<OptionItem[]>([])
 const specialiteOptions = ref<SpecialiteOption[]>([])
 const niveauOptions = ref<OptionItem[]>([])
+const baremeOptions = ref<OptionItem[]>([])
 const parcoursOptions = ref<ParcoursDTO[]>([])
 const selectedDepartementId = ref<number | null>(null)
 const selectedSpecialiteId = ref<number | null>(null)
 const selectedNiveauId = ref<number | null>(null)
+const selectedBaremeId = ref<number | null>(null)
 const formDepartementId = ref<number | null>(null)
 const searchQuery = ref('')
 const sortField = ref('specialite.code')
@@ -118,7 +121,8 @@ const modalSpecialiteOptions = computed(() => {
 
 const rules: FormRules = {
   specialiteId: { required: true, type: 'number', message: 'La spécialité est requise', trigger: 'change' },
-  niveauId: { required: true, type: 'number', message: 'Le niveau est requis', trigger: 'change' }
+  niveauId: { required: true, type: 'number', message: 'Le niveau est requis', trigger: 'change' },
+  baremeId: { required: true, type: 'number', message: 'Le barème est requis', trigger: 'change' }
 }
 
 const columns: DataTableColumns<ParcoursDTO> = [
@@ -144,6 +148,14 @@ const columns: DataTableColumns<ParcoursDTO> = [
     minWidth: 180,
     render (row) {
       return row.niveauLibelle || row.niveauId || '-'
+    }
+  },
+  {
+    title: 'Barème',
+    key: 'baremeCode',
+    minWidth: 150,
+    render (row) {
+      return row.baremeCode || row.baremeId || '-'
     }
   },
   {
@@ -222,6 +234,7 @@ const fetchData = async () => {
       departementId: selectedDepartementId.value,
       specialiteId: selectedSpecialiteId.value,
       niveauId: selectedNiveauId.value,
+      baremeId: selectedBaremeId.value,
       q: searchQuery.value,
       sort: `${sortField.value},${sortOrder.value}`
     })
@@ -277,18 +290,25 @@ const handleNiveauFilterUpdate = (value: number | null) => {
   applyServerFilters()
 }
 
+const handleBaremeFilterUpdate = (value: number | null) => {
+  selectedBaremeId.value = value
+  applyServerFilters()
+}
+
 const fetchOptions = async () => {
   try {
-    const [departementsRes, specialitesRes, niveauxRes, parcoursRes] = await Promise.all([
+    const [departementsRes, specialitesRes, niveauxRes, baremesRes, parcoursRes] = await Promise.all([
       DepartementService.getAll(0, 200),
       SpecialiteService.getAll(0, 200),
       NiveauService.getAll(0, 200),
+      BaremeService.getAll(0, 200),
       fetchParcoursOptions()
     ])
 
     const departements = departementsRes.data.content || []
     const specialites = specialitesRes.data.content || []
     const niveaux = niveauxRes.data.content || []
+    const baremes = baremesRes.data.content || []
     parcoursOptions.value = parcoursRes
 
     departementOptions.value = departements
@@ -315,6 +335,14 @@ const fetchOptions = async () => {
         value: niveau.id as number
       }))
       .sort((left: OptionItem, right: OptionItem) => left.label.localeCompare(right.label, 'fr', { sensitivity: 'base' }))
+
+    baremeOptions.value = baremes
+      .filter((bareme: BaremeDTO) => typeof bareme.id === 'number')
+      .map((bareme: BaremeDTO) => ({
+        label: bareme.code,
+        value: bareme.id as number
+      }))
+      .sort((left: OptionItem, right: OptionItem) => left.label.localeCompare(right.label, 'fr', { sensitivity: 'base' }))
   } catch {
     message.error('Erreur lors du chargement des options')
   }
@@ -325,7 +353,8 @@ const handleAdd = () => {
   Object.assign(formModel, {
     id: undefined,
     specialiteId: null,
-    niveauId: null
+    niveauId: null,
+    baremeId: null
   })
   formDepartementId.value = null
   showModal.value = true
@@ -336,7 +365,8 @@ const handleEdit = (row: ParcoursDTO) => {
   Object.assign(formModel, {
     id: row.id,
     specialiteId: row.specialiteId,
-    niveauId: row.niveauId
+    niveauId: row.niveauId,
+    baremeId: row.baremeId
   })
   formDepartementId.value = row.departementId || specialiteOptions.value.find((option) => option.value === row.specialiteId)?.departementId || null
   showModal.value = true
@@ -359,7 +389,8 @@ const handleSave = async () => {
         const payload: ParcoursDTO = {
           id: formModel.id,
           specialiteId: formModel.specialiteId,
-          niveauId: formModel.niveauId
+          niveauId: formModel.niveauId,
+          baremeId: formModel.baremeId
         }
 
         if (formModel.id) {
@@ -452,6 +483,15 @@ onMounted(() => {
         </div>
         <div class="w-full md:w-56">
           <n-select
+            :value="selectedBaremeId"
+            :options="baremeOptions"
+            placeholder="Filtrer par barème"
+            clearable
+            @update:value="handleBaremeFilterUpdate"
+          />
+        </div>
+        <div class="w-full md:w-56">
+          <n-select
             v-model:value="sortField"
             :options="sortFieldOptions"
             placeholder="Trier par"
@@ -516,6 +556,13 @@ onMounted(() => {
               v-model:value="formModel.niveauId"
               :options="niveauOptions"
               placeholder="Sélectionner un niveau"
+            />
+          </n-form-item>
+          <n-form-item label="Barème" path="baremeId">
+            <n-select
+              v-model:value="formModel.baremeId"
+              :options="baremeOptions"
+              placeholder="Sélectionner un barème"
             />
           </n-form-item>
         </div>
