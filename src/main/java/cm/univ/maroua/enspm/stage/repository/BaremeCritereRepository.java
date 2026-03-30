@@ -9,4 +9,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BaremeCritereRepository extends JpaRepository<BaremeCritere, Long> {
     Page<BaremeCritere> findAllByBaremeId(Long baremeId, Pageable pageable);
+    
+    /**
+     * Vérifie si un critère est utilisé dans au moins un barème
+     */
+    boolean existsByCritereId(Long critereId);
 }

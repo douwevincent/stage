@@ -80,6 +80,21 @@ const router = createRouter({
       component: () => import('@/views/inscriptions/InscriptionList.vue'),
     },
     {
+      path: '/baremes',
+      name: 'baremes',
+      component: () => import('@/views/baremes/BaremeList.vue'),
+    },
+    {
+      path: '/criteres',
+      name: 'criteres',
+      component: () => import('@/views/criteres/CritereList.vue'),
+    },
+    {
+      path: '/bareme-criteres',
+      name: 'bareme-criteres',
+      component: () => import('@/views/bareme-criteres/BaremeCritereList.vue'),
+    },
+    {
       path: '/parametres',
       name: 'parametres',
       component: () => import('@/views/parametres/ParametresList.vue'),

@@ -1,14 +1,18 @@
 package cm.univ.maroua.enspm.stage.service;
 
 import cm.univ.maroua.enspm.stage.domain.Parcours;
+import cm.univ.maroua.enspm.stage.domain.Bareme;
 import cm.univ.maroua.enspm.stage.repository.ParcoursRepository;
+import cm.univ.maroua.enspm.stage.repository.BaremeRepository;
 import cm.univ.maroua.enspm.stage.service.dto.ParcoursDTO;
 import cm.univ.maroua.enspm.stage.service.mapper.ParcoursMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -17,10 +21,12 @@ import java.util.Optional;
 public class ParcoursService {
 
     private final ParcoursRepository parcoursRepository;
+    private final BaremeRepository baremeRepository;
     private final ParcoursMapper parcoursMapper;
 
-    public ParcoursService(ParcoursRepository parcoursRepository, ParcoursMapper parcoursMapper) {
+    public ParcoursService(ParcoursRepository parcoursRepository, BaremeRepository baremeRepository, ParcoursMapper parcoursMapper) {
         this.parcoursRepository = parcoursRepository;
+        this.baremeRepository = baremeRepository;
         this.parcoursMapper = parcoursMapper;
     }
 
@@ -77,5 +83,33 @@ public class ParcoursService {
 
     public void delete(Long id) {
         parcoursRepository.deleteById(id);
+    }
+
+    /**
+     * Assigne un barème à un parcours avec validation
+     * - Le barème doit exister
+     * - Le barème doit être actif
+     */
+    public ParcoursDTO assignBareme(Long parcoursId, Long baremeId) {
+        // Vérifier que le parcours existe
+        Parcours parcours = parcoursRepository.findById(parcoursId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                "Parcours non trouvé avec l'id: " + parcoursId));
+        
+        // Vérifier que le barème existe
+        Bareme bareme = baremeRepository.findById(baremeId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                "Barème non trouvé avec l'id: " + baremeId));
+        
+        // Vérifier que le barème est actif
+        if (!bareme.getActif()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Le barème doit être actif pour être assigné à un parcours");
+        }
+        
+        // Assigner et sauvegarder
+        parcours.setBareme(bareme);
+        parcours = parcoursRepository.save(parcours);
+        return parcoursMapper.toDto(parcours);
     }
 }

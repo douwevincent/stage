@@ -6,8 +6,10 @@ import cm.univ.maroua.enspm.stage.service.dto.BaremeCritereDTO;
 import cm.univ.maroua.enspm.stage.service.mapper.BaremeCritereMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -36,6 +38,11 @@ public class BaremeCritereService {
     }
 
     public BaremeCritereDTO save(BaremeCritereDTO baremeCritereDTO) {
+        // Validation du coefficient (0 à 20)
+        if (baremeCritereDTO.coefficient() == null || baremeCritereDTO.coefficient() < 0 || baremeCritereDTO.coefficient() > 20) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                "Le coefficient doit être compris entre 0 et 20");
+        }
         BaremeCritere baremeCritere = baremeCritereMapper.toEntity(baremeCritereDTO);
         baremeCritere = baremeCritereRepository.save(baremeCritere);
         return baremeCritereMapper.toDto(baremeCritere);

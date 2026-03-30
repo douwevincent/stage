@@ -2,6 +2,8 @@ package cm.univ.maroua.enspm.stage.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.DecimalMax;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,5 +30,7 @@ public class BaremeCritere {
     private Critere critere;
 
     @NotNull
+    @DecimalMin("0.0")
+    @DecimalMax("20.0")
     private Float coefficient;
 }

@@ -67,4 +67,16 @@ public class ParcoursController {
         parcoursService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * Assigne un barème à un parcours
+     * PUT /api/v1/parcours/{id}/bareme?baremeId=X
+     */
+    @PutMapping("/{id}/bareme")
+    public ResponseEntity<ParcoursDTO> assignBareme(
+            @PathVariable Long id,
+            @RequestParam Long baremeId) {
+        ParcoursDTO result = parcoursService.assignBareme(id, baremeId);
+        return ResponseEntity.ok().body(result);
+    }
 }

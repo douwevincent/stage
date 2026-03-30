@@ -18,7 +18,10 @@ import {
   School,
   Tags,
   Route,
-  NotebookPen
+  NotebookPen,
+  BookOpen,
+  CheckSquare,
+  Link
 } from 'lucide-vue-next'
 
 const props = defineProps<{
@@ -94,6 +97,21 @@ const menuOptions: MenuOption[] = [
     label: () => h(RouterLink, { to: { name: 'inscriptions' } }, { default: () => 'Inscriptions' }),
     key: 'inscriptions',
     icon: renderIcon(NotebookPen)
+  },
+  {
+    label: () => h(RouterLink, { to: { name: 'baremes' } }, { default: () => 'Barèmes' }),
+    key: 'baremes',
+    icon: renderIcon(BookOpen)
+  },
+  {
+    label: () => h(RouterLink, { to: { name: 'criteres' } }, { default: () => 'Critères' }),
+    key: 'criteres',
+    icon: renderIcon(CheckSquare)
+  },
+  {
+    label: () => h(RouterLink, { to: { name: 'bareme-criteres' } }, { default: () => 'Assoc. Barème-Critères' }),
+    key: 'bareme-criteres',
+    icon: renderIcon(Link)
   },
   {
     label: 'Notes',
