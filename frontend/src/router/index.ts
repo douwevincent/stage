@@ -95,6 +95,11 @@ const router = createRouter({
       component: () => import('@/views/bareme-criteres/BaremeCritereList.vue'),
     },
     {
+      path: '/notifications',
+      name: 'notifications',
+      component: () => import('@/views/notifications/NotificationList.vue'),
+    },
+    {
       path: '/parametres',
       name: 'parametres',
       component: () => import('@/views/parametres/ParametresList.vue'),

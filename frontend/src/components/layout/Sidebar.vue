@@ -21,7 +21,8 @@ import {
   NotebookPen,
   BookOpen,
   CheckSquare,
-  Link
+  Link,
+  Bell
 } from 'lucide-vue-next'
 
 const props = defineProps<{
@@ -112,6 +113,11 @@ const menuOptions: MenuOption[] = [
     label: () => h(RouterLink, { to: { name: 'bareme-criteres' } }, { default: () => 'Assoc. Barème-Critères' }),
     key: 'bareme-criteres',
     icon: renderIcon(Link)
+  },
+  {
+    label: () => h(RouterLink, { to: { name: 'notifications' } }, { default: () => 'Notifications' }),
+    key: 'notifications',
+    icon: renderIcon(Bell)
   },
   {
     label: 'Notes',
