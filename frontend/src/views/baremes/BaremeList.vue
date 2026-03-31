@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { 
   NCard, NDataTable, NButton, NSpace, NInput, NIcon, NTooltip, NPopconfirm, 
-  NModal, NForm, NFormItem, useMessage, NCheckbox 
+  NModal, NForm, NFormItem, useMessage, NCheckbox, NTag 
 } from 'naive-ui'
 import type { FormInst, FormRules, DataTableColumns } from 'naive-ui'
 import { PlusOutlined, SearchOutlined } from '@vicons/antd'
@@ -18,7 +18,8 @@ const saving = ref(false)
 const formModel = reactive<BaremeDTO>({
   code: '',
   libelle: '',
-  actif: true
+  actif: true,
+  parDefaut: false
 })
 
 const rules: FormRules = {
@@ -32,8 +33,22 @@ const columns: DataTableColumns<BaremeDTO> = [
   {
     title: 'Actif',
     key: 'actif',
-    width: 80,
-    render: (row) => row.actif ? '✓' : '✗'
+    width: 110,
+    render (row) {
+      return h(NTag, { type: row.actif ? 'success' : 'default', size: 'small' }, {
+        default: () => row.actif ? 'Actif' : 'Inactif'
+      })
+    }
+  },
+  {
+    title: 'Par défaut',
+    key: 'parDefaut',
+    width: 130,
+    render (row) {
+      return h(NTag, { type: row.parDefaut ? 'warning' : 'default', size: 'small' }, {
+        default: () => row.parDefaut ? 'Par défaut' : 'Standard'
+      })
+    }
   },
   {
     title: 'Actions',
@@ -115,7 +130,8 @@ const handleAdd = () => {
     id: undefined,
     code: '',
     libelle: '',
-    actif: true
+    actif: true,
+    parDefaut: false
   })
   showModal.value = true
 }
@@ -218,6 +234,9 @@ onMounted(fetchData)
           </n-form-item>
           <n-form-item label="Actif" path="actif">
             <n-checkbox v-model:checked="formModel.actif" />
+          </n-form-item>
+          <n-form-item label="Par défaut" path="parDefaut">
+            <n-checkbox v-model:checked="formModel.parDefaut" />
           </n-form-item>
         </div>
       </n-form>

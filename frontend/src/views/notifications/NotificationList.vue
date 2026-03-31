@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
-  NCard, NDataTable, NButton, NSpace, NInput, NIcon, NTooltip, NPopconfirm,
-  NModal, NForm, NFormItem, NSelect, NInputNumber, useMessage, NSwitch, NDivider
+  NCard, NDataTable, NButton, NSpace, NIcon, NTooltip, NPopconfirm,
+  NModal, NForm, NFormItem, NSelect, NInputNumber, useMessage, NSwitch
 } from 'naive-ui'
 import type { FormInst, FormRules, DataTableColumns } from 'naive-ui'
 import { PlusOutlined } from '@vicons/antd'
@@ -27,8 +27,6 @@ const formModel = reactive<NotificationDTO>({
   typeStageId: null,
   referenceDateType: null,
   offsetDays: null,
-  objet: '',
-  contenuTemplate: '',
   actif: true
 })
 
@@ -60,26 +58,6 @@ const rules: FormRules = {
     type: 'number',
     message: 'Le décalage en jours est requis',
     trigger: ['blur', 'change']
-  },
-  objet: {
-    required: true,
-    validator: () => {
-      if (!formModel.objet || formModel.objet.trim().length === 0) {
-        return new Error('L\'objet est requis')
-      }
-      return true
-    },
-    trigger: ['blur', 'change']
-  },
-  contenuTemplate: {
-    required: true,
-    validator: () => {
-      if (!formModel.contenuTemplate || formModel.contenuTemplate.trim().length === 0) {
-        return new Error('Le contenu du template est requis')
-      }
-      return true
-    },
-    trigger: ['blur', 'change']
   }
 }
 
@@ -102,14 +80,6 @@ const columns: DataTableColumns<NotificationDTO> = [
     minWidth: 120,
     align: 'center',
     render: (row) => row.offsetDays
-  },
-  {
-    title: 'Objet',
-    key: 'objet',
-    minWidth: 200,
-    ellipsis: {
-      tooltip: true
-    }
   },
   {
     title: 'Actif',
@@ -211,8 +181,6 @@ const resetForm = () => {
     typeStageId: null,
     referenceDateType: null,
     offsetDays: null,
-    objet: '',
-    contenuTemplate: '',
     actif: true
   })
 }
@@ -230,8 +198,6 @@ const handleEdit = (row: NotificationDTO) => {
     typeStageId: row.typeStageId,
     referenceDateType: row.referenceDateType,
     offsetDays: row.offsetDays,
-    objet: row.objet,
-    contenuTemplate: row.contenuTemplate,
     actif: row.actif
   })
   showModal.value = true
@@ -247,8 +213,6 @@ const handleSave = async () => {
           typeStageId: formModel.typeStageId,
           referenceDateType: formModel.referenceDateType,
           offsetDays: formModel.offsetDays,
-          objet: formModel.objet,
-          contenuTemplate: formModel.contenuTemplate,
           actif: formModel.actif
         }
 
@@ -327,7 +291,7 @@ onMounted(async () => {
         :loading="loading"
         :bordered="false"
         :pagination="pagination"
-        :scroll-x="1100"
+        :scroll-x="900"
       />
     </n-card>
 
@@ -335,71 +299,49 @@ onMounted(async () => {
       v-model:show="showModal"
       preset="card"
       :title="modalTitle"
-      class="max-w-2xl"
+      class="max-w-md"
       :segmented="{ content: 'soft', footer: 'soft' }"
     >
       <n-form
         ref="formRef"
         :model="formModel"
         :rules="rules"
-        label-placement="left"
-        label-width="200"
-        label-align="left"
-        require-mark-placement="right-hanging"
+        label-placement="top"
       >
-        <div class="space-y-4">
-          <n-form-item label="Type de stage" path="typeStageId">
-            <n-select
-              v-model:value="formModel.typeStageId"
-              :options="typeStageOptions"
-              placeholder="Sélectionner un type de stage"
-              filterable
-            />
-          </n-form-item>
+        <n-form-item label="Type de stage" path="typeStageId">
+          <n-select
+            v-model:value="formModel.typeStageId"
+            :options="typeStageOptions"
+            placeholder="Sélectionner un type de stage"
+            filterable
+          />
+        </n-form-item>
 
-          <n-form-item label="Type de référence" path="referenceDateType">
-            <n-select
-              v-model:value="formModel.referenceDateType"
-              :options="referenceDateTypeOptions"
-              placeholder="Sélectionner un type de référence"
-              filterable
-            />
-          </n-form-item>
+        <n-form-item label="Type de référence" path="referenceDateType">
+          <n-select
+            v-model:value="formModel.referenceDateType"
+            :options="referenceDateTypeOptions"
+            placeholder="Sélectionner un type de référence"
+            filterable
+          />
+        </n-form-item>
 
-          <n-form-item label="Décalage en jours" path="offsetDays">
-            <n-input-number
-              v-model:value="formModel.offsetDays"
-              placeholder="Ex: -15, 0, +5"
-              :min="-365"
-              :max="365"
-              :step="1"
-              class="w-full"
-            />
-          </n-form-item>
+        <n-form-item label="Décalage en jours" path="offsetDays">
+          <n-input-number
+            v-model:value="formModel.offsetDays"
+            placeholder="Ex: -15, 0, +5"
+            :min="-365"
+            :max="365"
+            :step="1"
+            class="w-full"
+          >
+            <template #suffix>jours</template>
+          </n-input-number>
+        </n-form-item>
 
-          <n-divider style="margin: 12px 0" />
-
-          <n-form-item label="Objet" path="objet">
-            <n-input
-              v-model:value="formModel.objet"
-              placeholder="Sujet de l'email de notification"
-              type="text"
-            />
-          </n-form-item>
-
-          <n-form-item label="Contenu du template" path="contenuTemplate">
-            <n-input
-              v-model:value="formModel.contenuTemplate"
-              placeholder="Contenu du template d'email"
-              type="textarea"
-              :rows="6"
-            />
-          </n-form-item>
-
-          <n-form-item label="Actif">
-            <n-switch v-model:value="formModel.actif" />
-          </n-form-item>
-        </div>
+        <n-form-item label="Actif">
+          <n-switch v-model:value="formModel.actif" />
+        </n-form-item>
       </n-form>
 
       <template #footer>

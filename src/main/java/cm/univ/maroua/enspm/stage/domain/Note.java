@@ -27,4 +27,6 @@ public class Note {
 
     private Integer valeur;
     private String commentaire;
+
+    private java.time.LocalDate dateAttribution;
 }

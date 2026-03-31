@@ -5,6 +5,7 @@ export interface BaremeDTO {
   code: string
   libelle?: string | null
   actif?: boolean
+  parDefaut?: boolean
 }
 
 export interface BaremeCritereDTO {

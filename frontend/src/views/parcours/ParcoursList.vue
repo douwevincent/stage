@@ -24,13 +24,15 @@ type SpecialiteOption = OptionItem & { departementId: number | null }
 
 const formModel = reactive<ParcoursDTO>({
   specialiteId: null,
-  niveauId: null
+  niveauId: null,
+  baremeId: null
 })
 
 const departementOptions = ref<OptionItem[]>([])
 const specialiteOptions = ref<SpecialiteOption[]>([])
 const niveauOptions = ref<OptionItem[]>([])
 const baremeOptions = ref<OptionItem[]>([])
+const defaultBaremeId = ref<number | null>(null)
 const parcoursOptions = ref<ParcoursDTO[]>([])
 const selectedDepartementId = ref<number | null>(null)
 const selectedSpecialiteId = ref<number | null>(null)
@@ -308,8 +310,9 @@ const fetchOptions = async () => {
     const departements = departementsRes.data.content || []
     const specialites = specialitesRes.data.content || []
     const niveaux = niveauxRes.data.content || []
-    const baremes = baremesRes.data.content || []
+    const baremes = (baremesRes.data.content || []).filter((bareme: BaremeDTO) => bareme.actif)
     parcoursOptions.value = parcoursRes
+    defaultBaremeId.value = baremes.find((bareme: BaremeDTO) => bareme.parDefaut && typeof bareme.id === 'number')?.id ?? null
 
     departementOptions.value = departements
       .filter((departement: DepartementDTO) => typeof departement.id === 'number')
@@ -354,7 +357,7 @@ const handleAdd = () => {
     id: undefined,
     specialiteId: null,
     niveauId: null,
-    baremeId: null
+    baremeId: defaultBaremeId.value
   })
   formDepartementId.value = null
   showModal.value = true

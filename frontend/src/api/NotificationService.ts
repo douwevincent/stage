@@ -14,8 +14,6 @@ export interface NotificationDTO {
   typeStageId: number | null
   referenceDateType: NotificationReferenceDateType | null
   offsetDays: number | null
-  objet: string
-  contenuTemplate: string
   actif: boolean
 }
 

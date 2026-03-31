@@ -54,12 +54,6 @@ public class NotificationService {
         if (notificationDTO.offsetDays() == null) {
             throw new IllegalArgumentException("Offset days is required");
         }
-        if (notificationDTO.objet() == null || notificationDTO.objet().trim().isEmpty()) {
-            throw new IllegalArgumentException("Objet cannot be empty");
-        }
-        if (notificationDTO.contenuTemplate() == null || notificationDTO.contenuTemplate().trim().isEmpty()) {
-            throw new IllegalArgumentException("Contenu template cannot be empty");
-        }
         
         // Validate offsetDays range
         if (notificationDTO.offsetDays() < -365 || notificationDTO.offsetDays() > 365) {

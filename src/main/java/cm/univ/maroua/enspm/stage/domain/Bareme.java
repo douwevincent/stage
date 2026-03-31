@@ -9,7 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "code" }))
+@Table(uniqueConstraints = {
+    @UniqueConstraint(columnNames = { "code" }),
+    @UniqueConstraint(columnNames = { "par_defaut_unique_key" })
+})
 public class Bareme {
 
     @Id
@@ -23,4 +26,16 @@ public class Bareme {
 
     @Column(nullable = false)
     private Boolean actif = Boolean.TRUE;
+
+    @Column(name = "par_defaut", nullable = false)
+    private Boolean parDefaut = Boolean.FALSE;
+
+    @Column(name = "par_defaut_unique_key")
+    private String parDefautUniqueKey;
+
+    @PrePersist
+    @PreUpdate
+    private void syncParDefautUniqueKey() {
+        parDefautUniqueKey = Boolean.TRUE.equals(parDefaut) ? "DEFAULT" : null;
+    }
 }

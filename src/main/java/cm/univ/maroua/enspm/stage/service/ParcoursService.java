@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 @Service
@@ -77,6 +78,21 @@ public class ParcoursService {
 
     public ParcoursDTO save(ParcoursDTO parcoursDTO) {
         Parcours parcours = parcoursMapper.toEntity(parcoursDTO);
+        if (parcours.getBareme() == null || parcours.getBareme().getId() == null) {
+            Bareme baremeParDefaut = baremeRepository.findByParDefautTrueAndActifTrue().orElse(null);
+            if (baremeParDefaut != null) {
+                parcours.setBareme(baremeParDefaut);
+            }
+        } else {
+            Long baremeId = parcours.getBareme().getId();
+            Bareme bareme = baremeRepository.findById(baremeId)
+                    .orElseThrow(() -> new EntityNotFoundException("Barème introuvable : " + baremeId));
+            if (!Boolean.TRUE.equals(bareme.getActif())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Le barème doit être actif pour être assigné à un parcours");
+            }
+            parcours.setBareme(bareme);
+        }
         parcours = parcoursRepository.save(parcours);
         return parcoursMapper.toDto(parcours);
     }

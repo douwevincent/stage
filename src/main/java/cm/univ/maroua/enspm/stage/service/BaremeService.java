@@ -37,6 +37,12 @@ public class BaremeService {
         if (bareme.getActif() == null) {
             bareme.setActif(Boolean.TRUE);
         }
+        if (bareme.getParDefaut() == null) {
+            bareme.setParDefaut(Boolean.FALSE);
+        }
+        if (Boolean.TRUE.equals(bareme.getParDefaut())) {
+            baremeRepository.clearDefaultBareme();
+        }
         bareme = baremeRepository.save(bareme);
         return baremeMapper.toDto(bareme);
     }

@@ -8,8 +8,6 @@ public record NotificationDTO(
     Long typeStageId,
     NotificationReferenceDateType referenceDateType,
     Integer offsetDays,
-    String objet,
-    String contenuTemplate,
     Boolean actif
 ) implements Serializable {
 }

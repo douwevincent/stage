@@ -8,7 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -46,13 +45,6 @@ public class Notification {
     @Max(365)
     @Column(name = "offset_days")
     private Integer offsetDays;
-
-    @NotNull
-    private String objet;
-
-    @NotNull
-    @Lob
-    private String contenuTemplate;
 
     @NotNull
     private Boolean actif = true;
