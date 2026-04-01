@@ -22,7 +22,8 @@ public class SessionEvaluation {
     private Stage stage;
 
     private String codeAcces;
-    private String statut;
+    @Enumerated(EnumType.STRING)
+    private SessionEvaluationStatut statut = SessionEvaluationStatut.EN_ATTENTE;
     private LocalDate dateLimite;
 
     @OneToMany(mappedBy = "session")
