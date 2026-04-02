@@ -149,7 +149,7 @@ class EvaluationNotificationPlannerServiceIntegrationTest {
 
         // Session ouverte sans note saisie
         SessionEvaluation session = sessionEvaluationRepository.save(
-                new SessionEvaluation(null, stage, "CODE123", "OUVERT", today.plusDays(30), null));
+                new SessionEvaluation(null, stage, "CODE123", SessionEvaluationStatut.EN_ATTENTE, today.plusDays(30), null));
         stage.setSessionEvaluation(session);
         stageRepository.save(stage);
 
@@ -247,7 +247,7 @@ class EvaluationNotificationPlannerServiceIntegrationTest {
         creerInscription(etudiant, annee, niveau);
 
         SessionEvaluation session = sessionEvaluationRepository.save(
-                new SessionEvaluation(null, stage, "CODE456", "OUVERT", today.plusDays(30), null));
+                new SessionEvaluation(null, stage, "CODE456", SessionEvaluationStatut.EN_ATTENTE, today.plusDays(30), null));
         stage.setSessionEvaluation(session);
         stageRepository.save(stage);
 
