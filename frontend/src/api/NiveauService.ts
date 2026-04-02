@@ -9,24 +9,24 @@ export interface NiveauDTO {
 
 export const NiveauService = {
   getAll (page = 0, size = 20) {
-    return api.get('/api/niveaus', {
+    return api.get('/api/v1/niveaus', {
       params: { page, size }
     })
   },
 
   getOne (id: number) {
-    return api.get(`/api/niveaus/${id}`)
+    return api.get(`/api/v1/niveaus/${id}`)
   },
 
   create (niveau: NiveauDTO) {
-    return api.post('/api/niveaus', niveau)
+    return api.post('/api/v1/niveaus', niveau)
   },
 
   update (id: number, niveau: NiveauDTO) {
-    return api.put(`/api/niveaus/${id}`, niveau)
+    return api.put(`/api/v1/niveaus/${id}`, niveau)
   },
 
   delete (id: number) {
-    return api.delete(`/api/niveaus/${id}`)
+    return api.delete(`/api/v1/niveaus/${id}`)
   }
 }

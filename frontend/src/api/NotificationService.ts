@@ -19,24 +19,24 @@ export interface NotificationDTO {
 
 export const NotificationService = {
   getAll (page = 0, size = 20, typeStageId?: number) {
-    return api.get('/api/notifications', {
+    return api.get('/api/v1/notifications', {
       params: { page, size, typeStageId }
     })
   },
 
   getOne (id: number) {
-    return api.get(`/api/notifications/${id}`)
+    return api.get(`/api/v1/notifications/${id}`)
   },
 
   create (notification: NotificationDTO) {
-    return api.post('/api/notifications', notification)
+    return api.post('/api/v1/notifications', notification)
   },
 
   update (id: number, notification: NotificationDTO) {
-    return api.put(`/api/notifications/${id}`, notification)
+    return api.put(`/api/v1/notifications/${id}`, notification)
   },
 
   delete (id: number) {
-    return api.delete(`/api/notifications/${id}`)
+    return api.delete(`/api/v1/notifications/${id}`)
   }
 }

@@ -36,24 +36,24 @@ export const ParcoursService = {
     if (filters?.q) params.q = filters.q
     if (filters?.sort) params.sort = filters.sort
 
-    return api.get('/api/parcours', {
+    return api.get('/api/v1/parcours', {
       params
     })
   },
 
   getOne (id: number) {
-    return api.get(`/api/parcours/${id}`)
+    return api.get(`/api/v1/parcours/${id}`)
   },
 
   create (parcours: ParcoursDTO) {
-    return api.post('/api/parcours', parcours)
+    return api.post('/api/v1/parcours', parcours)
   },
 
   update (id: number, parcours: ParcoursDTO) {
-    return api.put(`/api/parcours/${id}`, parcours)
+    return api.put(`/api/v1/parcours/${id}`, parcours)
   },
 
   delete (id: number) {
-    return api.delete(`/api/parcours/${id}`)
+    return api.delete(`/api/v1/parcours/${id}`)
   }
 }

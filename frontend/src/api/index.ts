@@ -1,7 +1,16 @@
 import axios from 'axios'
 
+const rawBaseUrl = import.meta.env.BASE_URL || '/'
+const normalizedBaseUrl = rawBaseUrl.endsWith('/') ? rawBaseUrl : `${rawBaseUrl}/`
+const appBasePath = normalizedBaseUrl === '/' ? '' : normalizedBaseUrl.slice(0, -1)
+
+export const buildAppPath = (path: string): string => {
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+  return appBasePath ? `${appBasePath}${normalizedPath}` : normalizedPath
+}
+
 const api = axios.create({
-  baseURL: '/', // Uses the Vite proxy
+  baseURL: normalizedBaseUrl,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -22,8 +31,9 @@ api.interceptors.response.use(
     if (error?.response?.status === 401) {
       localStorage.removeItem('auth_token')
       localStorage.removeItem('auth_user')
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login'
+      const loginPath = buildAppPath('/login')
+      if (window.location.pathname !== loginPath) {
+        window.location.href = loginPath
       }
     }
     // Handle global errors here

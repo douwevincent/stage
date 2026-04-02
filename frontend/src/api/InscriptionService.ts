@@ -35,24 +35,24 @@ export const InscriptionService = {
     if (filters?.q) params.q = filters.q
     if (filters?.sort) params.sort = filters.sort
 
-    return api.get('/api/inscriptions', {
+    return api.get('/api/v1/inscriptions', {
       params
     })
   },
 
   getOne (id: number) {
-    return api.get(`/api/inscriptions/${id}`)
+    return api.get(`/api/v1/inscriptions/${id}`)
   },
 
   create (inscription: InscriptionDTO) {
-    return api.post('/api/inscriptions', inscription)
+    return api.post('/api/v1/inscriptions', inscription)
   },
 
   update (id: number, inscription: InscriptionDTO) {
-    return api.put(`/api/inscriptions/${id}`, inscription)
+    return api.put(`/api/v1/inscriptions/${id}`, inscription)
   },
 
   delete (id: number) {
-    return api.delete(`/api/inscriptions/${id}`)
+    return api.delete(`/api/v1/inscriptions/${id}`)
   }
 }

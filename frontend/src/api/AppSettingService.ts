@@ -13,10 +13,10 @@ export interface AppSettingDTO {
 
 export const AppSettingService = {
   getAll () {
-    return api.get('/api/parametres')
+    return api.get('/api/v1/parametres')
   },
 
   update (cle: string, valeur: string) {
-    return api.put(`/api/parametres/${cle}`, { valeur })
+    return api.put(`/api/v1/parametres/${cle}`, { valeur })
   }
 }

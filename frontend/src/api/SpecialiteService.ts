@@ -9,24 +9,24 @@ export interface SpecialiteDTO {
 
 export const SpecialiteService = {
   getAll (page = 0, size = 20, departementId?: number | null) {
-    return api.get('/api/specialites', {
+    return api.get('/api/v1/specialites', {
       params: { page, size, departementId }
     })
   },
 
   getOne (id: number) {
-    return api.get(`/api/specialites/${id}`)
+    return api.get(`/api/v1/specialites/${id}`)
   },
 
   create (specialite: SpecialiteDTO) {
-    return api.post('/api/specialites', specialite)
+    return api.post('/api/v1/specialites', specialite)
   },
 
   update (id: number, specialite: SpecialiteDTO) {
-    return api.put(`/api/specialites/${id}`, specialite)
+    return api.put(`/api/v1/specialites/${id}`, specialite)
   },
 
   delete (id: number) {
-    return api.delete(`/api/specialites/${id}`)
+    return api.delete(`/api/v1/specialites/${id}`)
   }
 }

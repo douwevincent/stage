@@ -42,38 +42,38 @@ export interface EtudiantImportResultDTO {
 
 export const EtudiantService = {
   getAll (page = 0, size = 20) {
-    return api.get('/api/etudiants', {
+    return api.get('/api/v1/etudiants', {
       params: { page, size }
     })
   },
 
   search (q = '', page = 0, size = 20) {
-    return api.get('/api/etudiants/recherche', {
+    return api.get('/api/v1/etudiants/recherche', {
       params: { q, page, size }
     })
   },
 
   getOne (id: number) {
-    return api.get(`/api/etudiants/${id}`)
+    return api.get(`/api/v1/etudiants/${id}`)
   },
 
   create (etudiant: EtudiantDTO) {
-    return api.post('/api/etudiants', etudiant)
+    return api.post('/api/v1/etudiants', etudiant)
   },
 
   update (id: number, etudiant: EtudiantDTO) {
-    return api.put(`/api/etudiants/${id}`, etudiant)
+    return api.put(`/api/v1/etudiants/${id}`, etudiant)
   },
 
   importRows (rows: EtudiantImportRowDTO[]) {
-    return api.post<EtudiantImportResultDTO>('/api/etudiants/import', rows)
+    return api.post<EtudiantImportResultDTO>('/api/v1/etudiants/import', rows)
   },
 
   delete (id: number) {
-    return api.delete(`/api/etudiants/${id}`)
+    return api.delete(`/api/v1/etudiants/${id}`)
   },
 
   validateMatricule (matricule: string) {
-    return api.get<EtudiantDTO>(`/api/etudiants/validate-matricule/${encodeURIComponent(matricule)}`)
+    return api.get<EtudiantDTO>(`/api/v1/etudiants/validate-matricule/${encodeURIComponent(matricule)}`)
   }
 }

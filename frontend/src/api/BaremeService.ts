@@ -19,29 +19,29 @@ export interface BaremeCritereDTO {
 
 export const BaremeService = {
   getAll (page = 0, size = 20) {
-    return api.get('/api/baremes', { params: { page, size } })
+    return api.get('/api/v1/baremes', { params: { page, size } })
   },
 
   getOne (id: number) {
-    return api.get(`/api/baremes/${id}`)
+    return api.get(`/api/v1/baremes/${id}`)
   },
 
   create (bareme: BaremeDTO) {
-    return api.post('/api/baremes', bareme)
+    return api.post('/api/v1/baremes', bareme)
   },
 
   update (id: number, bareme: BaremeDTO) {
-    return api.put(`/api/baremes/${id}`, bareme)
+    return api.put(`/api/v1/baremes/${id}`, bareme)
   },
 
   delete (id: number) {
-    return api.delete(`/api/baremes/${id}`)
+    return api.delete(`/api/v1/baremes/${id}`)
   }
 }
 
 export const BaremeCritereService = {
   getAll (page = 0, size = 20, baremeId?: number | null) {
-    return api.get('/api/bareme-criteres', {
+    return api.get('/api/v1/bareme-criteres', {
       params: {
         page,
         size,
@@ -51,14 +51,14 @@ export const BaremeCritereService = {
   },
 
   create (dto: BaremeCritereDTO) {
-    return api.post('/api/bareme-criteres', dto)
+    return api.post('/api/v1/bareme-criteres', dto)
   },
 
   update (id: number, dto: BaremeCritereDTO) {
-    return api.put(`/api/bareme-criteres/${id}`, dto)
+    return api.put(`/api/v1/bareme-criteres/${id}`, dto)
   },
 
   delete (id: number) {
-    return api.delete(`/api/bareme-criteres/${id}`)
+    return api.delete(`/api/v1/bareme-criteres/${id}`)
   }
 }

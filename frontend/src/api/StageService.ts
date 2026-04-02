@@ -1,4 +1,4 @@
-import api from './index'
+import api, { buildAppPath } from './index'
 import type { AxiosResponse } from 'axios'
 
 export type Source = 'ETUDIANT' | 'OPERATEUR'
@@ -25,43 +25,43 @@ export interface StageDTO {
 
 export const StageService = {
   getAll (page = 0, size = 20, statut?: Statut) {
-    return api.get('/api/stages', {
+    return api.get('/api/v1/stages', {
       params: { page, size, ...(statut ? { statut } : {}) }
     })
   },
 
   getOne (id: number) {
-    return api.get<StageDTO>(`/api/stages/${id}`)
+    return api.get<StageDTO>(`/api/v1/stages/${id}`)
   },
 
   create (stage: StageDTO) {
-    return api.post<StageDTO>('/api/stages', stage)
+    return api.post<StageDTO>('/api/v1/stages', stage)
   },
 
   update (id: number, stage: StageDTO) {
-    return api.put<StageDTO>(`/api/stages/${id}`, stage)
+    return api.put<StageDTO>(`/api/v1/stages/${id}`, stage)
   },
 
   delete (id: number) {
-    return api.delete(`/api/stages/${id}`)
+    return api.delete(`/api/v1/stages/${id}`)
   },
 
   valider (id: number) {
-    return api.patch<StageDTO>(`/api/stages/${id}/valider`)
+    return api.patch<StageDTO>(`/api/v1/stages/${id}/valider`)
   },
 
   rejeter (id: number) {
-    return api.patch<StageDTO>(`/api/stages/${id}/rejeter`)
+    return api.patch<StageDTO>(`/api/v1/stages/${id}/rejeter`)
   },
 
   assignerEtudiant (id: number, etudiantId: number) {
-    return api.patch<StageDTO>(`/api/stages/${id}/assigner-etudiant`, null, {
+    return api.patch<StageDTO>(`/api/v1/stages/${id}/assigner-etudiant`, null, {
       params: { etudiantId }
     })
   },
 
   getAutorisationUrl (id: number): string {
-    return `/api/stages/${id}/autorisation`
+    return buildAppPath(`/api/v1/stages/${id}/autorisation`)
   },
 
   declarer (params: {
@@ -85,7 +85,7 @@ export const StageService = {
     form.append('dateDebut', params.dateDebut)
     form.append('dateFin', params.dateFin)
     form.append('autorisation', params.autorisation)
-    return api.post<StageDTO>('/api/stages/declarer', form, {
+    return api.post<StageDTO>('/api/v1/stages/declarer', form, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
   }

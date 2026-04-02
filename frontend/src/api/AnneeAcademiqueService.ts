@@ -8,32 +8,32 @@ export interface AnneeAcademiqueDTO {
 
 export const AnneeAcademiqueService = {
   getAll (page = 0, size = 20) {
-    return api.get('/api/annee-academiques', {
+    return api.get('/api/v1/annee-academiques', {
       params: { page, size }
     })
   },
 
   getOne (id: number) {
-    return api.get(`/api/annee-academiques/${id}`)
+    return api.get(`/api/v1/annee-academiques/${id}`)
   },
 
   getActive () {
-    return api.get<AnneeAcademiqueDTO>('/api/annee-academiques/active')
+    return api.get<AnneeAcademiqueDTO>('/api/v1/annee-academiques/active')
   },
 
   create (anneeAcademique: AnneeAcademiqueDTO) {
-    return api.post('/api/annee-academiques', anneeAcademique)
+    return api.post('/api/v1/annee-academiques', anneeAcademique)
   },
 
   update (id: number, anneeAcademique: AnneeAcademiqueDTO) {
-    return api.put(`/api/annee-academiques/${id}`, anneeAcademique)
+    return api.put(`/api/v1/annee-academiques/${id}`, anneeAcademique)
   },
 
   delete (id: number) {
-    return api.delete(`/api/annee-academiques/${id}`)
+    return api.delete(`/api/v1/annee-academiques/${id}`)
   },
 
   activate (id: number) {
-    return api.patch(`/api/annee-academiques/${id}/activer`)
+    return api.patch(`/api/v1/annee-academiques/${id}/activer`)
   }
 }

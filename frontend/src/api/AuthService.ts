@@ -22,10 +22,10 @@ export interface AuthLoginRequestDTO {
 
 export const AuthService = {
   login(payload: AuthLoginRequestDTO) {
-    return api.post<AuthLoginResponseDTO>('/api/auth/login', payload)
+    return api.post<AuthLoginResponseDTO>('/api/v1/auth/login', payload)
   },
 
   me() {
-    return api.get<UserAccountDTO>('/api/auth/me')
+    return api.get<UserAccountDTO>('/api/v1/auth/me')
   },
 }

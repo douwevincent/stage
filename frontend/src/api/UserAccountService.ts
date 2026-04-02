@@ -19,28 +19,28 @@ export interface PagedResponse<T> {
 
 export const UserAccountService = {
   getAll(page = 0, size = 10) {
-    return api.get<PagedResponse<UserAccountDTO>>('/api/users', {
+    return api.get<PagedResponse<UserAccountDTO>>('/api/v1/users', {
       params: { page, size }
     })
   },
 
   create(payload: UserCreateRequestDTO) {
-    return api.post<UserAccountDTO>('/api/users', payload)
+    return api.post<UserAccountDTO>('/api/v1/users', payload)
   },
 
   activate(id: number) {
-    return api.patch<UserAccountDTO>(`/api/users/${id}/activate`)
+    return api.patch<UserAccountDTO>(`/api/v1/users/${id}/activate`)
   },
 
   deactivate(id: number) {
-    return api.patch<UserAccountDTO>(`/api/users/${id}/deactivate`)
+    return api.patch<UserAccountDTO>(`/api/v1/users/${id}/deactivate`)
   },
 
   resetPassword(id: number, payload: UserResetPasswordRequestDTO) {
-    return api.patch<UserAccountDTO>(`/api/users/${id}/reset-password`, payload)
+    return api.patch<UserAccountDTO>(`/api/v1/users/${id}/reset-password`, payload)
   },
 
   delete(id: number) {
-    return api.delete(`/api/users/${id}`)
+    return api.delete(`/api/v1/users/${id}`)
   }
 }

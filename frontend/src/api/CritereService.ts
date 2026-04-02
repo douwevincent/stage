@@ -8,22 +8,22 @@ export interface CritereDTO {
 
 export const CritereService = {
   getAll (page = 0, size = 20) {
-    return api.get('/api/criteres', { params: { page, size } })
+    return api.get('/api/v1/criteres', { params: { page, size } })
   },
 
   getOne (id: number) {
-    return api.get(`/api/criteres/${id}`)
+    return api.get(`/api/v1/criteres/${id}`)
   },
 
   create (critere: CritereDTO) {
-    return api.post('/api/criteres', critere)
+    return api.post('/api/v1/criteres', critere)
   },
 
   update (id: number, critere: CritereDTO) {
-    return api.put(`/api/criteres/${id}`, critere)
+    return api.put(`/api/v1/criteres/${id}`, critere)
   },
 
   delete (id: number) {
-    return api.delete(`/api/criteres/${id}`)
+    return api.delete(`/api/v1/criteres/${id}`)
   }
 }
