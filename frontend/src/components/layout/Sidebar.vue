@@ -4,6 +4,7 @@ import type { Component } from 'vue'
 import { NMenu } from 'naive-ui'
 import type { MenuOption } from 'naive-ui'
 import { RouterLink, useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore'
 import {
   LayoutDashboard,
   Users,
@@ -23,6 +24,7 @@ function renderIcon (icon: Component) {
 }
 
 const route = useRoute()
+const authStore = useAuthStore()
 
 const selectedKey = computed(() => {
   if (!route.name) return 'dashboard'
@@ -43,6 +45,9 @@ function getParentGroupKey (routeKey: string): string | null {
     return 'evaluation'
   }
   if (['notifications', 'parametres'].includes(routeKey)) {
+    return 'systeme'
+  }
+  if (['users-management'].includes(routeKey)) {
     return 'systeme'
   }
   return null
@@ -73,7 +78,7 @@ watch(
   { immediate: true }
 )
 
-const menuOptions: MenuOption[] = [
+const menuOptions = computed<MenuOption[]>(() => [
   {
     label: () => h(RouterLink, { to: { name: 'dashboard' } }, { default: () => 'Tableau de Bord' }),
     key: 'dashboard',
@@ -183,10 +188,16 @@ const menuOptions: MenuOption[] = [
       {
         label: () => h(RouterLink, { to: { name: 'parametres' } }, { default: () => 'Paramètres' }),
         key: 'parametres'
-      }
+      },
+      ...(authStore.isSuperAdmin
+        ? [{
+            label: () => h(RouterLink, { to: { name: 'users-management' } }, { default: () => 'Utilisateurs' }),
+            key: 'users-management'
+          }]
+        : [])
     ]
   }
-]
+])
 </script>
 
 <template>

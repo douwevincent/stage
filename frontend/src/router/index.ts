@@ -5,6 +5,12 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: '/login',
+      name: 'login',
+      component: () => import('@/views/auth/LoginPage.vue'),
+      meta: { layout: 'public', public: true },
+    },
+    {
       path: '/',
       name: 'dashboard',
       component: Dashboard,
@@ -47,7 +53,7 @@ const router = createRouter({
       path: '/declaration-stage',
       name: 'declaration-stage',
       component: () => import('@/views/stages/StudentStageDeclare.vue'),
-      meta: { layout: 'public' },
+      meta: { layout: 'public', public: true },
     },
     {
       path: '/annees-academiques',
@@ -104,7 +110,41 @@ const router = createRouter({
       name: 'parametres',
       component: () => import('@/views/parametres/ParametresList.vue'),
     },
+    {
+      path: '/utilisateurs',
+      name: 'users-management',
+      component: () => import('@/views/users/UserManagement.vue'),
+      meta: { requiresSuperAdmin: true },
+    },
   ],
+})
+
+router.beforeEach((to) => {
+  const token = localStorage.getItem('auth_token')
+  const user = localStorage.getItem('auth_user')
+  let currentRole: string | null = null
+  if (user) {
+    try {
+      currentRole = JSON.parse(user).role
+    } catch {
+      currentRole = null
+    }
+  }
+  const isPublic = Boolean(to.meta.public)
+
+  if (!isPublic && !token) {
+    return { name: 'login', query: { redirect: to.fullPath } }
+  }
+
+  if (to.name === 'login' && token) {
+    return { name: 'dashboard' }
+  }
+
+  if (to.meta.requiresSuperAdmin && currentRole !== 'SUPER_ADMIN') {
+    return { name: 'dashboard' }
+  }
+
+  return true
 })
 
 export default router

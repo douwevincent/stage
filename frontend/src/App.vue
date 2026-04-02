@@ -5,9 +5,11 @@ import type { GlobalThemeOverrides } from 'naive-ui'
 import { RouterView, useRoute } from 'vue-router'
 import Sidebar from '@/components/layout/Sidebar.vue'
 import Header from '@/components/layout/Header.vue'
+import { useAuthStore } from '@/stores/authStore'
 
 const route = useRoute()
 const isPublicLayout = computed(() => route.meta.layout === 'public')
+const authStore = useAuthStore()
 
 const isDark = ref(localStorage.getItem('theme') === 'dark')
 
@@ -43,6 +45,8 @@ const toggleTheme = () => {
 }
 
 onMounted(() => {
+  authStore.initialize()
+
   const currentTheme = localStorage.getItem('theme') || 'light'
   isDark.value = currentTheme === 'dark'
   document.documentElement.setAttribute('data-theme', currentTheme)
@@ -71,11 +75,17 @@ const toggleSidebar = () => {
               class="flex-1 flex flex-col min-w-0 w-full transition-all duration-300"
               :style="{ marginLeft: isPublicLayout ? '0' : (collapsed ? '80px' : '280px') }"
             >
-              <Header class="w-full" :is-dark="isDark" @toggle-theme="toggleTheme" @toggle-sidebar="toggleSidebar" />
+              <Header
+                v-if="!isPublicLayout"
+                class="w-full"
+                :is-dark="isDark"
+                @toggle-theme="toggleTheme"
+                @toggle-sidebar="toggleSidebar"
+              />
               <main class="flex-1 w-full p-8 overflow-y-auto">
                 <RouterView />
               </main>
-              <footer class="w-full p-6 text-center border-t border-gray-100 dark:border-gray-800 text-gray-500 text-sm">
+              <footer v-if="!isPublicLayout" class="w-full p-6 text-center border-t border-gray-100 dark:border-gray-800 text-gray-500 text-sm">
                 <p>&copy; 2026 ENSPM Stage Manager. Tous droits réservés.</p>
               </footer>
             </div>
