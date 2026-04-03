@@ -56,6 +56,18 @@ const router = createRouter({
       meta: { layout: 'public', public: true },
     },
     {
+      path: '/evaluation-encadreur/:code',
+      name: 'public-evaluation-list',
+      component: () => import('@/views/evaluations/PublicEvaluationList.vue'),
+      meta: { layout: 'public', public: true },
+    },
+    {
+      path: '/evaluation-encadreur/:code/stage/:stageId',
+      name: 'public-evaluation-form',
+      component: () => import('@/views/evaluations/PublicEvaluationForm.vue'),
+      meta: { layout: 'public', public: true },
+    },
+    {
       path: '/annees-academiques',
       name: 'annees-academiques',
       component: () => import('@/views/annees-academiques/AnneeAcademiqueList.vue'),

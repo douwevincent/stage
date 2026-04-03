@@ -5,7 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface InscriptionRepository extends JpaRepository<Inscription, Long>, JpaSpecificationExecutor<Inscription> {
-	boolean existsByAnneeAcademiqueIdAndEtudiantIdAndParcoursId(Long anneeAcademiqueId, Long etudiantId, Long parcoursId);
+    boolean existsByAnneeAcademiqueIdAndEtudiantIdAndParcoursId(Long anneeAcademiqueId, Long etudiantId, Long parcoursId);
+
+    Optional<Inscription> findFirstByEtudiantIdAndAnneeAcademiqueIdOrderByIdDesc(Long etudiantId, Long anneeAcademiqueId);
 }

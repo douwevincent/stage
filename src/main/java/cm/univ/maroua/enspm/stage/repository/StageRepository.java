@@ -55,4 +55,25 @@ public interface StageRepository extends JpaRepository<Stage, Long> {
             @Param("anneeAcademiqueId") Long anneeAcademiqueId,
             @Param("periodeDebut") LocalDate periodeDebut,
             @Param("periodeFin") LocalDate periodeFin);
+
+    @Query("""
+            SELECT s FROM Stage s
+            WHERE s.encadreur.id = :encadreurId
+              AND s.statut = cm.univ.maroua.enspm.stage.domain.Statut.VALIDE
+              AND s.anneeAcademique.id = :anneeAcademiqueId
+              AND s.dateDebut <= :periodeFin
+              AND s.dateFin >= :periodeDebut
+              AND (
+                  s.sessionEvaluation IS NULL
+                  OR NOT EXISTS (
+                      SELECT note FROM Note note
+                      WHERE note.session = s.sessionEvaluation
+                  )
+              )
+            """)
+    List<Stage> findStagesNonNotesPourEncadreurEtPeriode(
+            @Param("encadreurId") Long encadreurId,
+            @Param("anneeAcademiqueId") Long anneeAcademiqueId,
+            @Param("periodeDebut") LocalDate periodeDebut,
+            @Param("periodeFin") LocalDate periodeFin);
 }

@@ -7,6 +7,7 @@ import cm.univ.maroua.enspm.stage.repository.PeriodeStageRepository;
 import cm.univ.maroua.enspm.stage.repository.StageRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -36,23 +37,29 @@ public class EvaluationNotificationPlannerService {
             "Bonjour,\n\nCertains stages dont vous êtes encadreur n'ont pas encore été évalués. "
             + "Merci de vous connecter à la plateforme pour saisir vos notes.\n\nCordialement.";
 
+    @Value("${app.base-url:http://localhost:8080}")
+    private String baseUrl;
+
     private final NotificationRepository notificationRepository;
     private final PeriodeStageRepository periodeStageRepository;
     private final StageRepository stageRepository;
     private final MailQueueRepository mailQueueRepository;
     private final AppSettingService appSettingService;
+    private final SessionEvaluationService sessionEvaluationService;
 
     public EvaluationNotificationPlannerService(
             NotificationRepository notificationRepository,
             PeriodeStageRepository periodeStageRepository,
             StageRepository stageRepository,
             MailQueueRepository mailQueueRepository,
-            AppSettingService appSettingService) {
+            AppSettingService appSettingService,
+            SessionEvaluationService sessionEvaluationService) {
         this.notificationRepository = notificationRepository;
         this.periodeStageRepository = periodeStageRepository;
         this.stageRepository = stageRepository;
         this.mailQueueRepository = mailQueueRepository;
         this.appSettingService = appSettingService;
+        this.sessionEvaluationService = sessionEvaluationService;
     }
 
     /**
@@ -140,10 +147,35 @@ public class EvaluationNotificationPlannerService {
             return 0;
         }
 
+        // Créer ou récupérer une SessionEvaluation avec code court pour chaque stage éligible
+        List<Stage> stages = stageRepository.findStagesNonNotesPourEncadreurEtPeriode(
+                encadreur.getId(),
+                periode.getAnneeAcademique().getId(),
+                periode.getDateDebut(),
+                periode.getDateFin());
+
+        if (stages.isEmpty()) {
+            return 0;
+        }
+
+        String premierCode = null;
+        for (Stage stage : stages) {
+            SessionEvaluation session = sessionEvaluationService.ensureSessionWithCode(stage, periode.getDateFin());
+            if (premierCode == null) {
+                premierCode = session.getCodeAcces();
+            }
+        }
+
+        // Intégrer le lien dans le corps du message
+        String lien = baseUrl + "/evaluation-encadreur/" + premierCode;
+        String corpsAvecLien = corps.contains("{LIEN_EVALUATION}")
+                ? corps.replace("{LIEN_EVALUATION}", lien)
+                : corps + "\n\nLien d'évaluation : " + lien;
+
         MailQueue mail = new MailQueue();
         mail.setDestinataireEmail(encadreur.getEmail());
         mail.setSujet(sujet);
-        mail.setCorps(corps);
+        mail.setCorps(corpsAvecLien);
         mail.setStatut(MailQueueStatut.PENDING);
         mail.setDatePlanifiee(today);
         mail.setNombreTentatives(0);
@@ -153,8 +185,8 @@ public class EvaluationNotificationPlannerService {
 
         try {
             mailQueueRepository.save(mail);
-            log.debug("Mail enfilé : encadreur={} <{}> période={} notification={}",
-                    encadreur.getId(), encadreur.getEmail(), periode.getId(), notification.getId());
+            log.debug("Mail enfilé avec lien : encadreur={} <{}> période={} notification={} lien={}",
+                    encadreur.getId(), encadreur.getEmail(), periode.getId(), notification.getId(), lien);
             return 1;
         } catch (DataIntegrityViolationException e) {
             // Race condition entre le check existsBy et le save : on ignore silencieusement

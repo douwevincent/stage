@@ -265,6 +265,86 @@ INSERT INTO app_setting (id, cle, valeur, type, description, secret, modifiable,
                                          (8, 'MAIL_SUBJECT_DECLARATION', 'Declaration de stage recue', 'STRING', 'Objet du mail de declaration de stage', false, true, CURRENT_TIMESTAMP),
                                          (9, 'MAIL_SUBJECT_VALIDATION', 'Validation de stage', 'STRING', 'Objet du mail de validation de stage', false, true, CURRENT_TIMESTAMP),
                                          (10, 'MAIL_SUBJECT_RAPPEL', 'Rappel evaluation de stage', 'STRING', 'Objet du mail de rappel d''evaluation', false, true, CURRENT_TIMESTAMP);
+
+-- ========== TEST DATA FOR PUBLIC EVALUATION WORKFLOW ==========
+
+-- Encadreurs (supervisors)
+INSERT INTO encadreur (id, nom, email, telephone) VALUES 
+(1, 'Dr. KAMGUEU Adrien', 'kamgueu.adrien@example.com', '670123456'),
+(2, 'Pr. NGONGOUM Pierre', 'ngongoum.pierre@example.com', '671234567'),
+(3, 'Dr. DJIRE Fatima', 'djire.fatima@example.com', '672345678'),
+(4, 'Ing. NZOMO Benjamin', 'nzomo.benjamin@example.com', '673456789');
+
+-- Barèmes (marking scales) pour évaluations
+INSERT INTO bareme (id, code, libelle, actif, par_defaut) VALUES 
+(1, 'BAREME_STD', 'Barème Standard 20 points', true, true),
+(2, 'BAREME_INFOTEL', 'Barème Informatique/Télécommunications', true, false);
+
+-- Critères (evaluation criteria)
+INSERT INTO critere (id, libelle, categorie) VALUES 
+(1, 'Ponctualité et assiduité', 'Comportement'),
+(2, 'Respect des consignes', 'Comportement'),
+(3, 'Collaboration avec l''équipe', 'Soft skills'),
+(4, 'Initiative et autonomie', 'Soft skills'),
+(5, 'Qualité du travail produit', 'Compétences Techniques'),
+(6, 'Respect des délais', 'Compétences Techniques'),
+(7, 'Compréhension des enjeux', 'Connaissances Générales'),
+(8, 'Adaptabilité aux outils', 'Connaissances Générales');
+
+-- BaremeCritère (criteria with coefficients per barème)
+INSERT INTO bareme_critere (id, bareme_id, critere_id, coefficient) VALUES 
+(1, 1, 1, 2),
+(2, 1, 2, 2),
+(3, 1, 3, 2),
+(4, 1, 4, 3),
+(5, 1, 5, 4),
+(6, 1, 6, 3),
+(7, 1, 7, 2),
+(8, 1, 8, 2),
+(9, 2, 4, 3),
+(10, 2, 5, 5),
+(11, 2, 6, 3),
+(12, 2, 8, 4);
+
+-- Parcours avec barème assigné (for auto-resolution in public eval)
+UPDATE parcours SET bareme_id = 1 WHERE id IN (15, 16, 17, 18, 19);
+UPDATE parcours SET bareme_id = 2 WHERE id IN (20, 21, 22, 23, 24);
+
+-- Inscriptions pour les étudiants (avec année académique active 2025-2026)
+INSERT INTO inscription (id, etudiant_id, annee_academique_id, parcours_id) VALUES 
+(1, 1, 4, 15),
+(2, 2, 4, 15),
+(3, 3, 4, 20),
+(4, 4, 4, 20),
+(5, 5, 4, 25),
+(6, 6, 4, 25);
+
+-- Stages VALIDE avec encadreurs (pour l'année active 2025-2026)
+-- Stage 1: deux étudiants, encadreur 1
+INSERT INTO stage (id, etudiant_id, entreprise_id, encadreur_id, ville, adresse, 
+                   annee_academique_id, date_debut, date_fin, statut, source)
+VALUES 
+(1, 1, 1, 1, 'Yaoundé', 'BP 123', 4, '2026-08-01', '2026-08-31', 'VALIDE', 'DECLARATION'),
+(2, 2, 2, 1, 'Douala', 'BP 456', 4, '2026-08-01', '2026-08-31', 'VALIDE', 'DECLARATION'),
+(3, 3, 5, 2, 'Garoua', 'Rue 1', 4, '2026-08-01', '2026-08-31', 'VALIDE', 'DECLARATION'),
+(4, 4, 6, 2, 'Bertoua', 'Rue 2', 4, '2026-08-01', '2026-08-31', 'VALIDE', 'DECLARATION'),
+(5, 5, 10, 3, 'Limbe', 'Rue 3', 4, '2026-08-01', '2026-08-31', 'VALIDE', 'DECLARATION'),
+(6, 6, 15, 3, 'Bamenda', 'Rue 4', 4, '2026-08-01', '2026-08-31', 'VALIDE', 'DECLARATION');
+
+-- SessionEvaluation avec codes courts (test data)
+INSERT INTO session_evaluation (id, stage_id, code_acces, statut, date_limite) VALUES 
+(1, 1, 'AbC3Fg7xYz2Q', 'EN_ATTENTE', '2026-09-15'),
+(2, 2, 'BdE4Gh8aAa3R', 'EN_ATTENTE', '2026-09-15'),
+(3, 3, 'CeF5Hi9bBb4S', 'EN_ATTENTE', '2026-09-15'),
+(4, 4, 'DfG6Ij0cCc5T', 'EN_ATTENTE', '2026-09-15'),
+(5, 5, 'EgH7Jk1dDd6U', 'EN_ATTENTE', '2026-09-15'),
+(6, 6, 'FhI8Kl2eEe7V', 'EN_ATTENTE', '2026-09-15');
+
+-- TypeStage pour les notifications
+INSERT INTO notification (id, type_stage_id, reference_date_type, offset_days, actif) VALUES 
+(1, 5, 'FIN_PERIODE', 0, true),
+(2, 5, 'FIN_PERIODE', -7, true);
+
 alter table departement alter column ID restart with 11;
 alter table specialite alter column ID restart with 33;
 alter table annee_academique alter column ID restart with 5;
@@ -275,3 +355,11 @@ alter table etudiant alter column ID restart with 56;
 alter table periode_stage alter column ID restart with 6;
 alter table entreprise alter column ID restart with 34;
 alter table app_setting alter column ID restart with 19;
+alter table encadreur alter column ID restart with 5;
+alter table bareme alter column ID restart with 3;
+alter table critere alter column ID restart with 9;
+alter table bareme_critere alter column ID restart with 13;
+alter table inscription alter column ID restart with 7;
+alter table stage alter column ID restart with 7;
+alter table session_evaluation alter column ID restart with 7;
+alter table notification alter column ID restart with 3;
