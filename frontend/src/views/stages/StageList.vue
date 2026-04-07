@@ -6,12 +6,13 @@ import {
 } from 'naive-ui'
 import type { FormInst, FormRules, DataTableColumns, SelectOption } from 'naive-ui'
 import { PlusOutlined } from '@vicons/antd'
-import { Edit, Trash2, CheckCircle, XCircle, FileText, UserPlus } from 'lucide-vue-next'
+import { Edit, Trash2, CheckCircle, XCircle, FileText, UserPlus, UserCheck } from 'lucide-vue-next'
 import { ref, h, onMounted, computed, reactive, watch } from 'vue'
 import type { VNodeChild } from 'vue'
 import { StageService, type StageDTO, type Statut } from '@/api/StageService'
 import { EntrepriseService, type EntrepriseDTO } from '@/api/EntrepriseService'
 import { EtudiantService } from '@/api/EtudiantService'
+import { EncadreurService } from '@/api/EncadreurService'
 
 const message = useMessage()
 const formRef = ref<FormInst | null>(null)
@@ -29,6 +30,43 @@ const assignRules: FormRules = {
     type: 'number',
     message: 'Veuillez sélectionner un étudiant',
     trigger: 'change'
+  }
+}
+
+const assignEncadreurFormRef = ref<FormInst | null>(null)
+const quickCreateEncadreurFormRef = ref<FormInst | null>(null)
+const showAssignEncadreurModal = ref(false)
+const assigningEncadreur = ref(false)
+const creatingEncadreur = ref(false)
+const showQuickCreateEncadreur = ref(false)
+const stageToAssignEncadreur = reactive<{
+  stageId: number | null
+  entrepriseId: number | null
+  entrepriseNom: string
+}>({
+  stageId: null,
+  entrepriseId: null,
+  entrepriseNom: ''
+})
+const assignEncadreurModel = reactive<{ encadreurNom: string | null }>({ encadreurNom: null })
+const assignEncadreurRules: FormRules = {
+  encadreurNom: {
+    required: true,
+    message: 'Veuillez sélectionner un encadreur',
+    trigger: 'change'
+  }
+}
+const quickCreateEncadreurModel = reactive<{ nom: string, email: string }>({ nom: '', email: '' })
+const quickCreateEncadreurRules: FormRules = {
+  nom: {
+    required: true,
+    message: 'Le nom est requis',
+    trigger: 'blur'
+  },
+  email: {
+    required: true,
+    message: "L'email est requis",
+    trigger: ['blur', 'input']
   }
 }
 
@@ -110,6 +148,9 @@ function onEntrepriseSelect (val: string) {
 // ─── Etudiant select ─────────────────────────────────────────────────────────
 const etudiantOptions = ref<SelectOption[]>([])
 const etudiantLoading = ref(false)
+const encadreurOptions = ref<SelectOption[]>([])
+const encadreurLoading = ref(false)
+const encadreurSearchResults = ref<Array<{ id?: number, nom?: string | null, email?: string | null }>>([])
 
 async function loadEtudiantOptions (query = '') {
   etudiantLoading.value = true
@@ -122,6 +163,33 @@ async function loadEtudiantOptions (query = '') {
     etudiantOptions.value = []
   } finally {
     etudiantLoading.value = false
+  }
+}
+
+async function loadEncadreurOptions (query = '') {
+  if (!stageToAssignEncadreur.entrepriseId) {
+    encadreurOptions.value = []
+    return
+  }
+  encadreurLoading.value = true
+  try {
+    const res = await EncadreurService.search({
+      entrepriseId: stageToAssignEncadreur.entrepriseId,
+      q: query,
+      page: 0,
+      size: 20
+    })
+    const all = res.data?.content ?? res.data ?? []
+    encadreurSearchResults.value = all
+    encadreurOptions.value = all.map((e: any) => ({
+      label: `${e.nom ?? ''}${e.email ? ` (${e.email})` : ''}`.trim(),
+      value: e.nom ?? ''
+    }))
+  } catch {
+    encadreurSearchResults.value = []
+    encadreurOptions.value = []
+  } finally {
+    encadreurLoading.value = false
   }
 }
 
@@ -192,6 +260,12 @@ const columns: DataTableColumns<StageDTO> = [
     render (row) { return row.entrepriseNom ?? '—' }
   },
   {
+    title: 'Encadreur',
+    key: 'encadreurNom',
+    minWidth: 170,
+    render (row) { return row.encadreurNom ?? '—' }
+  },
+  {
     title: 'Ville',
     key: 'ville',
     minWidth: 120,
@@ -224,7 +298,7 @@ const columns: DataTableColumns<StageDTO> = [
   {
     title: 'Actions',
     key: 'actions',
-    width: 200,
+    width: 260,
     fixed: 'right',
     render (row) {
       const buttons: VNodeChild[] = []
@@ -278,6 +352,19 @@ const columns: DataTableColumns<StageDTO> = [
             onClick: () => openAssignModal(row)
           }, { default: () => h(NIcon, null, { default: () => h(UserPlus) }) }),
           default: () => 'Assigner un étudiant'
+        }))
+      }
+
+      // Assign/reassign supervisor only when stage already has a student and an entreprise
+      if (row.etudiantId && row.entrepriseId) {
+        buttons.push(h(NTooltip, null, {
+          trigger: () => h(NButton, {
+            size: 'small', quaternary: true,
+            type: row.encadreurId ? 'default' : 'primary',
+            circle: true,
+            onClick: () => openAssignEncadreurModal(row)
+          }, { default: () => h(NIcon, null, { default: () => h(UserCheck) }) }),
+          default: () => row.encadreurId ? 'Réassigner un encadreur' : 'Assigner un encadreur'
         }))
       }
 
@@ -374,6 +461,30 @@ function openAssignModal (row: StageDTO) {
   showAssignModal.value = true
 }
 
+function resetQuickCreateEncadreurForm () {
+  quickCreateEncadreurModel.nom = ''
+  quickCreateEncadreurModel.email = ''
+}
+
+function openAssignEncadreurModal (row: StageDTO) {
+  if (!row.id) {
+    message.error('Stage invalide')
+    return
+  }
+  if (!row.entrepriseId) {
+    message.warning('Veuillez d\'abord renseigner une entreprise pour ce stage')
+    return
+  }
+  stageToAssignEncadreur.stageId = row.id
+  stageToAssignEncadreur.entrepriseId = row.entrepriseId
+  stageToAssignEncadreur.entrepriseNom = row.entrepriseNom ?? ''
+  assignEncadreurModel.encadreurNom = row.encadreurNom ?? null
+  showQuickCreateEncadreur.value = false
+  resetQuickCreateEncadreurForm()
+  loadEncadreurOptions('')
+  showAssignEncadreurModal.value = true
+}
+
 async function handleAssignEtudiant () {
   await assignFormRef.value?.validate()
   if (!stageToAssignId.value || !assignModel.etudiantId) return
@@ -387,6 +498,58 @@ async function handleAssignEtudiant () {
     message.error('Erreur lors de l\'assignation de l\'étudiant')
   } finally {
     assigning.value = false
+  }
+}
+
+async function handleAssignEncadreur () {
+  await assignEncadreurFormRef.value?.validate()
+  if (!stageToAssignEncadreur.stageId || !assignEncadreurModel.encadreurNom) return
+
+  const selected = encadreurSearchResults.value.find(
+    e => (e.nom ?? '').trim().toLowerCase() === assignEncadreurModel.encadreurNom!.trim().toLowerCase()
+  )
+  if (!selected?.id) {
+    message.error('Encadreur introuvable pour ce nom, veuillez sélectionner une valeur de la liste')
+    return
+  }
+
+  assigningEncadreur.value = true
+  try {
+    await StageService.assignerEncadreur(stageToAssignEncadreur.stageId, selected.id)
+    message.success('Encadreur assigné avec succès')
+    showAssignEncadreurModal.value = false
+    await loadData()
+  } catch (err: any) {
+    const apiMessage = err?.response?.data?.message
+    message.error(apiMessage || 'Erreur lors de l\'assignation de l\'encadreur')
+  } finally {
+    assigningEncadreur.value = false
+  }
+}
+
+async function handleQuickCreateEncadreur () {
+  await quickCreateEncadreurFormRef.value?.validate()
+  if (!stageToAssignEncadreur.entrepriseId) return
+  creatingEncadreur.value = true
+  try {
+    const created = await EncadreurService.create({
+      nom: quickCreateEncadreurModel.nom.trim(),
+      prenom: null,
+      email: quickCreateEncadreurModel.email.trim(),
+      entrepriseId: stageToAssignEncadreur.entrepriseId
+    })
+    const createdNom = created.data?.nom
+    if (created.data?.id) {
+      await loadEncadreurOptions('')
+      assignEncadreurModel.encadreurNom = createdNom ?? quickCreateEncadreurModel.nom.trim()
+      showQuickCreateEncadreur.value = false
+      resetQuickCreateEncadreurForm()
+      message.success('Encadreur créé, vous pouvez maintenant l\'assigner')
+    }
+  } catch {
+    message.error('Erreur lors de la création de l\'encadreur')
+  } finally {
+    creatingEncadreur.value = false
   }
 }
 
@@ -469,7 +632,7 @@ async function handleSave () {
         :data="tableData"
         :loading="loading"
         :pagination="pagination"
-        :scroll-x="1100"
+        :scroll-x="1320"
         remote
         @update:page="handlePageChange"
         @update:page-size="handlePageSizeChange"
@@ -564,6 +727,65 @@ async function handleSave () {
         <NSpace justify="end">
           <NButton @click="showAssignModal = false">Annuler</NButton>
           <NButton type="primary" :loading="assigning" @click="handleAssignEtudiant">Assigner</NButton>
+        </NSpace>
+      </template>
+    </NModal>
+
+    <NModal v-model:show="showAssignEncadreurModal" title="Assigner un encadreur" preset="card" style="width: 560px">
+      <NForm ref="assignEncadreurFormRef" :model="assignEncadreurModel" :rules="assignEncadreurRules" label-placement="top">
+        <NAlert type="info" class="mb-4">
+          Sélectionnez un encadreur de l'entreprise
+          <strong>{{ stageToAssignEncadreur.entrepriseNom || 'du stage' }}</strong>.
+        </NAlert>
+        <NFormItem label="Encadreur" path="encadreurNom">
+          <NSelect
+            v-model:value="assignEncadreurModel.encadreurNom"
+            :options="encadreurOptions"
+            :loading="encadreurLoading"
+            filterable
+            remote
+            clearable
+            placeholder="Rechercher par nom ou email…"
+            @focus="loadEncadreurOptions('')"
+            @search="loadEncadreurOptions"
+          />
+        </NFormItem>
+      </NForm>
+
+      <div class="mt-2 border-t pt-4">
+        <div class="mb-2 flex items-center justify-between">
+          <span class="text-sm font-medium">Encadreur introuvable ?</span>
+          <NButton text type="primary" @click="showQuickCreateEncadreur = !showQuickCreateEncadreur">
+            {{ showQuickCreateEncadreur ? 'Masquer' : 'Créer rapidement' }}
+          </NButton>
+        </div>
+        <NForm
+          v-if="showQuickCreateEncadreur"
+          ref="quickCreateEncadreurFormRef"
+          :model="quickCreateEncadreurModel"
+          :rules="quickCreateEncadreurRules"
+          label-placement="top"
+        >
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <NFormItem label="Nom" path="nom">
+              <NInput v-model:value="quickCreateEncadreurModel.nom" placeholder="Nom de l'encadreur" />
+            </NFormItem>
+            <NFormItem label="Email" path="email">
+              <NInput v-model:value="quickCreateEncadreurModel.email" placeholder="email@entreprise.com" />
+            </NFormItem>
+          </div>
+          <NSpace justify="end">
+            <NButton :loading="creatingEncadreur" @click="handleQuickCreateEncadreur">
+              Créer l'encadreur
+            </NButton>
+          </NSpace>
+        </NForm>
+      </div>
+
+      <template #footer>
+        <NSpace justify="end">
+          <NButton @click="showAssignEncadreurModal = false">Annuler</NButton>
+          <NButton type="primary" :loading="assigningEncadreur" @click="handleAssignEncadreur">Assigner</NButton>
         </NSpace>
       </template>
     </NModal>

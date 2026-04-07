@@ -16,6 +16,7 @@ public record StageDTO(
                 String ville,
                 String adresse,
                 Long encadreurId,
+                String encadreurNom,
                 LocalDate dateDebut,
                 LocalDate dateFin,
                 Long anneeAcademiqueId,

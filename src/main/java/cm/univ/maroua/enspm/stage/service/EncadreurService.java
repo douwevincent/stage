@@ -27,6 +27,11 @@ public class EncadreurService {
         return encadreurRepository.findAll(pageable).map(encadreurMapper::toDto);
     }
 
+    public Page<EncadreurDTO> search(Long entrepriseId, String q, Pageable pageable) {
+        String query = q == null ? "" : q.trim();
+        return encadreurRepository.search(entrepriseId, query, pageable).map(encadreurMapper::toDto);
+    }
+
     @Transactional(readOnly = true)
     public Optional<EncadreurDTO> findOne(Long id) {
         return encadreurRepository.findById(id).map(encadreurMapper::toDto);

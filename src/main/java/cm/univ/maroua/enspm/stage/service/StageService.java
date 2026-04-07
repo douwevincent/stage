@@ -30,6 +30,7 @@ public class StageService {
     private final StageMapper stageMapper;
     private final AnneeAcademiqueRepository anneeAcademiqueRepository;
     private final EtudiantRepository etudiantRepository;
+    private final EncadreurRepository encadreurRepository;
     private final EntrepriseRepository entrepriseRepository;
 
     @Value("${app.upload.dir:uploads}")
@@ -38,11 +39,13 @@ public class StageService {
     public StageService(StageRepository stageRepository, StageMapper stageMapper,
             AnneeAcademiqueRepository anneeAcademiqueRepository,
             EtudiantRepository etudiantRepository,
+            EncadreurRepository encadreurRepository,
             EntrepriseRepository entrepriseRepository) {
         this.stageRepository = stageRepository;
         this.stageMapper = stageMapper;
         this.anneeAcademiqueRepository = anneeAcademiqueRepository;
         this.etudiantRepository = etudiantRepository;
+        this.encadreurRepository = encadreurRepository;
         this.entrepriseRepository = entrepriseRepository;
     }
 
@@ -175,14 +178,34 @@ public class StageService {
         return stageMapper.toDto(stageRepository.save(stage));
     }
 
-        public StageDTO assignerEtudiant(Long stageId, Long etudiantId) {
+    public StageDTO assignerEtudiant(Long stageId, Long etudiantId) {
         Stage stage = stageRepository.findById(stageId)
             .orElseThrow(() -> new IllegalArgumentException("Stage non trouvé: " + stageId));
         Etudiant etudiant = etudiantRepository.findById(etudiantId)
             .orElseThrow(() -> new IllegalArgumentException("Étudiant non trouvé: " + etudiantId));
         stage.setEtudiant(etudiant);
         return stageMapper.toDto(stageRepository.save(stage));
+    }
+
+    public StageDTO assignerEncadreur(Long stageId, Long encadreurId) {
+        Stage stage = stageRepository.findById(stageId)
+                .orElseThrow(() -> new IllegalArgumentException("Stage non trouvé: " + stageId));
+        Encadreur encadreur = encadreurRepository.findById(encadreurId)
+                .orElseThrow(() -> new IllegalArgumentException("Encadreur non trouvé: " + encadreurId));
+
+        if (stage.getEntreprise() == null || stage.getEntreprise().getId() == null) {
+            throw new IllegalStateException("Le stage n'est rattaché à aucune entreprise");
         }
+        if (encadreur.getEntreprise() == null || encadreur.getEntreprise().getId() == null) {
+            throw new IllegalArgumentException("L'encadreur n'est rattaché à aucune entreprise");
+        }
+        if (!stage.getEntreprise().getId().equals(encadreur.getEntreprise().getId())) {
+            throw new IllegalArgumentException("L'encadreur doit appartenir à l'entreprise du stage");
+        }
+
+        stage.setEncadreur(encadreur);
+        return stageMapper.toDto(stageRepository.save(stage));
+    }
 
     @Transactional(readOnly = true)
     public Resource loadAutorisation(Long id) throws IOException {

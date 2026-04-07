@@ -104,6 +104,13 @@ public class StageController {
         return ResponseEntity.ok(stageService.assignerEtudiant(id, etudiantId));
     }
 
+    @PatchMapping("/{id}/assigner-encadreur")
+    public ResponseEntity<StageDTO> assignerEncadreur(
+            @PathVariable Long id,
+            @RequestParam Long encadreurId) {
+        return ResponseEntity.ok(stageService.assignerEncadreur(id, encadreurId));
+    }
+
     @GetMapping("/{id}/autorisation")
     public ResponseEntity<Resource> getAutorisation(@PathVariable Long id) throws IOException {
         Resource resource = stageService.loadAutorisation(id);

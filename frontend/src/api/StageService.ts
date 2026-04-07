@@ -14,6 +14,7 @@ export interface StageDTO {
   ville?: string | null
   adresse?: string | null
   encadreurId?: number | null
+  encadreurNom?: string | null
   dateDebut?: string | null
   dateFin?: string | null
   anneeAcademiqueId?: number | null
@@ -57,6 +58,12 @@ export const StageService = {
   assignerEtudiant (id: number, etudiantId: number) {
     return api.patch<StageDTO>(`/api/v1/stages/${id}/assigner-etudiant`, null, {
       params: { etudiantId }
+    })
+  },
+
+  assignerEncadreur (id: number, encadreurId: number) {
+    return api.patch<StageDTO>(`/api/v1/stages/${id}/assigner-encadreur`, null, {
+      params: { encadreurId }
     })
   },
 

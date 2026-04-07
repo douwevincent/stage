@@ -26,6 +26,14 @@ public class EncadreurController {
         return encadreurService.findAll(pageable);
     }
 
+    @GetMapping("/recherche")
+    public Page<EncadreurDTO> rechercheEncadreurs(
+            @RequestParam(required = false) Long entrepriseId,
+            @RequestParam(defaultValue = "") String q,
+            Pageable pageable) {
+        return encadreurService.search(entrepriseId, q, pageable);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<EncadreurDTO> getEncadreur(@PathVariable Long id) {
         return encadreurService.findOne(id)
