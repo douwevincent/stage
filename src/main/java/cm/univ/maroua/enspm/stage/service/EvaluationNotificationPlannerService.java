@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Détecte les notifications dues aujourd'hui et enfile un message en attente
@@ -36,6 +38,8 @@ public class EvaluationNotificationPlannerService {
     private static final String CORPS_DEFAUT  =
             "Bonjour,\n\nCertains stages dont vous êtes encadreur n'ont pas encore été évalués. "
             + "Merci de vous connecter à la plateforme pour saisir vos notes.\n\nCordialement.";
+    private static final DateTimeFormatter DATE_FR_FORMATTER =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.FRANCE);
 
     @Value("${app.base-url:http://localhost:8080}")
     private String baseUrl;
@@ -159,18 +163,22 @@ public class EvaluationNotificationPlannerService {
         }
 
         String premierCode = null;
+        LocalDate premiereDateLimite = null;
         for (Stage stage : stages) {
             SessionEvaluation session = sessionEvaluationService.ensureSessionWithCode(stage, periode.getDateFin());
             if (premierCode == null) {
                 premierCode = session.getCodeAcces();
+                premiereDateLimite = session.getDateLimite();
             }
         }
 
         // Intégrer le lien dans le corps du message
-        String lien = baseUrl + "/evaluation-encadreur/" + premierCode;
+        String prefixeUrl = resolvePublicEvaluationUrlPrefix();
+        String lien = prefixeUrl + "/evaluation-encadreur/" + premierCode;
         String corpsAvecLien = corps.contains("{LIEN_EVALUATION}")
                 ? corps.replace("{LIEN_EVALUATION}", lien)
                 : corps + "\n\nLien d'évaluation : " + lien;
+        corpsAvecLien = applySupportedPlaceholders(corpsAvecLien, encadreur, premiereDateLimite);
 
         MailQueue mail = new MailQueue();
         mail.setDestinataireEmail(encadreur.getEmail());
@@ -185,8 +193,8 @@ public class EvaluationNotificationPlannerService {
 
         try {
             mailQueueRepository.save(mail);
-            log.debug("Mail enfilé avec lien : encadreur={} <{}> période={} notification={} lien={}",
-                    encadreur.getId(), encadreur.getEmail(), periode.getId(), notification.getId(), lien);
+            log.debug("Mail enfilé : encadreur={} <{}> période={} notification={} prefixe={} lien={}",
+                    encadreur.getId(), encadreur.getEmail(), periode.getId(), notification.getId(), prefixeUrl, lien);
             return 1;
         } catch (DataIntegrityViolationException e) {
             // Race condition entre le check existsBy et le save : on ignore silencieusement
@@ -217,5 +225,35 @@ public class EvaluationNotificationPlannerService {
             log.debug("MAIL_TEMPLATE_BODY non configuré, utilisation du corps par défaut.");
             return CORPS_DEFAUT;
         }
+    }
+
+    private String resolvePublicEvaluationUrlPrefix() {
+        try {
+            String val = appSettingService.getRawValue("MAIL_PUBLIC_EVALUATION_URL_PREFIX");
+            if (val != null && !val.isBlank()) {
+                return trimTrailingSlash(val.trim());
+            }
+        } catch (Exception e) {
+            log.debug("MAIL_PUBLIC_EVALUATION_URL_PREFIX non configuré, fallback sur app.base-url.");
+        }
+        return trimTrailingSlash(baseUrl);
+    }
+
+    private String applySupportedPlaceholders(String body, Encadreur encadreur, LocalDate dateLimite) {
+        String result = body;
+        if (encadreur != null && encadreur.getNom() != null) {
+            result = result.replace("${encadreur.nom}", encadreur.getNom());
+        }
+        if (dateLimite != null) {
+            result = result.replace("${stage.sessionEvaluation.dateLimite}", dateLimite.format(DATE_FR_FORMATTER));
+        }
+        return result;
+    }
+
+    private String trimTrailingSlash(String value) {
+        if (value == null || value.isBlank()) {
+            return value;
+        }
+        return value.endsWith("/") ? value.substring(0, value.length() - 1) : value;
     }
 }
