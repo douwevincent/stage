@@ -38,7 +38,7 @@ function getParentGroupKey (routeKey: string): string | null {
   if (['etudiants-list', 'etudiants-import', 'inscriptions'].includes(routeKey)) {
     return 'etudiants'
   }
-  if (['stages', 'entreprises', 'type-stages', 'periode-stages'].includes(routeKey)) {
+  if (['stages', 'entreprises', 'encadreurs', 'type-stages', 'periode-stages'].includes(routeKey)) {
     return 'stages-group'
   }
   if (['baremes', 'criteres', 'bareme-criteres'].includes(routeKey)) {
@@ -146,6 +146,10 @@ const menuOptions = computed<MenuOption[]>(() => [
       {
         label: () => h(RouterLink, { to: { name: 'entreprises' } }, { default: () => 'Entreprises' }),
         key: 'entreprises'
+      },
+      {
+        label: () => h(RouterLink, { to: { name: 'encadreurs' } }, { default: () => 'Encadreurs' }),
+        key: 'encadreurs'
       },
       {
         label: () => h(RouterLink, { to: { name: 'type-stages' } }, { default: () => 'Types de Stage' }),

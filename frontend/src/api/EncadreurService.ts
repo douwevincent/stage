@@ -9,6 +9,16 @@ export interface EncadreurDTO {
 }
 
 export const EncadreurService = {
+  getAll (page = 0, size = 20) {
+    return api.get('/api/v1/encadreurs', {
+      params: { page, size }
+    })
+  },
+
+  getById (id: number) {
+    return api.get(`/api/v1/encadreurs/${id}`)
+  },
+
   search (params: { entrepriseId?: number | null, q?: string, page?: number, size?: number }) {
     return api.get('/api/v1/encadreurs/recherche', {
       params: {
@@ -22,5 +32,13 @@ export const EncadreurService = {
 
   create (encadreur: EncadreurDTO) {
     return api.post<EncadreurDTO>('/api/v1/encadreurs', encadreur)
+  },
+
+  update (id: number, encadreur: EncadreurDTO) {
+    return api.put<EncadreurDTO>(`/api/v1/encadreurs/${id}`, encadreur)
+  },
+
+  delete (id: number) {
+    return api.delete(`/api/v1/encadreurs/${id}`)
   }
 }
