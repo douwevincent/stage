@@ -18,6 +18,33 @@ public interface StageRepository extends JpaRepository<Stage, Long> {
 
     Page<Stage> findByStatut(Statut statut, Pageable pageable);
 
+    long countByAnneeAcademiqueId(Long anneeAcademiqueId);
+
+    long countByAnneeAcademiqueIdAndStatut(Long anneeAcademiqueId, Statut statut);
+
+    long countByAnneeAcademiqueIdAndEtudiantIsNull(Long anneeAcademiqueId);
+
+    @Query("""
+            SELECT COUNT(s) FROM Stage s
+            WHERE s.anneeAcademique.id = :anneeAcademiqueId
+              AND s.statut = cm.univ.maroua.enspm.stage.domain.Statut.VALIDE
+              AND (
+                  s.sessionEvaluation IS NULL
+                  OR NOT EXISTS (
+                      SELECT note FROM Note note
+                      WHERE note.session = s.sessionEvaluation
+                  )
+              )
+            """)
+    long countStagesEnAttenteNotation(@Param("anneeAcademiqueId") Long anneeAcademiqueId);
+
+    @Query("""
+            SELECT COUNT(DISTINCT s.entreprise.id) FROM Stage s
+            WHERE s.anneeAcademique.id = :anneeAcademiqueId
+              AND s.entreprise IS NOT NULL
+            """)
+    long countDistinctEntreprisesByAnneeAcademiqueId(@Param("anneeAcademiqueId") Long anneeAcademiqueId);
+
     /**
      * Retourne les encadreurs distincts (avec email) ayant au moins un stage VALIDE
      * pour le type de stage de la période donnée, et dont au moins un stage

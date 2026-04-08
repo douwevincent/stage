@@ -11,5 +11,7 @@ import java.util.Optional;
 public interface InscriptionRepository extends JpaRepository<Inscription, Long>, JpaSpecificationExecutor<Inscription> {
     boolean existsByAnneeAcademiqueIdAndEtudiantIdAndParcoursId(Long anneeAcademiqueId, Long etudiantId, Long parcoursId);
 
+    long countByAnneeAcademiqueId(Long anneeAcademiqueId);
+
     Optional<Inscription> findFirstByEtudiantIdAndAnneeAcademiqueIdOrderByIdDesc(Long etudiantId, Long anneeAcademiqueId);
 }
