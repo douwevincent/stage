@@ -15,6 +15,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Periode officielle d'un type de stage pour une annee academique.
+ */
 @Entity
 @Data
 @NoArgsConstructor

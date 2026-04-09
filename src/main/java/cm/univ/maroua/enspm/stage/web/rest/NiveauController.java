@@ -13,6 +13,9 @@ import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/api/v1/niveaus")
+/**
+ * Controleur REST NiveauController.
+ */
 public class NiveauController {
 
     private final NiveauService niveauService;

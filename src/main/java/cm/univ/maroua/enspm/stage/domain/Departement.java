@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
+/**
+ * Departement academique de rattachement des specialites.
+ */
 @Entity
 @Data
 @NoArgsConstructor

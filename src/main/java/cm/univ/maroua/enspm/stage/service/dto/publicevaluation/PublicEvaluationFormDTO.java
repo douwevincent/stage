@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * DTO d'evaluation publique PublicEvaluationFormDTO.
+ */
 public record PublicEvaluationFormDTO(
         Long stageId,
         Long sessionId,

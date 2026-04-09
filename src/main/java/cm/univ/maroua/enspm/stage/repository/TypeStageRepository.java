@@ -5,5 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
+/**
+ * Repository JPA TypeStageRepository.
+ */
 public interface TypeStageRepository extends JpaRepository<TypeStage, Long> {
 }

@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/dashboard")
+/**
+ * Controleur REST DashboardController.
+ */
 public class DashboardController {
 
     private final DashboardService dashboardService;

@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/users")
+/**
+ * Controleur REST UserManagementController.
+ */
 public class UserManagementController {
 
     private final UserAccountService userAccountService;

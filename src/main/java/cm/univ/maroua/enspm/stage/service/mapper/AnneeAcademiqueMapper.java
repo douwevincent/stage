@@ -5,5 +5,8 @@ import cm.univ.maroua.enspm.stage.service.dto.AnneeAcademiqueDTO;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
+/**
+ * Mapper MapStruct AnneeAcademiqueMapper.
+ */
 public interface AnneeAcademiqueMapper extends EntityMapper<AnneeAcademiqueDTO, AnneeAcademique> {
 }

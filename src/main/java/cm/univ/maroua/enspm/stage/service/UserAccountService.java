@@ -13,6 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
+/**
+ * Service metier UserAccountService.
+ */
 public class UserAccountService {
 
     private final UserAccountRepository userAccountRepository;

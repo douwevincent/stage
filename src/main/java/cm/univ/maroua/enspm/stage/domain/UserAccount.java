@@ -16,6 +16,12 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
+/**
+ * Compte utilisateur interne utilise pour l'authentification et l'autorisation.
+ *
+ * <p>Le mot de passe est stocke sous forme de hash et le role determine les
+ * droits applicatifs exposes par l'API.</p>
+ */
 @Entity
 @Table(name = "user_account")
 @Data

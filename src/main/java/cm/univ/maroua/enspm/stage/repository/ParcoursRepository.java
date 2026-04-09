@@ -8,6 +8,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
+/**
+ * Repository JPA ParcoursRepository.
+ */
 public interface ParcoursRepository extends JpaRepository<Parcours, Long>, JpaSpecificationExecutor<Parcours> {
 	Optional<Parcours> findBySpecialiteIdAndNiveauId(Long specialiteId, Long niveauId);
 }

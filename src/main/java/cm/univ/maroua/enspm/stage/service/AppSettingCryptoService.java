@@ -13,6 +13,9 @@ import java.util.Arrays;
 import java.util.Base64;
 
 @Service
+/**
+ * Service metier AppSettingCryptoService.
+ */
 public class AppSettingCryptoService {
 
     private static final String PREFIX = "enc::";

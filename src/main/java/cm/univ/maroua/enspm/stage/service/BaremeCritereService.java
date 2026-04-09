@@ -15,6 +15,9 @@ import java.util.Optional;
 
 @Service
 @Transactional
+/**
+ * Service metier BaremeCritereService.
+ */
 public class BaremeCritereService {
 
     private final BaremeCritereRepository baremeCritereRepository;

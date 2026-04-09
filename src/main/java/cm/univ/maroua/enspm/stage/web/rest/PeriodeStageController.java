@@ -13,6 +13,9 @@ import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/api/v1/periode-stages")
+/**
+ * Controleur REST PeriodeStageController.
+ */
 public class PeriodeStageController {
 
     private final PeriodeStageService periodeStageService;

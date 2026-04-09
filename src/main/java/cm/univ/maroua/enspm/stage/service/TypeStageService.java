@@ -13,6 +13,9 @@ import java.util.Optional;
 
 @Service
 @Transactional
+/**
+ * Service metier TypeStageService.
+ */
 public class TypeStageService {
 
     private final TypeStageRepository typeStageRepository;

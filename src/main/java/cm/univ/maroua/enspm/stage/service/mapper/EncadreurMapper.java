@@ -6,6 +6,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
+/**
+ * Mapper MapStruct EncadreurMapper.
+ */
 public interface EncadreurMapper extends EntityMapper<EncadreurDTO, Encadreur> {
     @Mapping(source = "entreprise.id", target = "entrepriseId")
     EncadreurDTO toDto(Encadreur entity);

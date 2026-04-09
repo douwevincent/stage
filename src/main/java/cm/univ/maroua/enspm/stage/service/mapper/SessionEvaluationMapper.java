@@ -5,5 +5,8 @@ import cm.univ.maroua.enspm.stage.service.dto.SessionEvaluationDTO;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
+/**
+ * Mapper MapStruct SessionEvaluationMapper.
+ */
 public interface SessionEvaluationMapper extends EntityMapper<SessionEvaluationDTO, SessionEvaluation> {
 }

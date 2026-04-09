@@ -8,6 +8,12 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * Encadreur professionnel en entreprise.
+ *
+ * <p>Un encadreur peut suivre plusieurs stages et appartient a une
+ * entreprise donnee.</p>
+ */
 @Entity
 @Data
 @NoArgsConstructor

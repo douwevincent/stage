@@ -6,6 +6,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
+/**
+ * Mapper MapStruct NotificationMapper.
+ */
 public interface NotificationMapper extends EntityMapper<NotificationDTO, Notification> {
     @Mapping(source = "typeStage.id", target = "typeStageId")
     NotificationDTO toDto(Notification entity);

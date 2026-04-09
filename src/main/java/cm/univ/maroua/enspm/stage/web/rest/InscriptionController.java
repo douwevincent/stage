@@ -13,6 +13,9 @@ import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/api/v1/inscriptions")
+/**
+ * Controleur REST InscriptionController.
+ */
 public class InscriptionController {
 
     private final InscriptionService inscriptionService;

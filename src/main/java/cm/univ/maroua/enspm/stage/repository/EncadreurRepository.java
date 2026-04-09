@@ -9,6 +9,9 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
+/**
+ * Repository JPA EncadreurRepository.
+ */
 public interface EncadreurRepository extends JpaRepository<Encadreur, Long> {
 		@Query("""
 						select e from Encadreur e

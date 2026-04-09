@@ -5,6 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
+/**
+ * Repository JPA NoteRepository.
+ */
 public interface NoteRepository extends JpaRepository<Note, Long> {
     void deleteBySessionId(Long sessionId);
 }

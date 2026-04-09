@@ -16,6 +16,9 @@ import java.util.Map;
 
 @Service
 @Transactional
+/**
+ * Service metier MailQueueService.
+ */
 public class MailQueueService {
 
     private final MailQueueRepository mailQueueRepository;

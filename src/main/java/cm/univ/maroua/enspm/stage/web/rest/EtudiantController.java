@@ -17,6 +17,9 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/etudiants")
+/**
+ * Controleur REST EtudiantController.
+ */
 public class EtudiantController {
 
     private final EtudiantService etudiantService;

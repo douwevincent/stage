@@ -5,6 +5,9 @@ import cm.univ.maroua.enspm.stage.domain.AppSettingType;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+/**
+ * DTO AppSettingDTO.
+ */
 public record AppSettingDTO(
         Long id,
         String cle,

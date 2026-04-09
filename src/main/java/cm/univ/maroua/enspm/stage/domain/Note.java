@@ -3,6 +3,9 @@ package cm.univ.maroua.enspm.stage.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+/**
+ * Note attribuee a un critere dans une session d'evaluation.
+ */
 @Entity
 @Data
 @NoArgsConstructor

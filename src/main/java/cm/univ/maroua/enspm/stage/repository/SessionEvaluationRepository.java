@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+/**
+ * Repository JPA SessionEvaluationRepository.
+ */
 public interface SessionEvaluationRepository extends JpaRepository<SessionEvaluation, Long> {
     Optional<SessionEvaluation> findFirstByCodeAcces(String codeAcces);
 

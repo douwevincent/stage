@@ -11,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
+/**
+ * Service metier DashboardService.
+ */
 public class DashboardService {
 
     private final AnneeAcademiqueRepository anneeAcademiqueRepository;

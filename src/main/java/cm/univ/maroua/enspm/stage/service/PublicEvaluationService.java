@@ -36,6 +36,9 @@ import java.util.Objects;
 
 @Service
 @Transactional
+/**
+ * Service metier PublicEvaluationService.
+ */
 public class PublicEvaluationService {
 
     private final SessionEvaluationRepository sessionEvaluationRepository;

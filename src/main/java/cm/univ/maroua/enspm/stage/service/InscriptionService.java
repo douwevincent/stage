@@ -16,6 +16,9 @@ import java.util.Optional;
 
 @Service
 @Transactional
+/**
+ * Service metier InscriptionService.
+ */
 public class InscriptionService {
 
     private final InscriptionRepository inscriptionRepository;

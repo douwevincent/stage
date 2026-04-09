@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
+/**
+ * Repository JPA AnneeAcademiqueRepository.
+ */
 public interface AnneeAcademiqueRepository extends JpaRepository<AnneeAcademique, Long> {
 
     Optional<AnneeAcademique> findByActifTrue();

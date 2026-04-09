@@ -14,6 +14,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Service d'authentification applicative base sur Spring Security et JWT.
+ *
+ * <p>Responsable de la connexion utilisateur ({@code /auth/login}), de la
+ * generation du token et de l'exposition du profil courant authentifie.</p>
+ */
 @Service
 @Transactional
 public class AuthService {
@@ -32,6 +38,12 @@ public class AuthService {
         this.jwtTokenService = jwtTokenService;
     }
 
+    /**
+     * Authentifie un utilisateur et retourne un token JWT signe.
+     *
+     * @param request identifiants de connexion
+     * @return type de token, token JWT et profil utilisateur
+     */
     public AuthLoginResponseDTO login(AuthLoginRequestDTO request) {
         try {
             authenticationManager.authenticate(
@@ -50,6 +62,12 @@ public class AuthService {
         return new AuthLoginResponseDTO("Bearer", token, toDto(user));
     }
 
+    /**
+     * Retourne le profil de l'utilisateur actuellement authentifie.
+     *
+     * @param authentication contexte d'authentification courant
+     * @return profil utilisateur
+     */
     @Transactional(readOnly = true)
     public UserAccountDTO me(Authentication authentication) {
         if (authentication == null || authentication.getName() == null) {
@@ -60,6 +78,9 @@ public class AuthService {
         return toDto(user);
     }
 
+    /**
+     * Convertit un compte interne vers son DTO expose a l'API.
+     */
     private UserAccountDTO toDto(UserAccount user) {
         return new UserAccountDTO(
                 user.getId(),

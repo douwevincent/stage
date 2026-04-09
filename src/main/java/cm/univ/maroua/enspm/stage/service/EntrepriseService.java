@@ -16,6 +16,9 @@ import java.util.Optional;
 
 @Service
 @Transactional
+/**
+ * Service metier EntrepriseService.
+ */
 public class EntrepriseService {
 
     private final EntrepriseRepository entrepriseRepository;

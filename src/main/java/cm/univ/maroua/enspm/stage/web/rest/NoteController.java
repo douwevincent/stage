@@ -13,6 +13,9 @@ import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/api/v1/notes")
+/**
+ * Controleur REST NoteController.
+ */
 public class NoteController {
 
     private final NoteService noteService;

@@ -5,5 +5,8 @@ import cm.univ.maroua.enspm.stage.service.dto.BaremeDTO;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
+/**
+ * Mapper MapStruct BaremeMapper.
+ */
 public interface BaremeMapper extends EntityMapper<BaremeDTO, Bareme> {
 }

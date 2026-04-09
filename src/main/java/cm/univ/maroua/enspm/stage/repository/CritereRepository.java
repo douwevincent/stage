@@ -5,5 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
+/**
+ * Repository JPA CritereRepository.
+ */
 public interface CritereRepository extends JpaRepository<Critere, Long> {
 }

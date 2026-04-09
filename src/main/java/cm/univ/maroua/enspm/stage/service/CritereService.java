@@ -16,6 +16,9 @@ import java.util.Optional;
 
 @Service
 @Transactional
+/**
+ * Service metier CritereService.
+ */
 public class CritereService {
 
     private final CritereRepository critereRepository;

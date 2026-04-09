@@ -13,6 +13,9 @@ import java.util.Optional;
 
 @Service
 @Transactional
+/**
+ * Service metier NoteService.
+ */
 public class NoteService {
 
     private final NoteRepository noteRepository;

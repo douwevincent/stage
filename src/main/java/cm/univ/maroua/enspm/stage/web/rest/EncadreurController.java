@@ -13,6 +13,9 @@ import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/api/v1/encadreurs")
+/**
+ * Controleur REST EncadreurController.
+ */
 public class EncadreurController {
 
     private final EncadreurService encadreurService;

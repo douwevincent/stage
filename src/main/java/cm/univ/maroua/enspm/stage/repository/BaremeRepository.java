@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
+/**
+ * Repository JPA BaremeRepository.
+ */
 public interface BaremeRepository extends JpaRepository<Bareme, Long> {
 
     Optional<Bareme> findByParDefautTrueAndActifTrue();

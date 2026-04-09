@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+/**
+ * Repository JPA AppSettingRepository.
+ */
 public interface AppSettingRepository extends JpaRepository<AppSetting, Long> {
     List<AppSetting> findAllByOrderByCleAsc();
 

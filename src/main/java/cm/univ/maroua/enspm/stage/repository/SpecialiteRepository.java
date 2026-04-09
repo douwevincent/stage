@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
+/**
+ * Repository JPA SpecialiteRepository.
+ */
 public interface SpecialiteRepository extends JpaRepository<Specialite, Long> {
     Page<Specialite> findAllByDepartementId(Long departementId, Pageable pageable);
 

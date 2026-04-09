@@ -13,6 +13,9 @@ import java.util.Optional;
 
 @Service
 @Transactional
+/**
+ * Service metier EncadreurService.
+ */
 public class EncadreurService {
 
     private final EncadreurRepository encadreurRepository;

@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * Specialite academique rattachee a un departement.
+ */
 @Entity
 @Data
 @NoArgsConstructor

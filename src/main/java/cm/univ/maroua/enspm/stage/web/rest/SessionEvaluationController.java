@@ -13,6 +13,9 @@ import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/api/v1/session-evaluations")
+/**
+ * Controleur REST SessionEvaluationController.
+ */
 public class SessionEvaluationController {
 
     private final SessionEvaluationService sessionEvaluationService;

@@ -6,6 +6,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
+/**
+ * Mapper MapStruct PeriodeStageMapper.
+ */
 public interface PeriodeStageMapper extends EntityMapper<PeriodeStageDTO, PeriodeStage> {
     @Mapping(source = "typeStage.id", target = "typeStageId")
     @Mapping(source = "anneeAcademique.id", target = "anneeAcademiqueId")

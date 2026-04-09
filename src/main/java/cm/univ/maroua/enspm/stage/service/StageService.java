@@ -22,6 +22,13 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.Optional;
 
+/**
+ * Service metier principal pour la gestion du cycle de vie des stages.
+ *
+ * <p>Cette classe couvre les operations CRUD, la declaration publique par
+ * l'etudiant (avec upload d'autorisation), les transitions de statut
+ * (validation/rejet) et les affectations etudiant/encadreur.</p>
+ */
 @Service
 @Transactional
 public class StageService {
@@ -49,24 +56,42 @@ public class StageService {
         this.entrepriseRepository = entrepriseRepository;
     }
 
+    /**
+     * Liste paginee de tous les stages.
+     */
     public Page<StageDTO> findAll(Pageable pageable) {
         return stageRepository.findAll(pageable).map(stageMapper::toDto);
     }
 
+    /**
+     * Liste paginee des stages filtres par statut.
+     */
     public Page<StageDTO> findByStatut(Statut statut, Pageable pageable) {
         return stageRepository.findByStatut(statut, pageable).map(stageMapper::toDto);
     }
 
+    /**
+     * Recherche un stage par identifiant et retourne son DTO.
+     */
     @Transactional(readOnly = true)
     public Optional<StageDTO> findOne(Long id) {
         return stageRepository.findById(id).map(stageMapper::toDto);
     }
 
+    /**
+     * Recherche l'entite Stage brute par identifiant.
+     */
     @Transactional(readOnly = true)
     public Optional<Stage> findEntityById(Long id) {
         return stageRepository.findById(id);
     }
 
+    /**
+     * Cree ou met a jour un stage depuis l'interface d'administration.
+     *
+     * <p>Si l'annee academique est absente, l'annee active est affectee
+     * automatiquement.</p>
+     */
     public StageDTO save(StageDTO stageDTO) {
         Stage stage = stageMapper.toEntity(stageDTO);
         sanitizeTransientRelations(stage);
@@ -110,6 +135,13 @@ public class StageService {
         }
     }
 
+    /**
+     * Declaration publique d'un stage par un etudiant.
+     *
+     * <p>Le stage est cree avec le statut {@link Statut#EN_ATTENTE_VALIDATION}
+     * et la source {@link Source#ETUDIANT}. Un fichier d'autorisation peut etre
+     * televerse et stocke dans le repertoire configure.</p>
+     */
     public StageDTO declarer(String etudiantMatricule,
                               Long entrepriseId, String entrepriseNom, String entrepriseSecteur,
                               String ville, String adresse,
@@ -164,6 +196,9 @@ public class StageService {
         return stageMapper.toDto(stageRepository.save(stage));
     }
 
+    /**
+     * Valide un stage en attente.
+     */
     public StageDTO valider(Long id) {
         Stage stage = stageRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Stage non trouvé: " + id));
@@ -171,6 +206,9 @@ public class StageService {
         return stageMapper.toDto(stageRepository.save(stage));
     }
 
+    /**
+     * Rejette un stage.
+     */
     public StageDTO rejeter(Long id) {
         Stage stage = stageRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Stage non trouvé: " + id));
@@ -178,6 +216,9 @@ public class StageService {
         return stageMapper.toDto(stageRepository.save(stage));
     }
 
+    /**
+     * Affecte un etudiant a un stage.
+     */
     public StageDTO assignerEtudiant(Long stageId, Long etudiantId) {
         Stage stage = stageRepository.findById(stageId)
             .orElseThrow(() -> new IllegalArgumentException("Stage non trouvé: " + stageId));
@@ -187,6 +228,9 @@ public class StageService {
         return stageMapper.toDto(stageRepository.save(stage));
     }
 
+    /**
+     * Affecte un encadreur a un stage en verifiant la coherence entreprise.
+     */
     public StageDTO assignerEncadreur(Long stageId, Long encadreurId) {
         Stage stage = stageRepository.findById(stageId)
                 .orElseThrow(() -> new IllegalArgumentException("Stage non trouvé: " + stageId));

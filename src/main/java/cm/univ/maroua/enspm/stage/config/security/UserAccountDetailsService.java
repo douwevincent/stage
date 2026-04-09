@@ -8,6 +8,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+/**
+ * Adaptateur entre le modele utilisateur applicatif ({@link UserAccount})
+ * et le contrat {@link UserDetailsService} de Spring Security.
+ */
 @Service
 public class UserAccountDetailsService implements UserDetailsService {
 
@@ -17,6 +21,13 @@ public class UserAccountDetailsService implements UserDetailsService {
         this.userAccountRepository = userAccountRepository;
     }
 
+    /**
+     * Charge un utilisateur par e-mail (username) pour l'authentification.
+     *
+     * @param username e-mail de connexion
+     * @return utilisateur Spring Security
+     * @throws UsernameNotFoundException si aucun compte ne correspond
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserAccount account = userAccountRepository.findByEmailIgnoreCase(username)

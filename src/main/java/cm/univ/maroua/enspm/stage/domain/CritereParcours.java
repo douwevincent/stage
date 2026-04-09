@@ -3,6 +3,12 @@ package cm.univ.maroua.enspm.stage.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+/**
+ * Ancienne association entre un parcours et un critere avec coefficient.
+ *
+ * <p>Conservee pour compatibilite et migration des donnees historiques vers le
+ * modele {@link Bareme}/{@link BaremeCritere}.</p>
+ */
 @Entity
 @Data
 @NoArgsConstructor

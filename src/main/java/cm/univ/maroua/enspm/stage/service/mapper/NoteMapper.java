@@ -6,6 +6,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
+/**
+ * Mapper MapStruct NoteMapper.
+ */
 public interface NoteMapper extends EntityMapper<NoteDTO, Note> {
     @Mapping(source = "session.id", target = "sessionId")
     @Mapping(source = "critere.id", target = "critereId")

@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * Niveau academique (ex. L1, L2, M1) d'un parcours.
+ */
 @Entity
 @Data
 @NoArgsConstructor
