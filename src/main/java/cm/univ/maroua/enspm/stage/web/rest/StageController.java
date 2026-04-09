@@ -65,7 +65,7 @@ public class StageController {
         if (stageDTO.id() == null || !id.equals(stageDTO.id())) {
             return ResponseEntity.badRequest().build();
         }
-        StageDTO result = stageService.save(stageDTO);
+        StageDTO result = stageService.update(id, stageDTO);
         return ResponseEntity.ok()
                 .body(result);
     }

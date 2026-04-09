@@ -90,6 +90,32 @@ public class StageService {
         return stageMapper.toDto(stage);
     }
 
+    public StageDTO update(Long id, StageDTO stageDTO) {
+        StageDTO existing = findOne(id)
+                .orElseThrow(() -> new IllegalArgumentException("Stage non trouvé: " + id));
+
+        StageDTO merged = new StageDTO(
+                id,
+                stageDTO.etudiantId(),
+                stageDTO.etudiantMatricule(),
+                stageDTO.etudiantNom(),
+                stageDTO.entrepriseId() != null ? stageDTO.entrepriseId() : existing.entrepriseId(),
+                stageDTO.entrepriseNom(),
+                stageDTO.ville(),
+                stageDTO.adresse(),
+                stageDTO.encadreurId() != null ? stageDTO.encadreurId() : existing.encadreurId(),
+                stageDTO.encadreurNom(),
+                stageDTO.dateDebut() != null ? stageDTO.dateDebut() : existing.dateDebut(),
+                stageDTO.dateFin() != null ? stageDTO.dateFin() : existing.dateFin(),
+                stageDTO.anneeAcademiqueId() != null ? stageDTO.anneeAcademiqueId() : existing.anneeAcademiqueId(),
+                stageDTO.sessionEvaluationId() != null ? stageDTO.sessionEvaluationId() : existing.sessionEvaluationId(),
+                stageDTO.source() != null ? stageDTO.source() : existing.source(),
+                stageDTO.statut() != null ? stageDTO.statut() : existing.statut(),
+                stageDTO.cheminAutorisation() != null ? stageDTO.cheminAutorisation() : existing.cheminAutorisation());
+
+        return save(merged);
+    }
+
     // MapStruct may instantiate relation objects with null IDs (e.g. Encadreur{id=null}).
     // Hibernate interprets them as transient entities and fails on flush.
     private void sanitizeTransientRelations(Stage stage) {

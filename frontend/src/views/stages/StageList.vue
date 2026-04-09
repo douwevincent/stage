@@ -585,7 +585,15 @@ async function handleSave () {
     }
 
     if (payload.id) {
-      await StageService.update(payload.id, payload)
+      // The backend performs a full entity mapping on update, so we merge with
+      // the current persisted stage to avoid dropping non-edited associations.
+      const existing = (await StageService.getOne(payload.id)).data
+      const mergedPayload: StageDTO = {
+        ...existing,
+        ...payload,
+        id: payload.id,
+      }
+      await StageService.update(payload.id, mergedPayload)
       message.success('Stage mis à jour')
     } else {
       await StageService.create(payload)
