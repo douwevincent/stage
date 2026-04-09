@@ -7,17 +7,21 @@ import cm.univ.maroua.enspm.stage.domain.Inscription;
 import cm.univ.maroua.enspm.stage.domain.Niveau;
 import cm.univ.maroua.enspm.stage.domain.Parcours;
 import cm.univ.maroua.enspm.stage.domain.Specialite;
+import cm.univ.maroua.enspm.stage.domain.TypeStage;
+import cm.univ.maroua.enspm.stage.domain.PeriodeStage;
 import cm.univ.maroua.enspm.stage.repository.AnneeAcademiqueRepository;
 import cm.univ.maroua.enspm.stage.repository.DepartementRepository;
 import cm.univ.maroua.enspm.stage.repository.EtudiantRepository;
 import cm.univ.maroua.enspm.stage.repository.InscriptionRepository;
 import cm.univ.maroua.enspm.stage.repository.NiveauRepository;
 import cm.univ.maroua.enspm.stage.repository.ParcoursRepository;
+import cm.univ.maroua.enspm.stage.repository.PeriodeStageRepository;
 import cm.univ.maroua.enspm.stage.repository.SpecialiteRepository;
 import cm.univ.maroua.enspm.stage.service.dto.EtudiantImportResultDTO;
 import cm.univ.maroua.enspm.stage.service.dto.EtudiantImportRowDTO;
 import cm.univ.maroua.enspm.stage.service.dto.EtudiantDTO;
 import cm.univ.maroua.enspm.stage.service.dto.ImportRowMessageDTO;
+import cm.univ.maroua.enspm.stage.service.dto.StageDeclarationContextDTO;
 import cm.univ.maroua.enspm.stage.service.mapper.EtudiantMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +44,7 @@ public class EtudiantService {
     private final SpecialiteRepository specialiteRepository;
     private final ParcoursRepository parcoursRepository;
     private final InscriptionRepository inscriptionRepository;
+    private final PeriodeStageRepository periodeStageRepository;
 
     public EtudiantService(
             EtudiantRepository etudiantRepository,
@@ -49,7 +54,8 @@ public class EtudiantService {
             NiveauRepository niveauRepository,
             SpecialiteRepository specialiteRepository,
             ParcoursRepository parcoursRepository,
-            InscriptionRepository inscriptionRepository) {
+            InscriptionRepository inscriptionRepository,
+            PeriodeStageRepository periodeStageRepository) {
         this.etudiantRepository = etudiantRepository;
         this.etudiantMapper = etudiantMapper;
         this.anneeAcademiqueRepository = anneeAcademiqueRepository;
@@ -58,6 +64,7 @@ public class EtudiantService {
         this.specialiteRepository = specialiteRepository;
         this.parcoursRepository = parcoursRepository;
         this.inscriptionRepository = inscriptionRepository;
+        this.periodeStageRepository = periodeStageRepository;
     }
 
     public Page<EtudiantDTO> findAll(Pageable pageable) {
@@ -270,5 +277,40 @@ public class EtudiantService {
     @Transactional(readOnly = true)
     public Optional<EtudiantDTO> findByMatricule(String matricule) {
         return etudiantRepository.findByMatricule(matricule).map(etudiantMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<StageDeclarationContextDTO> findStageDeclarationContext(String matricule) {
+        Optional<Etudiant> etudiant = etudiantRepository.findByMatricule(matricule);
+        if (etudiant.isEmpty()) {
+            return Optional.empty();
+        }
+
+        AnneeAcademique anneeActive = anneeAcademiqueRepository.findByActifTrue()
+                .orElseThrow(() -> new IllegalStateException("Aucune année académique active"));
+
+        Inscription inscription = inscriptionRepository
+                .findFirstByEtudiantIdAndAnneeAcademiqueIdOrderByIdDesc(etudiant.get().getId(), anneeActive.getId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Aucune inscription active ne permet de déterminer le type de stage pour cet étudiant"));
+
+        if (inscription.getParcours() == null
+                || inscription.getParcours().getNiveau() == null
+                || inscription.getParcours().getNiveau().getTypeStage() == null) {
+            throw new IllegalArgumentException("Le niveau d'inscription de l'étudiant ne permet pas de déterminer le type de stage");
+        }
+
+        TypeStage typeStage = inscription.getParcours().getNiveau().getTypeStage();
+        PeriodeStage periodeStage = periodeStageRepository
+                .findByTypeStageIdAndAnneeAcademiqueId(typeStage.getId(), anneeActive.getId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Aucune période de stage active n'est configurée pour le type de stage de cet étudiant"));
+
+        return Optional.of(new StageDeclarationContextDTO(
+                etudiantMapper.toDto(etudiant.get()),
+                typeStage.getId(),
+                typeStage.getLibelle(),
+                periodeStage.getDateDebut(),
+                periodeStage.getDateFin()));
     }
 }

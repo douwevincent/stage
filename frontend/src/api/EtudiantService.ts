@@ -12,6 +12,14 @@ export interface EtudiantDTO {
   lieuNaissance: string
 }
 
+export interface StageDeclarationContextDTO {
+  etudiant: EtudiantDTO
+  typeStageId: number
+  typeStageLibelle: string
+  dateDebut: string
+  dateFin: string
+}
+
 export interface EtudiantImportRowDTO {
   no?: number
   matricule: string
@@ -75,5 +83,9 @@ export const EtudiantService = {
 
   validateMatricule (matricule: string) {
     return api.get<EtudiantDTO>(`/api/v1/etudiants/validate-matricule/${encodeURIComponent(matricule)}`)
+  },
+
+  getStageDeclarationContext (matricule: string) {
+    return api.get<StageDeclarationContextDTO>(`/api/v1/etudiants/validate-matricule/${encodeURIComponent(matricule)}/declaration-context`)
   }
 }

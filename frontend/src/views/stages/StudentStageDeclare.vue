@@ -8,7 +8,7 @@ import type { FormInst, FormRules, UploadFileInfo } from 'naive-ui'
 import { InboxOutlined } from '@vicons/antd'
 import { CheckCircle } from 'lucide-vue-next'
 import { ref, reactive, computed } from 'vue'
-import { EtudiantService, type EtudiantDTO } from '@/api/EtudiantService'
+import { EtudiantService, type EtudiantDTO, type StageDeclarationContextDTO } from '@/api/EtudiantService'
 import { EntrepriseService, type EntrepriseDTO } from '@/api/EntrepriseService'
 import { StageService } from '@/api/StageService'
 
@@ -26,6 +26,7 @@ const matriculeRules: FormRules = {
 }
 const validatingMatricule = ref(false)
 const validatedEtudiant = ref<EtudiantDTO | null>(null)
+const declarationContext = ref<StageDeclarationContextDTO | null>(null)
 const matriculeError = ref('')
 
 async function verifierMatricule () {
@@ -33,13 +34,19 @@ async function verifierMatricule () {
   validatingMatricule.value = true
   matriculeError.value = ''
   validatedEtudiant.value = null
+  declarationContext.value = null
   try {
-    const res = await EtudiantService.validateMatricule(matriculeForm.matricule.trim())
-    validatedEtudiant.value = res.data
+    const res = await EtudiantService.getStageDeclarationContext(matriculeForm.matricule.trim())
+    declarationContext.value = res.data
+    validatedEtudiant.value = res.data.etudiant
+    stageForm.dateDebut = res.data.dateDebut ? new Date(res.data.dateDebut).getTime() : null
+    stageForm.dateFin = res.data.dateFin ? new Date(res.data.dateFin).getTime() : null
     currentStep.value = 1
   } catch (err: any) {
     if (err?.response?.status === 404) {
       matriculeError.value = `Aucun étudiant trouvé avec le matricule « ${matriculeForm.matricule} »`
+    } else if (err?.response?.status === 400) {
+      matriculeError.value = err?.response?.data?.message ?? 'Impossible de déterminer le type de stage pour cet étudiant'
     } else {
       matriculeError.value = 'Erreur lors de la vérification du matricule'
     }
@@ -157,6 +164,7 @@ function recommencer () {
   success.value = false
   matriculeForm.matricule = ''
   validatedEtudiant.value = null
+  declarationContext.value = null
   matriculeError.value = ''
   Object.assign(stageForm, {
     entrepriseInput: '', entrepriseSecteur: '', entrepriseId: null,
@@ -230,6 +238,12 @@ function recommencer () {
             <NAlert type="success" class="mb-6">
               Étudiant identifié :
               <strong>{{ validatedEtudiant?.matricule }} — {{ validatedEtudiant?.nom }} {{ validatedEtudiant?.prenom }}</strong>
+            </NAlert>
+
+            <NAlert v-if="declarationContext" type="info" class="mb-6">
+              Type de stage déduit depuis votre niveau d'inscription :
+              <strong>{{ declarationContext.typeStageLibelle }}</strong>.
+              Les dates ont été préremplies à partir de la période de stage active correspondante.
             </NAlert>
 
             <NForm ref="stageRef" :model="stageForm" :rules="stageRules" label-placement="top">

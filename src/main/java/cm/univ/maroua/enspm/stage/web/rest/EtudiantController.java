@@ -84,6 +84,17 @@ public class EtudiantController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/validate-matricule/{matricule}/declaration-context")
+    public ResponseEntity<?> getStageDeclarationContext(@PathVariable String matricule) {
+        try {
+            return etudiantService.findStageDeclarationContext(matricule)
+                    .<ResponseEntity<?>>map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.notFound().build());
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEtudiant(@PathVariable Long id) {
         etudiantService.delete(id);
