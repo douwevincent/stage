@@ -83,17 +83,13 @@ class EvaluationNotificationPlannerServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        mailQueueRepository.deleteAll();
-        noteRepository.deleteAll();
-        sessionEvaluationRepository.deleteAll();
-        notificationRepository.deleteAll();
-        stageRepository.deleteAll();
-        inscriptionRepository.deleteAll();
-        parcoursRepository.deleteAll();
-        specialiteRepository.deleteAll();
-        departementRepository.deleteAll();
-        critereRepository.deleteAll();
-        periodeStageRepository.deleteAll();
+                mailQueueRepository.deleteAllInBatch();
+                noteRepository.deleteAllInBatch();
+                sessionEvaluationRepository.deleteAllInBatch();
+                notificationRepository.deleteAllInBatch();
+                stageRepository.deleteAllInBatch();
+                inscriptionRepository.deleteAllInBatch();
+                periodeStageRepository.deleteAllInBatch();
 
         typeStage   = typeStageRepository.save(new TypeStage(null, "Stage Test"));
         annee       = anneeAcademiqueRepository.save(new AnneeAcademique(null, "2025-2026", true));
@@ -109,15 +105,12 @@ class EvaluationNotificationPlannerServiceIntegrationTest {
 
     @Test
     void planifier_doitEnfilerUnMessageQuandNotificationDueAujourdhui() {
-        // Arrange : notification DEBUT_PERIODE avec offset=0 → déclenche si dateDebut == today
+        // Arrange : notification DEBUT_STAGE avec offset=0 → déclenche si dateDebut == today
         LocalDate today = LocalDate.now();
-        PeriodeStage periode = periodeStageRepository.save(
-                new PeriodeStage(null, typeStage, annee, today, today.plusDays(30)));
-
         Notification notification = notificationRepository.save(
-                new Notification(null, typeStage, NotificationReferenceDateType.DEBUT_PERIODE, 0, true));
+                new Notification(null, typeStage, NotificationReferenceDateType.DEBUT_STAGE, 0, true));
 
-        creerStageNonNote(encadreur, etudiant, entreprise, annee, today.minusDays(5), today.plusDays(25));
+        Stage stage = creerStageNonNote(encadreur, etudiant, entreprise, annee, today, today.plusDays(25));
         creerInscription(etudiant, annee, niveau);
 
         // Act
@@ -130,7 +123,8 @@ class EvaluationNotificationPlannerServiceIntegrationTest {
         assertThat(queue.get(0).getDestinataireEmail()).isEqualTo("dupont@test.com");
         assertThat(queue.get(0).getStatut()).isEqualTo(MailQueueStatut.PENDING);
         assertThat(queue.get(0).getEncadreurId()).isEqualTo(encadreur.getId());
-        assertThat(queue.get(0).getPeriodeStageId()).isEqualTo(periode.getId());
+                assertThat(queue.get(0).getStageId()).isEqualTo(stage.getId());
+                assertThat(queue.get(0).getPeriodeStageId()).isNull();
         assertThat(queue.get(0).getNotificationId()).isEqualTo(notification.getId());
     }
 
@@ -138,18 +132,15 @@ class EvaluationNotificationPlannerServiceIntegrationTest {
     void planifier_notifieEncoreSiEvaluationPartielle() {
         // Arrange : session d'évaluation présente mais sans note -> considéré non noté
         LocalDate today = LocalDate.now();
-        periodeStageRepository.save(
-                new PeriodeStage(null, typeStage, annee, today, today.plusDays(30)));
-
         notificationRepository.save(
-                new Notification(null, typeStage, NotificationReferenceDateType.DEBUT_PERIODE, 0, true));
+                new Notification(null, typeStage, NotificationReferenceDateType.FIN_STAGE, 0, true));
 
-        Stage stage = creerStageNonNote(encadreur, etudiant, entreprise, annee, today.minusDays(5), today.plusDays(25));
+        Stage stage = creerStageNonNote(encadreur, etudiant, entreprise, annee, today.minusDays(5), today);
         creerInscription(etudiant, annee, niveau);
 
         // Session ouverte sans note saisie
         SessionEvaluation session = sessionEvaluationRepository.save(
-                new SessionEvaluation(null, stage, "CODE123", SessionEvaluationStatut.EN_ATTENTE, today.plusDays(30), null));
+                new SessionEvaluation(null, stage, "CODE123", SessionEvaluationStatut.EN_ATTENTE, null, null));
         stage.setSessionEvaluation(session);
         stageRepository.save(stage);
 
@@ -159,19 +150,20 @@ class EvaluationNotificationPlannerServiceIntegrationTest {
         // Assert : session présente mais sans notes → doit quand même envoyer
         // (notes IS EMPTY → on notifie encore)
         assertThat(nbEnfiles).isEqualTo(1);
+        assertThat(sessionEvaluationRepository.findByStageId(stage.getId()))
+                .get()
+                .extracting(SessionEvaluation::getDateLimite)
+                .isEqualTo(today);
     }
 
     @Test
         void planifier_neDoitPasEnfilerSiNotificationNonDue() {
         // Arrange : offset = 5 → déclenche quand dateDebut = today - 5 → pas aujourd'hui si dateDebut = today
         LocalDate today = LocalDate.now();
-        periodeStageRepository.save(
-                new PeriodeStage(null, typeStage, annee, today, today.plusDays(30)));
-
         notificationRepository.save(
-                new Notification(null, typeStage, NotificationReferenceDateType.DEBUT_PERIODE, 5, true));
+                new Notification(null, typeStage, NotificationReferenceDateType.DEBUT_STAGE, 5, true));
 
-        creerStageNonNote(encadreur, etudiant, entreprise, annee, today.minusDays(5), today.plusDays(25));
+        creerStageNonNote(encadreur, etudiant, entreprise, annee, today, today.plusDays(25));
         creerInscription(etudiant, annee, niveau);
 
         // Act
@@ -184,13 +176,10 @@ class EvaluationNotificationPlannerServiceIntegrationTest {
     @Test
         void planifier_neDoitPasEnfilerSiNotificationInactive() {
         LocalDate today = LocalDate.now();
-        periodeStageRepository.save(
-                new PeriodeStage(null, typeStage, annee, today, today.plusDays(30)));
-
         notificationRepository.save(
-                new Notification(null, typeStage, NotificationReferenceDateType.DEBUT_PERIODE, 0, false));
+                        new Notification(null, typeStage, NotificationReferenceDateType.DEBUT_STAGE, 0, false));
 
-        creerStageNonNote(encadreur, etudiant, entreprise, annee, today.minusDays(5), today.plusDays(25));
+                creerStageNonNote(encadreur, etudiant, entreprise, annee, today, today.plusDays(25));
         creerInscription(etudiant, annee, niveau);
 
         int nbEnfiles = plannerService.planifier();
@@ -201,12 +190,10 @@ class EvaluationNotificationPlannerServiceIntegrationTest {
     @Test
     void planifier_antiDoublon_deuxiemeAppelNeCreeAucunMessageSupplementaire() {
         LocalDate today = LocalDate.now();
-        periodeStageRepository.save(
-                new PeriodeStage(null, typeStage, annee, today, today.plusDays(30)));
         notificationRepository.save(
-                new Notification(null, typeStage, NotificationReferenceDateType.DEBUT_PERIODE, 0, true));
+                new Notification(null, typeStage, NotificationReferenceDateType.DEBUT_STAGE, 0, true));
 
-        creerStageNonNote(encadreur, etudiant, entreprise, annee, today.minusDays(5), today.plusDays(25));
+        creerStageNonNote(encadreur, etudiant, entreprise, annee, today, today.plusDays(25));
         creerInscription(etudiant, annee, niveau);
 
         // Act : deux exécutions consécutives
@@ -220,12 +207,10 @@ class EvaluationNotificationPlannerServiceIntegrationTest {
 
     @Test
         void planifier_finPeriode_doitEnfilerQuandDateFinEgaleReference() {
-        // Arrange : FIN_PERIODE offset=0 → déclenche quand dateFin == today
+        // Arrange : FIN_STAGE offset=0 → déclenche quand dateFin == today
         LocalDate today = LocalDate.now();
-        periodeStageRepository.save(
-                new PeriodeStage(null, typeStage, annee, today.minusDays(30), today));
         notificationRepository.save(
-                new Notification(null, typeStage, NotificationReferenceDateType.FIN_PERIODE, 0, true));
+                new Notification(null, typeStage, NotificationReferenceDateType.FIN_STAGE, 0, true));
 
         creerStageNonNote(encadreur, etudiant, entreprise, annee, today.minusDays(30), today);
         creerInscription(etudiant, annee, niveau);
@@ -238,12 +223,10 @@ class EvaluationNotificationPlannerServiceIntegrationTest {
     @Test
     void planifier_neDoitPasEnfilerSiTousLesStagesSontNotes() {
         LocalDate today = LocalDate.now();
-        periodeStageRepository.save(
-                new PeriodeStage(null, typeStage, annee, today, today.plusDays(30)));
         notificationRepository.save(
-                new Notification(null, typeStage, NotificationReferenceDateType.DEBUT_PERIODE, 0, true));
+                new Notification(null, typeStage, NotificationReferenceDateType.DEBUT_STAGE, 0, true));
 
-        Stage stage = creerStageNonNote(encadreur, etudiant, entreprise, annee, today.minusDays(5), today.plusDays(25));
+        Stage stage = creerStageNonNote(encadreur, etudiant, entreprise, annee, today, today.plusDays(25));
         creerInscription(etudiant, annee, niveau);
 
         SessionEvaluation session = sessionEvaluationRepository.save(
@@ -260,6 +243,34 @@ class EvaluationNotificationPlannerServiceIntegrationTest {
         assertThat(mailQueueRepository.findAll()).isEmpty();
     }
 
+        @Test
+        void planifier_joursAvantFinStage_doitEnfilerQuandReferenceCorrespond() {
+                LocalDate today = LocalDate.now();
+                notificationRepository.save(
+                                new Notification(null, typeStage, NotificationReferenceDateType.JOURS_AVANT_FIN_STAGE, -7, true));
+
+                creerStageNonNote(encadreur, etudiant, entreprise, annee, today.minusDays(14), today.plusDays(7));
+                creerInscription(etudiant, annee, niveau);
+
+                int nbEnfiles = plannerService.planifier();
+
+                assertThat(nbEnfiles).isEqualTo(1);
+        }
+
+        @Test
+        void planifier_joursApresFinStage_doitEnfilerQuandReferenceCorrespond() {
+                LocalDate today = LocalDate.now();
+                notificationRepository.save(
+                                new Notification(null, typeStage, NotificationReferenceDateType.JOURS_APRES_FIN_STAGE, 2, true));
+
+                creerStageNonNote(encadreur, etudiant, entreprise, annee, today.minusDays(20), today.minusDays(2));
+                creerInscription(etudiant, annee, niveau);
+
+                int nbEnfiles = plannerService.planifier();
+
+                assertThat(nbEnfiles).isEqualTo(1);
+        }
+
     // -----------------------------------------------------------------------
     // Helpers
     // -----------------------------------------------------------------------
@@ -271,6 +282,7 @@ class EvaluationNotificationPlannerServiceIntegrationTest {
         stage.setEntreprise(ent);
         stage.setEncadreur(enc);
         stage.setAnneeAcademique(aa);
+        stage.setTypeStage(typeStage);
         stage.setDateDebut(debut);
         stage.setDateFin(fin);
         stage.setStatut(Statut.VALIDE);

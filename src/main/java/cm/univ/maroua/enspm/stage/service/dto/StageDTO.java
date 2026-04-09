@@ -11,6 +11,8 @@ public record StageDTO(
                 Long etudiantId,
                 String etudiantMatricule,
                 String etudiantNom,
+                Long typeStageId,
+                String typeStageLibelle,
                 Long entrepriseId,
                 String entrepriseNom,
                 String ville,

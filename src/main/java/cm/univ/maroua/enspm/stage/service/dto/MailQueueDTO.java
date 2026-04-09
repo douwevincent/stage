@@ -16,6 +16,7 @@ public record MailQueueDTO(
         int nombreTentatives,
         String erreur,
         Long encadreurId,
+        Long stageId,
         Long periodeStageId,
         Long notificationId,
         LocalDateTime createdAt,

@@ -18,8 +18,8 @@ import java.time.LocalDateTime;
     name = "mail_queue",
     uniqueConstraints = {
         @UniqueConstraint(
-            name = "uq_mail_queue_encadreur_periode_notif",
-            columnNames = {"encadreur_id", "periode_stage_id", "notification_id"}
+            name = "uq_mail_queue_encadreur_stage_notif",
+            columnNames = {"encadreur_id", "stage_id", "notification_id"}
         )
     }
 )
@@ -58,7 +58,10 @@ public class MailQueue {
     @Column(name = "encadreur_id", nullable = false)
     private Long encadreurId;
 
-    @Column(name = "periode_stage_id", nullable = false)
+    @Column(name = "stage_id")
+    private Long stageId;
+
+    @Column(name = "periode_stage_id")
     private Long periodeStageId;
 
     @Column(name = "notification_id", nullable = false)

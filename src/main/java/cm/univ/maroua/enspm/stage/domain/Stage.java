@@ -43,6 +43,11 @@ public class Stage {
     @JoinColumn(name = "annee_academique_id")
     private AnneeAcademique anneeAcademique;
 
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "type_stage_id")
+    private TypeStage typeStage;
+
     @OneToOne(mappedBy = "stage")
     private SessionEvaluation sessionEvaluation;
 

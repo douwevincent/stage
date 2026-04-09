@@ -24,10 +24,10 @@ public interface MailQueueRepository extends JpaRepository<MailQueue, Long> {
 
     long deleteByStatutAndDateEnvoiBefore(MailQueueStatut statut, LocalDateTime dateEnvoi);
 
-    /**
-     * Vérifie l'existence d'un message pour le triplet (encadreurId, periodeStageId, notificationId).
-     * Permet de tester l'idempotence avant insertion.
-     */
-    boolean existsByEncadreurIdAndPeriodeStageIdAndNotificationId(
-            Long encadreurId, Long periodeStageId, Long notificationId);
+        /**
+         * Vérifie l'existence d'un message pour le triplet (encadreurId, stageId, notificationId).
+         * Permet de tester l'idempotence avant insertion.
+         */
+        boolean existsByEncadreurIdAndStageIdAndNotificationId(
+            Long encadreurId, Long stageId, Long notificationId);
 }

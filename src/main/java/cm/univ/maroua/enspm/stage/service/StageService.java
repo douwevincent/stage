@@ -32,6 +32,8 @@ public class StageService {
     private final EtudiantRepository etudiantRepository;
     private final EncadreurRepository encadreurRepository;
     private final EntrepriseRepository entrepriseRepository;
+    private final InscriptionRepository inscriptionRepository;
+    private final TypeStageRepository typeStageRepository;
 
     @Value("${app.upload.dir:uploads}")
     private String uploadDir;
@@ -40,13 +42,17 @@ public class StageService {
             AnneeAcademiqueRepository anneeAcademiqueRepository,
             EtudiantRepository etudiantRepository,
             EncadreurRepository encadreurRepository,
-            EntrepriseRepository entrepriseRepository) {
+            EntrepriseRepository entrepriseRepository,
+            InscriptionRepository inscriptionRepository,
+            TypeStageRepository typeStageRepository) {
         this.stageRepository = stageRepository;
         this.stageMapper = stageMapper;
         this.anneeAcademiqueRepository = anneeAcademiqueRepository;
         this.etudiantRepository = etudiantRepository;
         this.encadreurRepository = encadreurRepository;
         this.entrepriseRepository = entrepriseRepository;
+        this.inscriptionRepository = inscriptionRepository;
+        this.typeStageRepository = typeStageRepository;
     }
 
     public Page<StageDTO> findAll(Pageable pageable) {
@@ -80,6 +86,7 @@ public class StageService {
                     .orElseThrow(() -> new IllegalStateException("Aucune année académique active"));
             stage.setAnneeAcademique(active);
         }
+        resolveAndAssignTypeStage(stage, stageDTO.typeStageId());
         if (stage.getSource() == null) {
             stage.setSource(Source.OPERATEUR);
         }
@@ -99,6 +106,8 @@ public class StageService {
                 stageDTO.etudiantId(),
                 stageDTO.etudiantMatricule(),
                 stageDTO.etudiantNom(),
+            stageDTO.typeStageId() != null ? stageDTO.typeStageId() : existing.typeStageId(),
+            stageDTO.typeStageLibelle() != null ? stageDTO.typeStageLibelle() : existing.typeStageLibelle(),
                 stageDTO.entrepriseId() != null ? stageDTO.entrepriseId() : existing.entrepriseId(),
                 stageDTO.entrepriseNom(),
                 stageDTO.ville(),
@@ -124,6 +133,9 @@ public class StageService {
         }
         if (stage.getEntreprise() != null && stage.getEntreprise().getId() == null) {
             stage.setEntreprise(null);
+        }
+        if (stage.getTypeStage() != null && stage.getTypeStage().getId() == null) {
+            stage.setTypeStage(null);
         }
         if (stage.getEncadreur() != null && stage.getEncadreur().getId() == null) {
             stage.setEncadreur(null);
@@ -183,6 +195,7 @@ public class StageService {
         stage.setDateDebut(dateDebut);
         stage.setDateFin(dateFin);
         stage.setAnneeAcademique(anneeActive);
+        resolveAndAssignTypeStage(stage, null);
         stage.setSource(Source.ETUDIANT);
         stage.setStatut(Statut.EN_ATTENTE_VALIDATION);
         stage.setCheminAutorisation(cheminAutorisation);
@@ -210,6 +223,7 @@ public class StageService {
         Etudiant etudiant = etudiantRepository.findById(etudiantId)
             .orElseThrow(() -> new IllegalArgumentException("Étudiant non trouvé: " + etudiantId));
         stage.setEtudiant(etudiant);
+        resolveAndAssignTypeStage(stage, null);
         return stageMapper.toDto(stageRepository.save(stage));
     }
 
@@ -231,6 +245,64 @@ public class StageService {
 
         stage.setEncadreur(encadreur);
         return stageMapper.toDto(stageRepository.save(stage));
+    }
+
+    private void resolveAndAssignTypeStage(Stage stage, Long requestedTypeStageId) {
+        TypeStage derivedTypeStage = resolveTypeStageFromInscription(stage);
+
+        if (requestedTypeStageId != null) {
+            TypeStage requestedTypeStage = typeStageRepository.findById(requestedTypeStageId)
+                    .orElseThrow(() -> new IllegalArgumentException("Type de stage non trouvé: " + requestedTypeStageId));
+
+            if (derivedTypeStage != null && !requestedTypeStage.getId().equals(derivedTypeStage.getId())) {
+                throw new IllegalArgumentException("Le type de stage fourni ne correspond pas à l'inscription de l'étudiant");
+            }
+
+            stage.setTypeStage(requestedTypeStage);
+            return;
+        }
+
+        if (derivedTypeStage != null) {
+            stage.setTypeStage(derivedTypeStage);
+            return;
+        }
+
+        if (stage.getEtudiant() == null || stage.getEtudiant().getId() == null) {
+            throw new IllegalArgumentException("Le type de stage est requis si aucun étudiant n'est associé au stage");
+        }
+        if (stage.getAnneeAcademique() == null || stage.getAnneeAcademique().getId() == null) {
+            throw new IllegalArgumentException("L'année académique est requise pour déterminer le type de stage");
+        }
+
+        throw new IllegalArgumentException(
+                "Aucune inscription ne permet de déterminer le type de stage pour cet étudiant");
+    }
+
+    private TypeStage resolveTypeStageFromInscription(Stage stage) {
+        if (stage.getEtudiant() == null || stage.getEtudiant().getId() == null) {
+            return null;
+        }
+        if (stage.getAnneeAcademique() == null || stage.getAnneeAcademique().getId() == null) {
+            return null;
+        }
+
+        Inscription inscription = inscriptionRepository
+                .findFirstByEtudiantIdAndAnneeAcademiqueIdOrderByIdDesc(
+                        stage.getEtudiant().getId(),
+                        stage.getAnneeAcademique().getId())
+                .orElse(null);
+
+        if (inscription == null) {
+            return null;
+        }
+
+        if (inscription.getParcours() == null
+                || inscription.getParcours().getNiveau() == null
+                || inscription.getParcours().getNiveau().getTypeStage() == null) {
+            throw new IllegalArgumentException("Le parcours de l'étudiant ne permet pas de déterminer le type de stage");
+        }
+
+        return inscription.getParcours().getNiveau().getTypeStage();
     }
 
     @Transactional(readOnly = true)

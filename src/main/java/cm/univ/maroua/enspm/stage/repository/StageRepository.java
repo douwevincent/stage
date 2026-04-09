@@ -1,6 +1,5 @@
 package cm.univ.maroua.enspm.stage.repository;
 
-import cm.univ.maroua.enspm.stage.domain.Encadreur;
 import cm.univ.maroua.enspm.stage.domain.Stage;
 import cm.univ.maroua.enspm.stage.domain.Statut;
 import org.springframework.data.domain.Page;
@@ -45,30 +44,13 @@ public interface StageRepository extends JpaRepository<Stage, Long> {
             """)
     long countDistinctEntreprisesByAnneeAcademiqueId(@Param("anneeAcademiqueId") Long anneeAcademiqueId);
 
-    /**
-     * Retourne les encadreurs distincts (avec email) ayant au moins un stage VALIDE
-     * pour le type de stage de la période donnée, et dont au moins un stage
-     * n'est pas encore noté (session d'évaluation absente ou sans notes).
-     *
-     * La liaison typeStage se fait via : Stage.etudiant → Inscription → Parcours → Niveau.typeStage
-     * en s'assurant que l'Inscription partage la même annéeAcadémique que le Stage.
-     */
     @Query("""
-            SELECT DISTINCT s.encadreur FROM Stage s
+            SELECT s FROM Stage s
             WHERE s.statut = cm.univ.maroua.enspm.stage.domain.Statut.VALIDE
               AND s.encadreur IS NOT NULL
               AND s.encadreur.email IS NOT NULL
-              AND s.anneeAcademique.id = :anneeAcademiqueId
-              AND s.dateDebut <= :periodeFin
-              AND s.dateFin >= :periodeDebut
-              AND EXISTS (
-                  SELECT i FROM Inscription i
-                  JOIN i.parcours p
-                  JOIN p.niveau n
-                  WHERE i.etudiant = s.etudiant
-                    AND i.anneeAcademique = s.anneeAcademique
-                    AND n.typeStage.id = :typeStageId
-              )
+              AND s.typeStage.id = :typeStageId
+              AND s.dateDebut = :referenceDate
               AND (
                   s.sessionEvaluation IS NULL
                   OR NOT EXISTS (
@@ -77,19 +59,17 @@ public interface StageRepository extends JpaRepository<Stage, Long> {
                   )
               )
             """)
-    List<Encadreur> findEncadreursAvecStagesNonNotesPourPeriode(
+        List<Stage> findStagesNonNotesPourDebutStage(
             @Param("typeStageId") Long typeStageId,
-            @Param("anneeAcademiqueId") Long anneeAcademiqueId,
-            @Param("periodeDebut") LocalDate periodeDebut,
-            @Param("periodeFin") LocalDate periodeFin);
+          @Param("referenceDate") LocalDate referenceDate);
 
     @Query("""
             SELECT s FROM Stage s
-            WHERE s.encadreur.id = :encadreurId
-              AND s.statut = cm.univ.maroua.enspm.stage.domain.Statut.VALIDE
-              AND s.anneeAcademique.id = :anneeAcademiqueId
-              AND s.dateDebut <= :periodeFin
-              AND s.dateFin >= :periodeDebut
+          WHERE s.statut = cm.univ.maroua.enspm.stage.domain.Statut.VALIDE
+            AND s.encadreur IS NOT NULL
+            AND s.encadreur.email IS NOT NULL
+            AND s.typeStage.id = :typeStageId
+            AND s.dateFin = :referenceDate
               AND (
                   s.sessionEvaluation IS NULL
                   OR NOT EXISTS (
@@ -98,9 +78,7 @@ public interface StageRepository extends JpaRepository<Stage, Long> {
                   )
               )
             """)
-    List<Stage> findStagesNonNotesPourEncadreurEtPeriode(
-            @Param("encadreurId") Long encadreurId,
-            @Param("anneeAcademiqueId") Long anneeAcademiqueId,
-            @Param("periodeDebut") LocalDate periodeDebut,
-            @Param("periodeFin") LocalDate periodeFin);
+        List<Stage> findStagesNonNotesPourFinStage(
+          @Param("typeStageId") Long typeStageId,
+          @Param("referenceDate") LocalDate referenceDate);
 }

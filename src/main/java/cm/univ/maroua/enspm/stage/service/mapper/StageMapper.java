@@ -10,6 +10,8 @@ public interface StageMapper extends EntityMapper<StageDTO, Stage> {
     @Mapping(source = "etudiant.id", target = "etudiantId")
     @Mapping(source = "etudiant.matricule", target = "etudiantMatricule")
     @Mapping(source = "etudiant.nom", target = "etudiantNom")
+    @Mapping(source = "typeStage.id", target = "typeStageId")
+    @Mapping(source = "typeStage.libelle", target = "typeStageLibelle")
     @Mapping(source = "entreprise.id", target = "entrepriseId")
     @Mapping(source = "entreprise.nom", target = "entrepriseNom")
     @Mapping(source = "encadreur.id", target = "encadreurId")
@@ -19,6 +21,7 @@ public interface StageMapper extends EntityMapper<StageDTO, Stage> {
     StageDTO toDto(Stage entity);
 
     @Mapping(source = "etudiantId", target = "etudiant.id")
+    @Mapping(source = "typeStageId", target = "typeStage.id")
     @Mapping(source = "entrepriseId", target = "entreprise.id")
     @Mapping(source = "encadreurId", target = "encadreur.id")
     @Mapping(source = "anneeAcademiqueId", target = "anneeAcademique.id")

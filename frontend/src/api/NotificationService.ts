@@ -1,6 +1,8 @@
 import api from './index'
 
 export const NotificationReferenceDateType = {
+  DEBUT_STAGE: 'DEBUT_STAGE',
+  FIN_STAGE: 'FIN_STAGE',
   DEBUT_PERIODE: 'DEBUT_PERIODE',
   FIN_PERIODE: 'FIN_PERIODE',
   JOURS_AVANT_FIN_STAGE: 'JOURS_AVANT_FIN_STAGE',

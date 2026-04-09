@@ -93,6 +93,7 @@ public class MailQueueService {
                 mail.getNombreTentatives(),
                 mail.getErreur(),
                 mail.getEncadreurId(),
+                mail.getStageId(),
                 mail.getPeriodeStageId(),
                 mail.getNotificationId(),
                 mail.getCreatedAt(),

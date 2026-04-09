@@ -3,7 +3,6 @@ package cm.univ.maroua.enspm.stage.service;
 import cm.univ.maroua.enspm.stage.domain.*;
 import cm.univ.maroua.enspm.stage.repository.MailQueueRepository;
 import cm.univ.maroua.enspm.stage.repository.NotificationRepository;
-import cm.univ.maroua.enspm.stage.repository.PeriodeStageRepository;
 import cm.univ.maroua.enspm.stage.repository.StageRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,13 +19,13 @@ import java.util.Locale;
 
 /**
  * Détecte les notifications dues aujourd'hui et enfile un message en attente
- * pour chaque encadreur ayant au moins un stage non noté dans la période concernée.
+ * pour chaque stage non noté concerné.
  *
  * <p>Règle de déclenchement : une {@link Notification} active est due aujourd'hui si
- * {@code dateReference + offsetDays == today}, où dateReference est soit
- * {@code PeriodeStage.dateDebut} (DEBUT_PERIODE) soit {@code PeriodeStage.dateFin} (FIN_PERIODE).</p>
+ * {@code dateReference + offsetDays == today}, où dateReference est la date réelle
+ * de début ou de fin du stage selon le type de notification.</p>
  *
- * <p>Anti-doublon : un seul message par triplet (encadreur, période, notification)
+ * <p>Anti-doublon : un seul message par triplet (encadreur, stage, notification)
  * grâce à la contrainte unique sur la table {@code mail_queue}.</p>
  */
 @Service
@@ -45,7 +44,6 @@ public class EvaluationNotificationPlannerService {
     private String baseUrl;
 
     private final NotificationRepository notificationRepository;
-    private final PeriodeStageRepository periodeStageRepository;
     private final StageRepository stageRepository;
     private final MailQueueRepository mailQueueRepository;
     private final AppSettingService appSettingService;
@@ -53,13 +51,11 @@ public class EvaluationNotificationPlannerService {
 
     public EvaluationNotificationPlannerService(
             NotificationRepository notificationRepository,
-            PeriodeStageRepository periodeStageRepository,
             StageRepository stageRepository,
             MailQueueRepository mailQueueRepository,
             AppSettingService appSettingService,
             SessionEvaluationService sessionEvaluationService) {
         this.notificationRepository = notificationRepository;
-        this.periodeStageRepository = periodeStageRepository;
         this.stageRepository = stageRepository;
         this.mailQueueRepository = mailQueueRepository;
         this.appSettingService = appSettingService;
@@ -97,15 +93,16 @@ public class EvaluationNotificationPlannerService {
     // Logique interne
     // -----------------------------------------------------------------------
 
+    @SuppressWarnings("deprecation")
     private int traiterNotification(Notification notification, LocalDate today, String sujet, String corps) {
         Long typeStageId = notification.getTypeStage().getId();
         LocalDate referenceDate = today.minusDays(notification.getOffsetDays());
 
-        List<PeriodeStage> periodesDues = switch (notification.getReferenceDateType()) {
-            case DEBUT_PERIODE -> periodeStageRepository
-                    .findByTypeStageIdAndDateDebut(typeStageId, referenceDate);
-            case FIN_PERIODE   -> periodeStageRepository
-                    .findByTypeStageIdAndDateFin(typeStageId, referenceDate);
+        List<Stage> stagesDues = switch (notification.getReferenceDateType()) {
+            case DEBUT_STAGE, DEBUT_PERIODE -> stageRepository
+                    .findStagesNonNotesPourDebutStage(typeStageId, referenceDate);
+            case FIN_STAGE, FIN_PERIODE, JOURS_AVANT_FIN_STAGE, JOURS_APRES_FIN_STAGE -> stageRepository
+                    .findStagesNonNotesPourFinStage(typeStageId, referenceDate);
             default -> {
                 log.debug("Type de référence {} non supporté pour les notifications encadreurs, ignoré.",
                         notification.getReferenceDateType());
@@ -113,72 +110,44 @@ public class EvaluationNotificationPlannerService {
             }
         };
 
-        if (periodesDues.isEmpty()) {
+        if (stagesDues.isEmpty()) {
             return 0;
         }
 
         int count = 0;
-        for (PeriodeStage periode : periodesDues) {
-            List<Encadreur> encadreurs = stageRepository.findEncadreursAvecStagesNonNotesPourPeriode(
-                    typeStageId,
-                    periode.getAnneeAcademique().getId(),
-                    periode.getDateDebut(),
-                    periode.getDateFin());
-
-            if (encadreurs.isEmpty()) {
+        for (Stage stage : stagesDues) {
+            if (stage.getEncadreur() == null || stage.getEncadreur().getId() == null) {
                 continue;
             }
-
-            for (Encadreur encadreur : encadreurs) {
-                count += enfiler(encadreur, periode, notification, today, sujet, corps);
-            }
+            count += enfiler(stage, notification, today, sujet, corps);
         }
 
         if (count == 0) {
-            log.debug("Notification {} : aucun encadreur éligible (tous ont noté leurs stages ou pas de stages).",
+            log.debug("Notification {} : aucun stage éligible (déjà noté ou sans encadreur).",
                     notification.getId());
         }
         return count;
     }
 
-    private int enfiler(Encadreur encadreur, PeriodeStage periode, Notification notification,
-                        LocalDate today, String sujet, String corps) {
+    private int enfiler(Stage stage, Notification notification, LocalDate today, String sujet, String corps) {
+        Encadreur encadreur = stage.getEncadreur();
 
-        if (mailQueueRepository.existsByEncadreurIdAndPeriodeStageIdAndNotificationId(
-                encadreur.getId(), periode.getId(), notification.getId())) {
-            log.debug("Doublon ignoré : encadreur={} période={} notification={}",
-                    encadreur.getId(), periode.getId(), notification.getId());
+        if (mailQueueRepository.existsByEncadreurIdAndStageIdAndNotificationId(
+                encadreur.getId(), stage.getId(), notification.getId())) {
+            log.debug("Doublon ignoré : encadreur={} stage={} notification={}",
+                    encadreur.getId(), stage.getId(), notification.getId());
             return 0;
         }
 
-        // Créer ou récupérer une SessionEvaluation avec code court pour chaque stage éligible
-        List<Stage> stages = stageRepository.findStagesNonNotesPourEncadreurEtPeriode(
-                encadreur.getId(),
-                periode.getAnneeAcademique().getId(),
-                periode.getDateDebut(),
-                periode.getDateFin());
-
-        if (stages.isEmpty()) {
-            return 0;
-        }
-
-        String premierCode = null;
-        LocalDate premiereDateLimite = null;
-        for (Stage stage : stages) {
-            SessionEvaluation session = sessionEvaluationService.ensureSessionWithCode(stage, periode.getDateFin());
-            if (premierCode == null) {
-                premierCode = session.getCodeAcces();
-                premiereDateLimite = session.getDateLimite();
-            }
-        }
+        SessionEvaluation session = sessionEvaluationService.ensureSessionWithCode(stage, stage.getDateFin());
 
         // Intégrer le lien dans le corps du message
         String prefixeUrl = resolvePublicEvaluationUrlPrefix();
-        String lien = prefixeUrl + "/evaluation-encadreur/" + premierCode;
+        String lien = prefixeUrl + "/evaluation-encadreur/" + session.getCodeAcces();
         String corpsAvecLien = corps.contains("{LIEN_EVALUATION}")
                 ? corps.replace("{LIEN_EVALUATION}", lien)
                 : corps + "\n\nLien d'évaluation : " + lien;
-        corpsAvecLien = applySupportedPlaceholders(corpsAvecLien, encadreur, premiereDateLimite);
+        corpsAvecLien = applySupportedPlaceholders(corpsAvecLien, encadreur, session.getDateLimite());
 
         MailQueue mail = new MailQueue();
         mail.setDestinataireEmail(encadreur.getEmail());
@@ -188,13 +157,14 @@ public class EvaluationNotificationPlannerService {
         mail.setDatePlanifiee(today);
         mail.setNombreTentatives(0);
         mail.setEncadreurId(encadreur.getId());
-        mail.setPeriodeStageId(periode.getId());
+        mail.setStageId(stage.getId());
+        mail.setPeriodeStageId(null);
         mail.setNotificationId(notification.getId());
 
         try {
             mailQueueRepository.save(mail);
-            log.debug("Mail enfilé : encadreur={} <{}> période={} notification={} prefixe={} lien={}",
-                    encadreur.getId(), encadreur.getEmail(), periode.getId(), notification.getId(), prefixeUrl, lien);
+            log.debug("Mail enfilé : encadreur={} <{}> stage={} notification={} prefixe={} lien={}",
+                    encadreur.getId(), encadreur.getEmail(), stage.getId(), notification.getId(), prefixeUrl, lien);
             return 1;
         } catch (DataIntegrityViolationException e) {
             // Race condition entre le check existsBy et le save : on ignore silencieusement

@@ -32,8 +32,8 @@ const formModel = reactive<NotificationDTO>({
 
 const typeStageOptions = ref<SelectOption[]>([])
 const referenceDateTypeOptions = ref<SelectOption[]>([
-  { label: 'Début de période', value: NotificationReferenceDateType.DEBUT_PERIODE },
-  { label: 'Fin de période', value: NotificationReferenceDateType.FIN_PERIODE },
+  { label: 'Début du stage', value: NotificationReferenceDateType.DEBUT_STAGE },
+  { label: 'Fin du stage', value: NotificationReferenceDateType.FIN_STAGE },
   { label: 'Jours avant fin de stage', value: NotificationReferenceDateType.JOURS_AVANT_FIN_STAGE },
   { label: 'Jours après fin de stage', value: NotificationReferenceDateType.JOURS_APRES_FIN_STAGE }
 ])
@@ -44,6 +44,8 @@ const typeStageMap = computed(() => {
 })
 
 const referenceDateTypeMap = new Map<string, string>([
+  [NotificationReferenceDateType.DEBUT_STAGE, 'Début du stage'],
+  [NotificationReferenceDateType.FIN_STAGE, 'Fin du stage'],
   [NotificationReferenceDateType.DEBUT_PERIODE, 'Début de période'],
   [NotificationReferenceDateType.FIN_PERIODE, 'Fin de période'],
   [NotificationReferenceDateType.JOURS_AVANT_FIN_STAGE, 'Jours avant fin de stage'],

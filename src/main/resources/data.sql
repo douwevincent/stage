@@ -323,14 +323,14 @@ INSERT INTO inscription (id, etudiant_id, annee_academique_id, parcours_id) VALU
 -- Stages VALIDE avec encadreurs (pour l'année active 2025-2026)
 -- Stage 1: deux étudiants, encadreur 1
 INSERT INTO stage (id, etudiant_id, entreprise_id, encadreur_id, ville, adresse, 
-                   annee_academique_id, date_debut, date_fin, statut, source)
+                   annee_academique_id, type_stage_id, date_debut, date_fin, statut, source)
 VALUES 
-(1, 1, 1, 1, 'Yaoundé', 'BP 123', 4, '2026-08-01', '2026-08-31', 'VALIDE', 'OPERATEUR'),
-(2, 2, 2, 1, 'Douala', 'BP 456', 4, '2026-08-01', '2026-08-31', 'VALIDE', 'OPERATEUR'),
-(3, 3, 5, 2, 'Garoua', 'Rue 1', 4, '2026-08-01', '2026-08-31', 'VALIDE', 'OPERATEUR'),
-(4, 4, 6, 2, 'Bertoua', 'Rue 2', 4, '2026-08-01', '2026-08-31', 'VALIDE', 'OPERATEUR'),
-(5, 5, 10, 3, 'Limbe', 'Rue 3', 4, '2026-08-01', '2026-08-31', 'VALIDE', 'OPERATEUR'),
-(6, 6, 15, 3, 'Bamenda', 'Rue 4', 4, '2026-08-01', '2026-08-31', 'VALIDE', 'OPERATEUR');
+(1, 1, 1, 1, 'Yaoundé', 'BP 123', 4, 3, '2026-08-01', '2026-08-31', 'VALIDE', 'OPERATEUR'),
+(2, 2, 2, 1, 'Douala', 'BP 456', 4, 3, '2026-08-01', '2026-08-31', 'VALIDE', 'OPERATEUR'),
+(3, 3, 5, 2, 'Garoua', 'Rue 1', 4, 4, '2026-08-01', '2026-08-31', 'VALIDE', 'OPERATEUR'),
+(4, 4, 6, 2, 'Bertoua', 'Rue 2', 4, 4, '2026-08-01', '2026-08-31', 'VALIDE', 'OPERATEUR'),
+(5, 5, 10, 3, 'Limbe', 'Rue 3', 4, 5, '2026-08-01', '2026-08-31', 'VALIDE', 'OPERATEUR'),
+(6, 6, 15, 3, 'Bamenda', 'Rue 4', 4, 5, '2026-08-01', '2026-08-31', 'VALIDE', 'OPERATEUR');
 
 -- SessionEvaluation avec codes courts (test data)
 INSERT INTO session_evaluation (id, stage_id, code_acces, statut, date_limite) VALUES 
@@ -343,8 +343,8 @@ INSERT INTO session_evaluation (id, stage_id, code_acces, statut, date_limite) V
 
 -- TypeStage pour les notifications
 INSERT INTO notification (id, type_stage_id, reference_date_type, offset_days, actif) VALUES 
-(1, 5, 'FIN_PERIODE', 0, true),
-(2, 5, 'FIN_PERIODE', -7, true);
+(1, 5, 'FIN_STAGE', 0, true),
+(2, 5, 'JOURS_AVANT_FIN_STAGE', -7, true);
 
 alter table departement alter column ID restart with 11;
 alter table specialite alter column ID restart with 33;
