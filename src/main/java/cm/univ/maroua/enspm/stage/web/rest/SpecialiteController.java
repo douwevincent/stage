@@ -13,6 +13,9 @@ import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/api/v1/specialites")
+/**
+ * Controleur REST SpecialiteController.
+ */
 public class SpecialiteController {
 
     private final SpecialiteService specialiteService;

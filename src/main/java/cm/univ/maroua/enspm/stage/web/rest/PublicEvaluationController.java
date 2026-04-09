@@ -18,6 +18,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/public/evaluations")
+/**
+ * Controleur REST PublicEvaluationController.
+ */
 public class PublicEvaluationController {
 
     private final PublicEvaluationService publicEvaluationService;

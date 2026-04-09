@@ -5,6 +5,9 @@ import cm.univ.maroua.enspm.stage.domain.MailQueueStatut;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * DTO MailQueueDTO.
+ */
 public record MailQueueDTO(
         Long id,
         String destinataireEmail,

@@ -13,6 +13,9 @@ import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/api/v1/departements")
+/**
+ * Controleur REST DepartementController.
+ */
 public class DepartementController {
 
     private final DepartementService departementService;

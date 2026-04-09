@@ -7,6 +7,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * Entreprise d'accueil des stages.
+ *
+ * <p>Reference les encadreurs et les stages associes a cette structure.</p>
+ */
 @Entity
 @Data
 @NoArgsConstructor

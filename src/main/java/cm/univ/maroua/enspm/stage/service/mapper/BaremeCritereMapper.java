@@ -6,6 +6,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
+/**
+ * Mapper MapStruct BaremeCritereMapper.
+ */
 public interface BaremeCritereMapper extends EntityMapper<BaremeCritereDTO, BaremeCritere> {
     @Mapping(source = "bareme.id", target = "baremeId")
     @Mapping(source = "bareme.code", target = "baremeCode")

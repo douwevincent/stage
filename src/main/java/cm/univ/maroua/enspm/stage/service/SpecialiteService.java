@@ -16,6 +16,9 @@ import java.util.Optional;
 
 @Service
 @Transactional
+/**
+ * Service metier SpecialiteService.
+ */
 public class SpecialiteService {
 
     private final SpecialiteRepository specialiteRepository;

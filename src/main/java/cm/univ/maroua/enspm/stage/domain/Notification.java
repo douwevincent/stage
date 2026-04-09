@@ -18,6 +18,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Regle de notification planifiee liee a un type de stage.
+ *
+ * <p>Definit un type de date de reference et un decalage en jours pour
+ * calculer la date de planification des messages.</p>
+ */
 @Entity
 @Data
 @NoArgsConstructor

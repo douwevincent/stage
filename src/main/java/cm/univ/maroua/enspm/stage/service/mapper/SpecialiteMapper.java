@@ -6,6 +6,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
+/**
+ * Mapper MapStruct SpecialiteMapper.
+ */
 public interface SpecialiteMapper extends EntityMapper<SpecialiteDTO, Specialite> {
     @Mapping(source = "departement.id", target = "departementId")
     SpecialiteDTO toDto(Specialite entity);

@@ -25,6 +25,16 @@ const router = createRouter({
       component: () => import('@/views/etudiants/EtudiantList.vue'),
     },
     {
+      path: '/etudiants/recherche',
+      name: 'etudiants-search',
+      component: () => import('@/views/etudiants/EtudiantSearch.vue'),
+    },
+    {
+      path: '/etudiants/:id',
+      name: 'etudiants-detail',
+      component: () => import('@/views/etudiants/EtudiantDetail.vue'),
+    },
+    {
       path: '/etudiants/importer',
       name: 'etudiants-import',
       component: () => import('@/views/etudiants/EtudiantImport.vue'),

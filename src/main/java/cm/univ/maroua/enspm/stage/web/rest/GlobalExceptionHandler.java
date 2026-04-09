@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+/**
+ * Controleur REST GlobalExceptionHandler.
+ */
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)

@@ -9,6 +9,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Type de stage (academique, professionnel, etc.).
+ */
 @Entity
 @Data
 @NoArgsConstructor

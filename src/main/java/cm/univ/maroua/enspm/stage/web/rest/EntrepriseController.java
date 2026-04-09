@@ -15,6 +15,9 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/entreprises")
+/**
+ * Controleur REST EntrepriseController.
+ */
 public class EntrepriseController {
 
     private final EntrepriseService entrepriseService;

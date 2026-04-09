@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+/**
+ * Repository JPA EntrepriseRepository.
+ */
 public interface EntrepriseRepository extends JpaRepository<Entreprise, Long> {
     List<Entreprise> findByNomContainingIgnoreCase(String nom);
     Optional<Entreprise> findByNomIgnoreCase(String nom);

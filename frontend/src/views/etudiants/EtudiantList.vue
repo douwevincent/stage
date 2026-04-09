@@ -5,7 +5,7 @@ import {
 } from 'naive-ui'
 import type { FormInst, FormRules, DataTableColumns } from 'naive-ui'
 import { PlusOutlined, SearchOutlined } from '@vicons/antd'
-import { Edit, Trash2 } from 'lucide-vue-next'
+import { Edit, Eye, Loader2, Trash2 } from 'lucide-vue-next'
 import { ref, h, onMounted, computed, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { EtudiantService, type EtudiantDTO } from '@/api/EtudiantService'
@@ -42,11 +42,21 @@ const columns: DataTableColumns<EtudiantDTO> = [
   {
     title: 'Actions',
     key: 'actions',
-    width: 100,
+    width: 150,
     fixed: 'right',
     render (row) {
       return h(NSpace, null, {
         default: () => [
+          h(NTooltip, null, {
+            trigger: () => h(NButton, {
+              size: 'small',
+              quaternary: true,
+              type: 'primary',
+              circle: true,
+              onClick: () => openDetail(row)
+            }, { default: () => h(NIcon, null, { default: () => h(Eye) }) }),
+            default: () => 'Voir détail'
+          }),
           h(NTooltip, null, {
             trigger: () => h(NButton, { 
               size: 'small', 
@@ -82,6 +92,8 @@ const loading = ref(false)
 const page = ref(1)
 const pageSize = ref(10)
 const itemCount = ref(0)
+const searchQuery = ref('')
+let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
 
 const pagination = computed(() => ({
   page: page.value,
@@ -103,7 +115,10 @@ const pagination = computed(() => ({
 const fetchData = async () => {
   loading.value = true
   try {
-    const res = await EtudiantService.getAll(page.value - 1, pageSize.value)
+    const trimmedQuery = searchQuery.value.trim()
+    const res = trimmedQuery.length > 0
+      ? await EtudiantService.search(trimmedQuery, page.value - 1, pageSize.value)
+      : await EtudiantService.getAll(page.value - 1, pageSize.value)
     data.value = res.data.content || []
     // Support both flattened and wrapped response structures
     itemCount.value = res.data.totalElements || res.data.page?.totalElements || 0
@@ -112,6 +127,24 @@ const fetchData = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const handleSearchInput = () => {
+  page.value = 1
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer)
+  }
+  searchDebounceTimer = setTimeout(() => {
+    fetchData()
+  }, 400)
+}
+
+const openDetail = (row: EtudiantDTO) => {
+  if (!row.id) {
+    message.warning('Étudiant introuvable')
+    return
+  }
+  router.push({ name: 'etudiants-detail', params: { id: row.id } })
 }
 
 const handleAdd = () => {
@@ -191,11 +224,25 @@ onMounted(fetchData)
 
     <n-card>
       <div class="mb-4 flex items-center space-x-4">
-        <n-input placeholder="Rechercher un étudiant..." class="max-w-xs">
+        <div class="space-y-1">
+        <n-input
+          v-model:value="searchQuery"
+          placeholder="Rechercher un étudiant..."
+          class="max-w-xs"
+          clearable
+          @update:value="handleSearchInput"
+        >
           <template #prefix>
             <n-icon><SearchOutlined /></n-icon>
           </template>
+          <template #suffix>
+            <n-icon v-if="loading" class="animate-spin">
+              <Loader2 />
+            </n-icon>
+          </template>
         </n-input>
+          <p v-if="loading" class="text-xs text-slate-500">Recherche en cours...</p>
+        </div>
       </div>
       <n-data-table
         remote

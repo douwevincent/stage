@@ -17,6 +17,12 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * Parametre applicatif persiste en base de donnees.
+ *
+ * <p>Utilise pour centraliser des clefs de configuration metier et technique,
+ * avec support de type, confidentialite et controle de modifiabilite.</p>
+ */
 @Entity
 @Table(name = "app_setting")
 @Data

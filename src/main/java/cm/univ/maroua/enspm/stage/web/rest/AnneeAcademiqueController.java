@@ -11,6 +11,12 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+/**
+ * Controleur REST de gestion des annees academiques.
+ *
+ * <p>Expose des endpoints CRUD ainsi qu'un endpoint dedie a l'activation de
+ * l'annee academique courante.</p>
+ */
 @RestController
 @RequestMapping("/api/v1/annee-academiques")
 public class AnneeAcademiqueController {
@@ -21,11 +27,17 @@ public class AnneeAcademiqueController {
         this.anneeAcademiqueService = anneeAcademiqueService;
     }
 
+    /**
+     * Retourne les annees academiques de maniere paginee.
+     */
     @GetMapping
     public Page<AnneeAcademiqueDTO> getAllAnneeAcademiques(Pageable pageable) {
         return anneeAcademiqueService.findAll(pageable);
     }
 
+    /**
+     * Retourne l'annee academique active.
+     */
     @GetMapping("/active")
     public ResponseEntity<AnneeAcademiqueDTO> getAnneeActive() {
         return anneeAcademiqueService.findActive()
@@ -33,11 +45,17 @@ public class AnneeAcademiqueController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    /**
+     * Active l'annee academique cible en desactivant les autres.
+     */
     @PatchMapping("/{id}/activer")
     public ResponseEntity<AnneeAcademiqueDTO> activerAnneeAcademique(@PathVariable Long id) {
         return ResponseEntity.ok(anneeAcademiqueService.activate(id));
     }
 
+    /**
+     * Retourne une annee academique par identifiant.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<AnneeAcademiqueDTO> getAnneeAcademique(@PathVariable Long id) {
         return anneeAcademiqueService.findOne(id)
@@ -45,6 +63,9 @@ public class AnneeAcademiqueController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    /**
+     * Cree une nouvelle annee academique.
+     */
     @PostMapping
     public ResponseEntity<AnneeAcademiqueDTO> createAnneeAcademique(
             @Valid @RequestBody AnneeAcademiqueDTO anneeAcademiqueDTO)
@@ -57,6 +78,9 @@ public class AnneeAcademiqueController {
                 .body(result);
     }
 
+    /**
+     * Met a jour une annee academique existante.
+     */
     @PutMapping("/{id}")
     public ResponseEntity<AnneeAcademiqueDTO> updateAnneeAcademique(
             @PathVariable(value = "id", required = false) final Long id,
@@ -69,6 +93,9 @@ public class AnneeAcademiqueController {
                 .body(result);
     }
 
+    /**
+     * Supprime une annee academique.
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAnneeAcademique(@PathVariable Long id) {
         anneeAcademiqueService.delete(id);

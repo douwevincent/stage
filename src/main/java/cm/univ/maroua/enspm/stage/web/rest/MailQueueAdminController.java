@@ -12,6 +12,9 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/admin/mail-queue")
+/**
+ * Controleur REST MailQueueAdminController.
+ */
 public class MailQueueAdminController {
 
     private final MailQueueService mailQueueService;

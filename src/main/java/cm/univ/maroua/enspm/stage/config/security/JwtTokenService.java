@@ -12,6 +12,12 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
 
+/**
+ * Service de generation et de validation des tokens JWT.
+ *
+ * <p>Le token embarque l'email de l'utilisateur comme sujet et son role comme claim.
+ * La cle de signature est derivee de la configuration applicative.</p>
+ */
 @Service
 public class JwtTokenService {
 
@@ -26,6 +32,12 @@ public class JwtTokenService {
         this.expirationMs = expirationMs;
     }
 
+    /**
+     * Genere un token JWT signe pour un utilisateur applicatif.
+     *
+     * @param user utilisateur authentifie
+     * @return token JWT compact
+     */
     public String generateToken(UserAccount user) {
         Instant now = Instant.now();
         return Jwts.builder()
@@ -37,10 +49,22 @@ public class JwtTokenService {
                 .compact();
     }
 
+    /**
+     * Extrait l'adresse e-mail (claim {@code sub}) du token.
+     *
+     * @param token token JWT brut
+     * @return e-mail contenu dans le token
+     */
     public String extractEmail(String token) {
         return extractClaims(token).getSubject();
     }
 
+    /**
+     * Verifie la validite cryptographique et temporelle du token.
+     *
+     * @param token token JWT brut
+     * @return {@code true} si le token est valide, sinon {@code false}
+     */
     public boolean isTokenValid(String token) {
         try {
             extractClaims(token);
@@ -50,6 +74,9 @@ public class JwtTokenService {
         }
     }
 
+    /**
+     * Parse et valide le token afin d'en extraire ses claims.
+     */
     private Claims extractClaims(String token) {
         return Jwts.parser()
                 .verifyWith(signingKey)
@@ -58,6 +85,9 @@ public class JwtTokenService {
                 .getPayload();
     }
 
+    /**
+     * Normalise la cle secrete pour atteindre la longueur minimale requise par HS256.
+     */
     private String normalizeSecret(String secret) {
         if (secret == null) {
             throw new IllegalStateException("JWT secret cannot be null");

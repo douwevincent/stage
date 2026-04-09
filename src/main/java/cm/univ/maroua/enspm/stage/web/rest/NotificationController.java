@@ -13,6 +13,9 @@ import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/api/v1/notifications")
+/**
+ * Controleur REST NotificationController.
+ */
 public class NotificationController {
 
     private final NotificationService notificationService;

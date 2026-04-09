@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
+/**
+ * Repository JPA CritereParcoursRepository.
+ */
 public interface CritereParcoursRepository extends JpaRepository<CritereParcours, Long> {
 	@Modifying
 	@Query("delete from CritereParcours cp where cp.parcours.bareme is not null")

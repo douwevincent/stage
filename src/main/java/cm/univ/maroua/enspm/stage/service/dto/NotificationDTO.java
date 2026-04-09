@@ -3,6 +3,9 @@ package cm.univ.maroua.enspm.stage.service.dto;
 import cm.univ.maroua.enspm.stage.domain.NotificationReferenceDateType;
 import java.io.Serializable;
 
+/**
+ * DTO NotificationDTO.
+ */
 public record NotificationDTO(
     Long id,
     Long typeStageId,

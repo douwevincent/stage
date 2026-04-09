@@ -6,6 +6,12 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+/**
+ * Initialise automatiquement le compte super administrateur au demarrage.
+ *
+ * <p>Si l'email et le mot de passe de bootstrap sont fournis dans la
+ * configuration, le composant garantit la presence d'un compte SUPER_ADMIN.</p>
+ */
 @Component
 public class SuperAdminBootstrap implements ApplicationRunner {
 
@@ -23,6 +29,9 @@ public class SuperAdminBootstrap implements ApplicationRunner {
         this.superAdminPassword = superAdminPassword;
     }
 
+    /**
+     * Execute l'initialisation du super administrateur apres le demarrage.
+     */
     @Override
     public void run(ApplicationArguments args) {
         if (superAdminEmail == null || superAdminEmail.isBlank()) {

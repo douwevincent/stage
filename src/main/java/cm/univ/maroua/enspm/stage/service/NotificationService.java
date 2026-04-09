@@ -15,6 +15,9 @@ import java.util.Optional;
 
 @Service
 @Transactional
+/**
+ * Service metier NotificationService.
+ */
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;

@@ -6,6 +6,9 @@ import cm.univ.maroua.enspm.stage.domain.Statut;
 import java.io.Serializable;
 import java.time.LocalDate;
 
+/**
+ * DTO StageDTO.
+ */
 public record StageDTO(
                 Long id,
                 Long etudiantId,

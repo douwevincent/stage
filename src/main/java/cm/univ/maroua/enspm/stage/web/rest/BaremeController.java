@@ -13,6 +13,9 @@ import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/api/v1/baremes")
+/**
+ * Controleur REST BaremeController.
+ */
 public class BaremeController {
 
     private final BaremeService baremeService;

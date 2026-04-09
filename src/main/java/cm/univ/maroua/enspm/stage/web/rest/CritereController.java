@@ -13,6 +13,9 @@ import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/api/v1/criteres")
+/**
+ * Controleur REST CritereController.
+ */
 public class CritereController {
 
     private final CritereService critereService;

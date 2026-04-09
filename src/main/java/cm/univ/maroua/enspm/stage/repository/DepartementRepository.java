@@ -7,6 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
+/**
+ * Repository JPA DepartementRepository.
+ */
 public interface DepartementRepository extends JpaRepository<Departement, Long> {
 	Optional<Departement> findByCodeIgnoreCase(String code);
 }

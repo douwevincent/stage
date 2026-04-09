@@ -2,6 +2,9 @@ package cm.univ.maroua.enspm.stage.service.dto;
 
 import java.io.Serializable;
 
+/**
+ * DTO BaremeCritereDTO.
+ */
 public record BaremeCritereDTO(
         Long id,
         Long baremeId,

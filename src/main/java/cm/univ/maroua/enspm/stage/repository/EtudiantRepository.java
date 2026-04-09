@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
+/**
+ * Repository JPA EtudiantRepository.
+ */
 public interface EtudiantRepository extends JpaRepository<Etudiant, Long> {
 	Optional<Etudiant> findByMatricule(String matricule);
 

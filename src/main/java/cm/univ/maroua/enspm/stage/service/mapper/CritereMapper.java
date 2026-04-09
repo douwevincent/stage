@@ -5,5 +5,8 @@ import cm.univ.maroua.enspm.stage.service.dto.CritereDTO;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
+/**
+ * Mapper MapStruct CritereMapper.
+ */
 public interface CritereMapper extends EntityMapper<CritereDTO, Critere> {
 }

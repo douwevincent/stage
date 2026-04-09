@@ -16,6 +16,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/parametres")
+/**
+ * Controleur REST AppSettingController.
+ */
 public class AppSettingController {
 
     private final AppSettingService appSettingService;

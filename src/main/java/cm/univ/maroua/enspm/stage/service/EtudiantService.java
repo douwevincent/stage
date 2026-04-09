@@ -34,6 +34,9 @@ import java.util.Optional;
 
 @Service
 @Transactional
+/**
+ * Service metier EtudiantService.
+ */
 public class EtudiantService {
 
     private final EtudiantRepository etudiantRepository;

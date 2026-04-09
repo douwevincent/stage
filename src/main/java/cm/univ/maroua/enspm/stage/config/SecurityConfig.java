@@ -17,6 +17,13 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * Configuration globale de securite Spring Security.
+ *
+ * <p>Cette configuration active un modele stateless base sur JWT, desactive CSRF
+ * (adaptation API REST), autorise quelques routes publiques (authentification,
+ * evaluation publique, Swagger) et protege les operations d'administration.</p>
+ */
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
@@ -27,6 +34,13 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
+    /**
+     * Construit la chaine de filtres de securite HTTP.
+     *
+     * @param http configuration HTTP Spring Security
+     * @return chaine de filtres configuree
+     * @throws Exception en cas d'erreur de configuration
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -49,11 +63,23 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Fournit l'encodeur de mot de passe utilise pour les comptes applicatifs.
+     *
+     * @return encodeur BCrypt
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Expose le gestionnaire d'authentification principal.
+     *
+     * @param authenticationConfiguration configuration standard de Spring Security
+     * @return gestionnaire d'authentification
+     * @throws Exception en cas d'erreur de recuperation
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
             throws Exception {

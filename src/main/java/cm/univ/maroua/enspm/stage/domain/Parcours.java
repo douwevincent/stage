@@ -8,6 +8,12 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * Parcours de formation combinant une specialite et un niveau.
+ *
+ * <p>Un parcours peut utiliser un bareme specifique ou heriter du bareme
+ * par defaut de l'application.</p>
+ */
 @Entity
 @Data
 @NoArgsConstructor

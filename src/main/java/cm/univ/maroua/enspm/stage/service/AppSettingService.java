@@ -16,6 +16,9 @@ import java.util.stream.Stream;
 
 @Service
 @Transactional
+/**
+ * Service metier AppSettingService.
+ */
 public class AppSettingService {
 
     private static final String MASKED_SECRET = "********";

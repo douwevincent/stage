@@ -6,6 +6,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
+/**
+ * Mapper MapStruct InscriptionMapper.
+ */
 public interface InscriptionMapper extends EntityMapper<InscriptionDTO, Inscription> {
     @Mapping(source = "anneeAcademique.id", target = "anneeAcademiqueId")
     @Mapping(source = "anneeAcademique.libelle", target = "anneeAcademiqueLibelle")

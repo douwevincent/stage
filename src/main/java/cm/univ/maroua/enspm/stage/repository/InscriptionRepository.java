@@ -8,6 +8,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
+/**
+ * Repository JPA InscriptionRepository.
+ */
 public interface InscriptionRepository extends JpaRepository<Inscription, Long>, JpaSpecificationExecutor<Inscription> {
     boolean existsByAnneeAcademiqueIdAndEtudiantIdAndParcoursId(Long anneeAcademiqueId, Long etudiantId, Long parcoursId);
 

@@ -5,5 +5,8 @@ import cm.univ.maroua.enspm.stage.service.dto.TypeStageDTO;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
+/**
+ * Mapper MapStruct TypeStageMapper.
+ */
 public interface TypeStageMapper extends EntityMapper<TypeStageDTO, TypeStage> {
 }

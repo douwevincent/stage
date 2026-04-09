@@ -35,7 +35,7 @@ function getParentGroupKey (routeKey: string): string | null {
   if (['annees-academiques', 'niveaux', 'departements', 'specialites', 'parcours'].includes(routeKey)) {
     return 'academique'
   }
-  if (['etudiants-list', 'etudiants-import', 'inscriptions'].includes(routeKey)) {
+  if (['etudiants-list', 'etudiants-search', 'etudiants-detail', 'etudiants-import', 'inscriptions'].includes(routeKey)) {
     return 'etudiants'
   }
   if (['stages', 'entreprises', 'encadreurs', 'type-stages', 'periode-stages'].includes(routeKey)) {
@@ -123,6 +123,10 @@ const menuOptions = computed<MenuOption[]>(() => [
       {
         label: () => h(RouterLink, { to: { name: 'etudiants-list' } }, { default: () => 'Liste des étudiants' }),
         key: 'etudiants-list'
+      },
+      {
+        label: () => h(RouterLink, { to: { name: 'etudiants-search' } }, { default: () => 'Recherche étudiant' }),
+        key: 'etudiants-search'
       },
       {
         label: () => h(RouterLink, { to: { name: 'etudiants-import' } }, { default: () => 'Importer étudiants' }),

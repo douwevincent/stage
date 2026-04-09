@@ -24,6 +24,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
+/**
+ * Service metier LegacyCritereParcoursMigrationService.
+ */
 public class LegacyCritereParcoursMigrationService {
 
     private final CritereParcoursRepository critereParcoursRepository;

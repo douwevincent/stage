@@ -1,5 +1,8 @@
 package cm.univ.maroua.enspm.stage.domain;
 
+/**
+ * Types de dates de reference utilises pour calculer les notifications.
+ */
 public enum NotificationReferenceDateType {
     DEBUT_STAGE,
     FIN_STAGE,

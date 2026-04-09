@@ -21,6 +21,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 
+/**
+ * Controleur REST des operations sur les stages.
+ *
+ * <p>Expose les operations de consultation, creation/mise a jour, declaration
+ * publique avec upload de document, transitions de statut et telechargement de
+ * l'autorisation de stage.</p>
+ */
 @RestController
 @RequestMapping("/api/v1/stages")
 public class StageController {
@@ -31,6 +38,9 @@ public class StageController {
         this.stageService = stageService;
     }
 
+    /**
+     * Retourne les stages pagines, optionnellement filtres par statut.
+     */
     @GetMapping
     public Page<StageDTO> getAllStages(
             @RequestParam(required = false) String statut,
@@ -41,6 +51,9 @@ public class StageController {
         return stageService.findAll(pageable);
     }
 
+    /**
+     * Retourne un stage par identifiant.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<StageDTO> getStage(@PathVariable Long id) {
         return stageService.findOne(id)
@@ -48,6 +61,9 @@ public class StageController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    /**
+     * Cree un stage via l'interface d'administration.
+     */
     @PostMapping
     public ResponseEntity<StageDTO> createStage(@Valid @RequestBody StageDTO stageDTO) throws URISyntaxException {
         if (stageDTO.id() != null) {
@@ -58,6 +74,9 @@ public class StageController {
                 .body(result);
     }
 
+    /**
+     * Met a jour un stage existant.
+     */
     @PutMapping("/{id}")
     public ResponseEntity<StageDTO> updateStage(
             @PathVariable(value = "id", required = false) final Long id,
@@ -70,6 +89,9 @@ public class StageController {
                 .body(result);
     }
 
+    /**
+     * Permet la declaration publique d'un stage par l'etudiant.
+     */
     @PostMapping(value = "/declarer", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<StageDTO> declarerStage(
             @RequestParam String etudiantMatricule,
@@ -87,16 +109,25 @@ public class StageController {
         return ResponseEntity.created(new URI("/stages/" + result.id())).body(result);
     }
 
+    /**
+     * Valide un stage en attente.
+     */
     @PatchMapping("/{id}/valider")
     public ResponseEntity<StageDTO> validerStage(@PathVariable Long id) {
         return ResponseEntity.ok(stageService.valider(id));
     }
 
+    /**
+     * Rejette un stage.
+     */
     @PatchMapping("/{id}/rejeter")
     public ResponseEntity<StageDTO> rejeterStage(@PathVariable Long id) {
         return ResponseEntity.ok(stageService.rejeter(id));
     }
 
+    /**
+     * Assigne un etudiant a un stage.
+     */
     @PatchMapping("/{id}/assigner-etudiant")
     public ResponseEntity<StageDTO> assignerEtudiant(
             @PathVariable Long id,
@@ -104,6 +135,9 @@ public class StageController {
         return ResponseEntity.ok(stageService.assignerEtudiant(id, etudiantId));
     }
 
+    /**
+     * Assigne un encadreur a un stage.
+     */
     @PatchMapping("/{id}/assigner-encadreur")
     public ResponseEntity<StageDTO> assignerEncadreur(
             @PathVariable Long id,
@@ -111,6 +145,9 @@ public class StageController {
         return ResponseEntity.ok(stageService.assignerEncadreur(id, encadreurId));
     }
 
+    /**
+     * Retourne le document d'autorisation de stage associe.
+     */
     @GetMapping("/{id}/autorisation")
     public ResponseEntity<Resource> getAutorisation(@PathVariable Long id) throws IOException {
         Resource resource = stageService.loadAutorisation(id);
@@ -126,6 +163,9 @@ public class StageController {
                 .body(resource);
     }
 
+    /**
+     * Supprime un stage.
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStage(@PathVariable Long id) {
         stageService.delete(id);

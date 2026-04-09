@@ -7,6 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
+/**
+ * Repository JPA NiveauRepository.
+ */
 public interface NiveauRepository extends JpaRepository<Niveau, Long> {
 	Optional<Niveau> findByLibelleIgnoreCase(String libelle);
 }

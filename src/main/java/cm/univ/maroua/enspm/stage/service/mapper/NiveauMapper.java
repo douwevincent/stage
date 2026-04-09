@@ -6,6 +6,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
+/**
+ * Mapper MapStruct NiveauMapper.
+ */
 public interface NiveauMapper extends EntityMapper<NiveauDTO, Niveau> {
 	@Mapping(source = "typeStage.id", target = "typeStageId")
 	@Mapping(source = "typeStage.libelle", target = "typeStageLibelle")

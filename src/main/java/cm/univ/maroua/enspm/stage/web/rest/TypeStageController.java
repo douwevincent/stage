@@ -13,6 +13,9 @@ import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/api/v1/type-stages")
+/**
+ * Controleur REST TypeStageController.
+ */
 public class TypeStageController {
 
     private final TypeStageService typeStageService;

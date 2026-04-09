@@ -2,6 +2,9 @@ package cm.univ.maroua.enspm.stage.service.dto;
 
 import java.io.Serializable;
 
+/**
+ * DTO ParcoursDTO.
+ */
 public record ParcoursDTO(
 				Long id,
 				Long departementId,
