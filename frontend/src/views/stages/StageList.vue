@@ -13,6 +13,8 @@ import { StageService, type StageDTO, type Statut } from '@/api/StageService'
 import { EntrepriseService, type EntrepriseDTO } from '@/api/EntrepriseService'
 import { EtudiantService } from '@/api/EtudiantService'
 import { EncadreurService } from '@/api/EncadreurService'
+import { TypeStageService, type TypeStageDTO } from '@/api/TypeStageService'
+import { PeriodeStageService } from '@/api/PeriodeStageService'
 
 const message = useMessage()
 const formRef = ref<FormInst | null>(null)
@@ -83,6 +85,7 @@ const selectedStatut = ref<string>('')
 interface StageFormModel {
   id?: number | null
   etudiantId: number | null
+  typeStageId: number | null
   entrepriseId: number | null
   entrepriseInput: string
   entrepriseSecteur: string
@@ -95,6 +98,7 @@ interface StageFormModel {
 const formModel = reactive<StageFormModel>({
   id: null,
   etudiantId: null,
+  typeStageId: null,
   entrepriseId: null,
   entrepriseInput: '',
   entrepriseSecteur: '',
@@ -105,11 +109,50 @@ const formModel = reactive<StageFormModel>({
 })
 
 const rules: FormRules = {
+  typeStageId: { required: true, type: 'number', message: 'Le type de stage est requis', trigger: ['blur', 'change'] },
   ville: { required: true, message: 'La ville est requise', trigger: 'blur' },
   adresse: { required: true, message: "L'adresse est requise", trigger: 'blur' },
   entrepriseInput: { required: true, message: "L'entreprise est requise", trigger: ['blur', 'input'] },
   dateDebut: { required: true, type: 'number', message: 'La date de début est requise', trigger: 'change' },
   dateFin: { required: true, type: 'number', message: 'La date de fin est requise', trigger: 'change' },
+}
+
+const typeStageOptions = ref<SelectOption[]>([])
+
+async function loadTypeStageOptions () {
+  try {
+    const res = await TypeStageService.getAll(0, 100)
+    const all = res.data?.content ?? res.data ?? []
+    typeStageOptions.value = all.map((item: TypeStageDTO) => ({
+      label: item.libelle,
+      value: item.id ?? 0
+    }))
+  } catch {
+    typeStageOptions.value = []
+    message.error('Erreur lors du chargement des types de stage')
+  }
+}
+
+async function prefillDatesFromPeriodeStage (typeStageId: number | null) {
+  if (!typeStageId) {
+    formModel.dateDebut = null
+    formModel.dateFin = null
+    return
+  }
+
+  try {
+    const res = await PeriodeStageService.getActiveByTypeStageId(typeStageId)
+    formModel.dateDebut = res.data?.dateDebut ? new Date(res.data.dateDebut).getTime() : null
+    formModel.dateFin = res.data?.dateFin ? new Date(res.data.dateFin).getTime() : null
+  } catch (err: any) {
+    formModel.dateDebut = null
+    formModel.dateFin = null
+    if (err?.response?.status === 404) {
+      message.warning('Aucune période de stage active ne correspond au type sélectionné')
+    } else {
+      message.error('Erreur lors du chargement de la période de stage')
+    }
+  }
 }
 
 // ─── Autocomplete entreprise ─────────────────────────────────────────────────
@@ -387,7 +430,7 @@ const columns: DataTableColumns<StageDTO> = [
 // ─── Actions ──────────────────────────────────────────────────────────────────
 function resetForm () {
   Object.assign(formModel, {
-    id: null, etudiantId: null,
+    id: null, etudiantId: null, typeStageId: null,
     entrepriseId: null, entrepriseInput: '', entrepriseSecteur: '',
     ville: '', adresse: '', dateDebut: null, dateFin: null
   })
@@ -398,6 +441,7 @@ function resetForm () {
 function openCreateModal () {
   resetForm()
   loadEtudiantOptions('')
+  loadTypeStageOptions()
   modalTitle.value = 'Nouveau stage'
   showModal.value = true
 }
@@ -407,6 +451,7 @@ function handleEdit (row: StageDTO) {
   Object.assign(formModel, {
     id: row.id,
     etudiantId: row.etudiantId ?? null,
+    typeStageId: row.typeStageId ?? null,
     entrepriseId: row.entrepriseId ?? null,
     entrepriseInput: row.entrepriseNom ?? '',
     ville: row.ville ?? '',
@@ -419,6 +464,14 @@ function handleEdit (row: StageDTO) {
       label: `${row.etudiantMatricule ?? ''} – ${row.etudiantNom ?? ''}`.trim(),
       value: row.etudiantId
     }]
+  }
+  if (row.typeStageId && row.typeStageLibelle) {
+    typeStageOptions.value = [{
+      label: row.typeStageLibelle,
+      value: row.typeStageId
+    }]
+  } else {
+    loadTypeStageOptions()
   }
   modalTitle.value = 'Modifier le stage'
   showModal.value = true
@@ -494,8 +547,9 @@ async function handleAssignEtudiant () {
     message.success('Étudiant assigné avec succès')
     showAssignModal.value = false
     await loadData()
-  } catch {
-    message.error('Erreur lors de l\'assignation de l\'étudiant')
+  } catch (err: any) {
+    const apiMessage = err?.response?.data?.message
+    message.error(apiMessage || 'Erreur lors de l\'assignation de l\'étudiant')
   } finally {
     assigning.value = false
   }
@@ -577,6 +631,7 @@ async function handleSave () {
     const payload: StageDTO = {
       id: formModel.id ?? undefined,
       etudiantId: formModel.etudiantId,
+      typeStageId: formModel.typeStageId,
       entrepriseId,
       ville: formModel.ville,
       adresse: formModel.adresse,
@@ -605,7 +660,8 @@ async function handleSave () {
     if (!err?.response?.status) {
       // validation error already shown
     } else {
-      message.error("Erreur lors de l'enregistrement")
+      const apiMessage = err?.response?.data?.message
+      message.error(apiMessage || "Erreur lors de l'enregistrement")
     }
   } finally {
     saving.value = false
@@ -662,6 +718,18 @@ async function handleSave () {
             placeholder="Rechercher par matricule ou nom…"
             @focus="loadEtudiantOptions('')"
             @search="loadEtudiantOptions"
+          />
+        </NFormItem>
+
+        <NFormItem label="Type de stage" path="typeStageId">
+          <NSelect
+            v-model:value="formModel.typeStageId"
+            :options="typeStageOptions"
+            clearable
+            filterable
+            placeholder="Sélectionner un type de stage"
+            @focus="loadTypeStageOptions"
+            @update:value="prefillDatesFromPeriodeStage"
           />
         </NFormItem>
 

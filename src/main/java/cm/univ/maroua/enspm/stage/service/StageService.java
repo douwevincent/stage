@@ -263,6 +263,11 @@ public class StageService {
         }
 
         if (derivedTypeStage != null) {
+            if (stage.getTypeStage() != null
+                    && stage.getTypeStage().getId() != null
+                    && !stage.getTypeStage().getId().equals(derivedTypeStage.getId())) {
+                throw new IllegalArgumentException("L'étudiant n'est pas inscrit dans le niveau correspondant au type de stage sélectionné");
+            }
             stage.setTypeStage(derivedTypeStage);
             return;
         }

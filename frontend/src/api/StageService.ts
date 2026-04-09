@@ -9,6 +9,8 @@ export interface StageDTO {
   etudiantId?: number | null
   etudiantMatricule?: string | null
   etudiantNom?: string | null
+  typeStageId?: number | null
+  typeStageLibelle?: string | null
   entrepriseId?: number | null
   entrepriseNom?: string | null
   ville?: string | null

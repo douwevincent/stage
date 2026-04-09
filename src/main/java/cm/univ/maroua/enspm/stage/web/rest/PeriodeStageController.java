@@ -38,6 +38,13 @@ public class PeriodeStageController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/active")
+    public ResponseEntity<PeriodeStageDTO> getActivePeriodeStageByType(@RequestParam("typeStageId") Long typeStageId) {
+        return periodeStageService.findActiveByTypeStageId(typeStageId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @PostMapping
     public ResponseEntity<PeriodeStageDTO> createPeriodeStage(@Valid @RequestBody PeriodeStageDTO periodeStageDTO)
             throws URISyntaxException {

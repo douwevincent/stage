@@ -15,6 +15,12 @@ export const PeriodeStageService = {
     })
   },
 
+  getActiveByTypeStageId (typeStageId: number) {
+    return api.get<PeriodeStageDTO>('/api/v1/periode-stages/active', {
+      params: { typeStageId }
+    })
+  },
+
   getOne (id: number) {
     return api.get(`/api/v1/periode-stages/${id}`)
   },

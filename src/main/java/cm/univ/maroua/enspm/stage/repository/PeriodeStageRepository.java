@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PeriodeStageRepository extends JpaRepository<PeriodeStage, Long> {
@@ -19,4 +20,5 @@ public interface PeriodeStageRepository extends JpaRepository<PeriodeStage, Long
 
     /** Périodes dont la date de fin correspond à la date de référence calculée (today - offsetDays). */
     List<PeriodeStage> findByTypeStageIdAndDateFin(Long typeStageId, LocalDate dateFin);
+    Optional<PeriodeStage> findByTypeStageIdAndAnneeAcademiqueId(Long typeStageId, Long anneeAcademiqueId);
 }

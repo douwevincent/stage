@@ -42,6 +42,17 @@ public class PeriodeStageService {
         return periodeStageRepository.findById(id).map(periodeStageMapper::toDto);
     }
 
+    @Transactional(readOnly = true)
+    public Optional<PeriodeStageDTO> findActiveByTypeStageId(Long typeStageId) {
+        if (typeStageId == null) {
+            return Optional.empty();
+        }
+
+        return anneeAcademiqueRepository.findByActifTrue()
+                .flatMap(activeYear -> periodeStageRepository.findByTypeStageIdAndAnneeAcademiqueId(typeStageId, activeYear.getId()))
+                .map(periodeStageMapper::toDto);
+    }
+
     public PeriodeStageDTO save(PeriodeStageDTO periodeStageDTO) {
         PeriodeStage periodeStage = periodeStageMapper.toEntity(periodeStageDTO);
         if (periodeStage.getAnneeAcademique() == null || periodeStage.getAnneeAcademique().getId() == null) {
