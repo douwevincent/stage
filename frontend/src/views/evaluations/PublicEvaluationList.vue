@@ -13,6 +13,7 @@ const code = computed(() => String(route.params.code ?? ''))
 const loading = ref(false)
 const stages = ref<PublicEvaluationStageItemDTO[]>([])
 const errorMessage = ref('')
+const completionMessage = ref('')
 
 const columns: DataTableColumns<PublicEvaluationStageItemDTO> = [
   {
@@ -66,6 +67,7 @@ async function loadStages () {
 
   loading.value = true
   errorMessage.value = ''
+  completionMessage.value = ''
 
   try {
     const response = await PublicEvaluationService.getStages(code.value)
@@ -77,7 +79,7 @@ async function loadStages () {
     }
 
     if (stages.value.length === 0) {
-      errorMessage.value = 'Aucun stage a evaluer avec ce lien'
+      completionMessage.value = 'Merci, vous avez termine l\'evaluation de vos etudiants.'
     }
   } catch (error: any) {
     const status = error?.response?.status
@@ -122,6 +124,10 @@ onMounted(loadStages)
         <NSpin :show="loading">
           <NAlert v-if="errorMessage" type="error" class="mb-4">
             {{ errorMessage }}
+          </NAlert>
+
+          <NAlert v-else-if="completionMessage" type="success" class="mb-4">
+            {{ completionMessage }}
           </NAlert>
 
           <NDataTable

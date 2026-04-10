@@ -8,8 +8,10 @@ import Header from '@/components/layout/Header.vue'
 import { useAuthStore } from '@/stores/authStore'
 
 const route = useRoute()
+const isRouteReady = computed(() => route.matched.length > 0)
 const isPublicLayout = computed(() => route.meta.layout === 'public')
 const authStore = useAuthStore()
+const showPrivateLayout = computed(() => isRouteReady.value && !isPublicLayout.value)
 
 const isDark = ref(localStorage.getItem('theme') === 'dark')
 
@@ -70,13 +72,13 @@ const toggleSidebar = () => {
         <n-notification-provider>
           <n-global-style />
           <div class="app-container flex min-h-screen bg-app-light dark:bg-app-dark font-inter transition-colors duration-300">
-            <Sidebar v-if="!isPublicLayout" :collapsed="collapsed" />
+            <Sidebar v-if="showPrivateLayout" :collapsed="collapsed" />
             <div 
               class="flex-1 flex flex-col min-w-0 w-full transition-all duration-300"
-              :style="{ marginLeft: isPublicLayout ? '0' : (collapsed ? '80px' : '280px') }"
+              :style="{ marginLeft: showPrivateLayout ? (collapsed ? '80px' : '280px') : '0' }"
             >
               <Header
-                v-if="!isPublicLayout"
+                v-if="showPrivateLayout"
                 class="w-full"
                 :is-dark="isDark"
                 @toggle-theme="toggleTheme"
@@ -85,7 +87,7 @@ const toggleSidebar = () => {
               <main class="flex-1 w-full p-8 overflow-y-auto">
                 <RouterView />
               </main>
-              <footer v-if="!isPublicLayout" class="w-full p-6 text-center border-t border-gray-100 dark:border-gray-800 text-gray-500 text-sm">
+              <footer v-if="showPrivateLayout" class="w-full p-6 text-center border-t border-gray-100 dark:border-gray-800 text-gray-500 text-sm">
                 <p>&copy; 2026 ENSPM Stage Manager. Tous droits réservés.</p>
               </footer>
             </div>
