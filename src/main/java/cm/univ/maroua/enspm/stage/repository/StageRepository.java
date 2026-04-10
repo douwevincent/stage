@@ -27,13 +27,10 @@ public interface StageRepository extends JpaRepository<Stage, Long> {
             SELECT COUNT(s) FROM Stage s
             WHERE s.anneeAcademique.id = :anneeAcademiqueId
               AND s.statut = cm.univ.maroua.enspm.stage.domain.Statut.VALIDE
-              AND (
-                  s.sessionEvaluation IS NULL
-                  OR NOT EXISTS (
-                      SELECT note FROM Note note
-                      WHERE note.session = s.sessionEvaluation
-                  )
-              )
+          AND NOT EXISTS (
+            SELECT note FROM Note note
+            WHERE note.session.stage = s
+          )
             """)
     long countStagesEnAttenteNotation(@Param("anneeAcademiqueId") Long anneeAcademiqueId);
 
@@ -51,13 +48,10 @@ public interface StageRepository extends JpaRepository<Stage, Long> {
               AND s.encadreur.email IS NOT NULL
               AND s.typeStage.id = :typeStageId
               AND s.dateDebut = :referenceDate
-              AND (
-                  s.sessionEvaluation IS NULL
-                  OR NOT EXISTS (
-                      SELECT note FROM Note note
-                      WHERE note.session = s.sessionEvaluation
-                  )
-              )
+          AND NOT EXISTS (
+            SELECT note FROM Note note
+            WHERE note.session.stage = s
+          )
             """)
         List<Stage> findStagesNonNotesPourDebutStage(
             @Param("typeStageId") Long typeStageId,
@@ -70,12 +64,9 @@ public interface StageRepository extends JpaRepository<Stage, Long> {
             AND s.encadreur.email IS NOT NULL
             AND s.typeStage.id = :typeStageId
             AND s.dateFin = :referenceDate
-              AND (
-                  s.sessionEvaluation IS NULL
-                  OR NOT EXISTS (
-                      SELECT note FROM Note note
-                      WHERE note.session = s.sessionEvaluation
-                  )
+              AND NOT EXISTS (
+                  SELECT note FROM Note note
+                  WHERE note.session.stage = s
               )
             """)
         List<Stage> findStagesNonNotesPourFinStage(

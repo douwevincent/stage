@@ -20,7 +20,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Service metier principal pour la gestion du cycle de vie des stages.
@@ -41,6 +46,7 @@ public class StageService {
     private final EntrepriseRepository entrepriseRepository;
     private final InscriptionRepository inscriptionRepository;
     private final TypeStageRepository typeStageRepository;
+    private final SessionEvaluationRepository sessionEvaluationRepository;
 
     @Value("${app.upload.dir:uploads}")
     private String uploadDir;
@@ -51,7 +57,8 @@ public class StageService {
             EncadreurRepository encadreurRepository,
             EntrepriseRepository entrepriseRepository,
             InscriptionRepository inscriptionRepository,
-            TypeStageRepository typeStageRepository) {
+            TypeStageRepository typeStageRepository,
+            SessionEvaluationRepository sessionEvaluationRepository) {
         this.stageRepository = stageRepository;
         this.stageMapper = stageMapper;
         this.anneeAcademiqueRepository = anneeAcademiqueRepository;
@@ -60,20 +67,21 @@ public class StageService {
         this.entrepriseRepository = entrepriseRepository;
         this.inscriptionRepository = inscriptionRepository;
         this.typeStageRepository = typeStageRepository;
+        this.sessionEvaluationRepository = sessionEvaluationRepository;
     }
 
     /**
      * Liste paginee de tous les stages.
      */
     public Page<StageDTO> findAll(Pageable pageable) {
-        return stageRepository.findAll(pageable).map(stageMapper::toDto);
+        return enrichSessionEvaluationIds(stageRepository.findAll(pageable).map(stageMapper::toDto));
     }
 
     /**
      * Liste paginee des stages filtres par statut.
      */
     public Page<StageDTO> findByStatut(Statut statut, Pageable pageable) {
-        return stageRepository.findByStatut(statut, pageable).map(stageMapper::toDto);
+        return enrichSessionEvaluationIds(stageRepository.findByStatut(statut, pageable).map(stageMapper::toDto));
     }
 
     /**
@@ -81,7 +89,7 @@ public class StageService {
      */
     @Transactional(readOnly = true)
     public Optional<StageDTO> findOne(Long id) {
-        return stageRepository.findById(id).map(stageMapper::toDto);
+        return stageRepository.findById(id).map(stageMapper::toDto).map(this::enrichSessionEvaluationId);
     }
 
     /**
@@ -119,7 +127,7 @@ public class StageService {
             stage.setStatut(Statut.VALIDE);
         }
         stage = stageRepository.save(stage);
-        return stageMapper.toDto(stage);
+        return enrichSessionEvaluationId(stageMapper.toDto(stage));
     }
 
     public StageDTO update(Long id, StageDTO stageDTO) {
@@ -167,9 +175,6 @@ public class StageService {
         }
         if (stage.getAnneeAcademique() != null && stage.getAnneeAcademique().getId() == null) {
             stage.setAnneeAcademique(null);
-        }
-        if (stage.getSessionEvaluation() != null && stage.getSessionEvaluation().getId() == null) {
-            stage.setSessionEvaluation(null);
         }
     }
 
@@ -232,7 +237,7 @@ public class StageService {
         stage.setStatut(Statut.EN_ATTENTE_VALIDATION);
         stage.setCheminAutorisation(cheminAutorisation);
 
-        return stageMapper.toDto(stageRepository.save(stage));
+        return enrichSessionEvaluationId(stageMapper.toDto(stageRepository.save(stage)));
     }
 
     /**
@@ -242,7 +247,7 @@ public class StageService {
         Stage stage = stageRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Stage non trouvé: " + id));
         stage.setStatut(Statut.VALIDE);
-        return stageMapper.toDto(stageRepository.save(stage));
+        return enrichSessionEvaluationId(stageMapper.toDto(stageRepository.save(stage)));
     }
 
     /**
@@ -252,7 +257,7 @@ public class StageService {
         Stage stage = stageRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Stage non trouvé: " + id));
         stage.setStatut(Statut.REJETE);
-        return stageMapper.toDto(stageRepository.save(stage));
+        return enrichSessionEvaluationId(stageMapper.toDto(stageRepository.save(stage)));
     }
 
     /**
@@ -265,7 +270,7 @@ public class StageService {
             .orElseThrow(() -> new IllegalArgumentException("Étudiant non trouvé: " + etudiantId));
         stage.setEtudiant(etudiant);
         resolveAndAssignTypeStage(stage, null);
-        return stageMapper.toDto(stageRepository.save(stage));
+        return enrichSessionEvaluationId(stageMapper.toDto(stageRepository.save(stage)));
     }
 
     /**
@@ -288,7 +293,65 @@ public class StageService {
         }
 
         stage.setEncadreur(encadreur);
-        return stageMapper.toDto(stageRepository.save(stage));
+        return enrichSessionEvaluationId(stageMapper.toDto(stageRepository.save(stage)));
+    }
+
+    private Page<StageDTO> enrichSessionEvaluationIds(Page<StageDTO> page) {
+        List<Long> stageIds = page.getContent().stream()
+                .map(StageDTO::id)
+                .filter(Objects::nonNull)
+                .toList();
+
+        Map<Long, Long> sessionIdByStageId = loadSessionIdByStageId(stageIds);
+        return page.map(dto -> copyWithSessionEvaluationId(dto, sessionIdByStageId.get(dto.id())));
+    }
+
+    private StageDTO enrichSessionEvaluationId(StageDTO dto) {
+        if (dto == null || dto.id() == null) {
+            return dto;
+        }
+        Long sessionEvaluationId = sessionEvaluationRepository.findByStageId(dto.id())
+                .map(SessionEvaluation::getId)
+                .orElse(null);
+        return copyWithSessionEvaluationId(dto, sessionEvaluationId);
+    }
+
+    private Map<Long, Long> loadSessionIdByStageId(Collection<Long> stageIds) {
+        if (stageIds == null || stageIds.isEmpty()) {
+            return Map.of();
+        }
+        return sessionEvaluationRepository.findByStageIdIn(stageIds).stream()
+                .filter(session -> session.getStage() != null && session.getStage().getId() != null)
+                .collect(Collectors.toMap(
+                        session -> session.getStage().getId(),
+                        SessionEvaluation::getId,
+                    (existing, ignored) -> existing));
+    }
+
+    private StageDTO copyWithSessionEvaluationId(StageDTO dto, Long sessionEvaluationId) {
+        if (dto == null) {
+            return null;
+        }
+        return new StageDTO(
+                dto.id(),
+                dto.etudiantId(),
+                dto.etudiantMatricule(),
+                dto.etudiantNom(),
+                dto.typeStageId(),
+                dto.typeStageLibelle(),
+                dto.entrepriseId(),
+                dto.entrepriseNom(),
+                dto.ville(),
+                dto.adresse(),
+                dto.encadreurId(),
+                dto.encadreurNom(),
+                dto.dateDebut(),
+                dto.dateFin(),
+                dto.anneeAcademiqueId(),
+                sessionEvaluationId,
+                dto.source(),
+                dto.statut(),
+                dto.cheminAutorisation());
     }
 
     private void resolveAndAssignTypeStage(Stage stage, Long requestedTypeStageId) {
@@ -305,7 +368,6 @@ public class StageService {
             stage.setTypeStage(requestedTypeStage);
             return;
         }
-
         if (derivedTypeStage != null) {
             if (stage.getTypeStage() != null
                     && stage.getTypeStage().getId() != null

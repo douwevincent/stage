@@ -16,7 +16,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Data
@@ -41,7 +40,4 @@ public class SessionEvaluation {
     /** Date limite au-delà de laquelle la session ne peut plus être complétée. */
     private LocalDate dateLimite;
 
-    /** Notes saisies dans le cadre de cette session d'évaluation. */
-    @OneToMany(mappedBy = "session")
-    private List<Note> notes;
 }

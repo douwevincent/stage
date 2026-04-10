@@ -139,10 +139,8 @@ class EvaluationNotificationPlannerServiceIntegrationTest {
         creerInscription(etudiant, annee, niveau);
 
         // Session ouverte sans note saisie
-        SessionEvaluation session = sessionEvaluationRepository.save(
-                new SessionEvaluation(null, stage, "CODE123", SessionEvaluationStatut.EN_ATTENTE, null, null));
-        stage.setSessionEvaluation(session);
-        stageRepository.save(stage);
+        sessionEvaluationRepository.save(
+                new SessionEvaluation(null, stage, "CODE123", SessionEvaluationStatut.EN_ATTENTE, null));
 
         // Act
         int nbEnfiles = plannerService.planifier();
@@ -230,9 +228,7 @@ class EvaluationNotificationPlannerServiceIntegrationTest {
         creerInscription(etudiant, annee, niveau);
 
         SessionEvaluation session = sessionEvaluationRepository.save(
-                new SessionEvaluation(null, stage, "CODE456", SessionEvaluationStatut.EN_ATTENTE, today.plusDays(30), null));
-        stage.setSessionEvaluation(session);
-        stageRepository.save(stage);
+                new SessionEvaluation(null, stage, "CODE456", SessionEvaluationStatut.EN_ATTENTE, today.plusDays(30)));
 
         Critere critere = critereRepository.save(new Critere(null, "Assiduité", "Critère test", null, null));
         noteRepository.save(new Note(null, session, critere, null, 15, "RAS", LocalDate.now()));

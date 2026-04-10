@@ -67,10 +67,6 @@ public class Stage {
     @JoinColumn(name = "type_stage_id")
     private TypeStage typeStage;
 
-    /** Session d'évaluation associée à ce stage, {@code null} si aucune session n'a été créée. */
-    @OneToOne(mappedBy = "stage")
-    private SessionEvaluation sessionEvaluation;
-
     /** Origine de la déclaration du stage ({@link Source#ETUDIANT} ou {@link Source#OPERATEUR}). */
     @Enumerated(EnumType.STRING)
     private Source source;
