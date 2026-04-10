@@ -26,7 +26,6 @@ public interface ParcoursMapper extends EntityMapper<ParcoursDTO, Parcours> {
     @Mapping(source = "specialiteId", target = "specialite.id")
     @Mapping(source = "niveauId", target = "niveau.id")
     @Mapping(source = "baremeId", target = "bareme.id")
-    @Mapping(target = "inscriptions", ignore = true)
     Parcours toEntity(ParcoursDTO dto);
 
     default String buildParcoursLibelle(Parcours entity) {

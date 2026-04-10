@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 /**
  * Encadreur professionnel en entreprise.
  *
@@ -34,7 +32,4 @@ public class Encadreur {
     @ManyToOne
     @JoinColumn(name = "entreprise_id")
     private Entreprise entreprise;
-
-    @OneToMany(mappedBy = "encadreur")
-    private List<Stage> stages;
 }

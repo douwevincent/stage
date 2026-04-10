@@ -15,6 +15,5 @@ public interface NiveauMapper extends EntityMapper<NiveauDTO, Niveau> {
 	NiveauDTO toDto(Niveau entity);
 
 	@Mapping(source = "typeStageId", target = "typeStage.id")
-	@Mapping(target = "parcours", ignore = true)
 	Niveau toEntity(NiveauDTO dto);
 }

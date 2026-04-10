@@ -1,7 +1,10 @@
 package cm.univ.maroua.enspm.stage.service;
 
 import cm.univ.maroua.enspm.stage.domain.Bareme;
+import cm.univ.maroua.enspm.stage.repository.BaremeCritereRepository;
 import cm.univ.maroua.enspm.stage.repository.BaremeRepository;
+import cm.univ.maroua.enspm.stage.repository.InscriptionRepository;
+import cm.univ.maroua.enspm.stage.repository.ParcoursRepository;
 import cm.univ.maroua.enspm.stage.service.dto.BaremeDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,9 +28,21 @@ class BaremeServiceIntegrationTest {
     @Autowired
     private BaremeRepository baremeRepository;
 
+    @Autowired
+    private BaremeCritereRepository baremeCritereRepository;
+
+    @Autowired
+    private ParcoursRepository parcoursRepository;
+
+    @Autowired
+    private InscriptionRepository inscriptionRepository;
+
     @BeforeEach
     void setUp() {
-        baremeRepository.deleteAll();
+        inscriptionRepository.deleteAllInBatch();
+        parcoursRepository.deleteAllInBatch();
+        baremeCritereRepository.deleteAllInBatch();
+        baremeRepository.deleteAllInBatch();
     }
 
     @Test

@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import jakarta.validation.constraints.NotBlank;
-import java.util.List;
 
 /**
  * Departement academique de rattachement des specialites.
@@ -25,7 +24,4 @@ public class Departement {
     private String code;
 
     private String intitule;
-
-    @OneToMany(mappedBy = "departement")
-    private List<Specialite> specialites;
 }

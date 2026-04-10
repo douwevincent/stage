@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 /**
  * Niveau academique (ex. L1, L2, M1) d'un parcours.
  */
@@ -26,7 +24,4 @@ public class Niveau {
     @ManyToOne
     @JoinColumn(name = "type_stage_id")
     private TypeStage typeStage;
-
-    @OneToMany(mappedBy = "niveau")
-    private List<Parcours> parcours;
 }

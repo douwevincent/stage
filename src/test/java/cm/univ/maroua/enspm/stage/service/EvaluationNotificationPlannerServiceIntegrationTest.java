@@ -93,10 +93,10 @@ class EvaluationNotificationPlannerServiceIntegrationTest {
 
         typeStage   = typeStageRepository.save(new TypeStage(null, "Stage Test"));
         annee       = anneeAcademiqueRepository.save(new AnneeAcademique(null, "2025-2026", true));
-        entreprise  = entrepriseRepository.save(new Entreprise(null, "Entreprise Test", "IT", null, null));
-        encadreur   = encadreurRepository.save(new Encadreur(null, "Dupont", "0600000000", "dupont@test.com", entreprise, null));
-        etudiant    = etudiantRepository.save(new Etudiant(null, "Etudiant 1", "etudiant1@test.com", null, "MAT001", null, null));
-        niveau      = niveauRepository.save(new Niveau(null, "L3", typeStage, null));
+        entreprise  = entrepriseRepository.save(new Entreprise(null, "Entreprise Test", "IT"));
+        encadreur   = encadreurRepository.save(new Encadreur(null, "Dupont", "0600000000", "dupont@test.com", entreprise));
+        etudiant    = etudiantRepository.save(new Etudiant(null, "Etudiant 1", "etudiant1@test.com", null, "MAT001"));
+        niveau      = niveauRepository.save(new Niveau(null, "L3", typeStage));
     }
 
     // -----------------------------------------------------------------------
@@ -230,7 +230,7 @@ class EvaluationNotificationPlannerServiceIntegrationTest {
         SessionEvaluation session = sessionEvaluationRepository.save(
                 new SessionEvaluation(null, stage, "CODE456", SessionEvaluationStatut.EN_ATTENTE, today.plusDays(30)));
 
-        Critere critere = critereRepository.save(new Critere(null, "Assiduité", "Critère test", null, null));
+        Critere critere = critereRepository.save(new Critere(null, "Assiduité", "Critère test"));
         noteRepository.save(new Note(null, session, critere, null, 15, "RAS", LocalDate.now()));
 
         int nbEnfiles = plannerService.planifier();
@@ -287,9 +287,9 @@ class EvaluationNotificationPlannerServiceIntegrationTest {
     }
 
         private void creerInscription(Etudiant etu, AnneeAcademique aa, Niveau niv) {
-                Departement dept = departementRepository.save(new Departement(null, "INFO", "Informatique", null));
-                Specialite spec = specialiteRepository.save(new Specialite(null, "GL", "Génie Logiciel", dept, null));
-                Parcours parcours = parcoursRepository.save(new Parcours(null, spec, niv, null, null));
+                Departement dept = departementRepository.save(new Departement(null, "INFO", "Informatique"));
+                Specialite spec = specialiteRepository.save(new Specialite(null, "GL", "Génie Logiciel", dept));
+                Parcours parcours = parcoursRepository.save(new Parcours(null, spec, niv, null));
         inscriptionRepository.save(new Inscription(null, aa, etu, parcours));
     }
 }

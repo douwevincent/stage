@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 /**
  * Specialite academique rattachee a un departement.
  */
@@ -30,7 +28,4 @@ public class Specialite {
     @ManyToOne
     @JoinColumn(name = "departement_id")
     private Departement departement;
-
-    @OneToMany(mappedBy = "specialite")
-    private List<Parcours> parcours;
 }

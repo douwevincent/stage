@@ -6,7 +6,9 @@ import cm.univ.maroua.enspm.stage.domain.Niveau;
 import cm.univ.maroua.enspm.stage.domain.Parcours;
 import cm.univ.maroua.enspm.stage.domain.Specialite;
 import cm.univ.maroua.enspm.stage.repository.BaremeRepository;
+import cm.univ.maroua.enspm.stage.repository.BaremeCritereRepository;
 import cm.univ.maroua.enspm.stage.repository.DepartementRepository;
+import cm.univ.maroua.enspm.stage.repository.InscriptionRepository;
 import cm.univ.maroua.enspm.stage.repository.NiveauRepository;
 import cm.univ.maroua.enspm.stage.repository.ParcoursRepository;
 import cm.univ.maroua.enspm.stage.repository.SpecialiteRepository;
@@ -37,6 +39,9 @@ class ParcoursServiceIntegrationTest {
     private BaremeRepository baremeRepository;
 
     @Autowired
+    private BaremeCritereRepository baremeCritereRepository;
+
+    @Autowired
     private DepartementRepository departementRepository;
 
     @Autowired
@@ -45,22 +50,27 @@ class ParcoursServiceIntegrationTest {
     @Autowired
     private NiveauRepository niveauRepository;
 
+    @Autowired
+    private InscriptionRepository inscriptionRepository;
+
     @BeforeEach
     void setUp() {
-        parcoursRepository.deleteAll();
-        baremeRepository.deleteAll();
-        specialiteRepository.deleteAll();
-        niveauRepository.deleteAll();
-        departementRepository.deleteAll();
+        inscriptionRepository.deleteAllInBatch();
+        parcoursRepository.deleteAllInBatch();
+        baremeCritereRepository.deleteAllInBatch();
+        baremeRepository.deleteAllInBatch();
+        specialiteRepository.deleteAllInBatch();
+        niveauRepository.deleteAllInBatch();
+        departementRepository.deleteAllInBatch();
     }
 
     @Test
     void saveShouldAssignDefaultBaremeWhenBaremeIsMissing() {
         Bareme baremeParDefaut = baremeRepository.save(new Bareme(null, "B-DEF", "Barème par défaut", true, true, null));
 
-        Departement departement = departementRepository.save(new Departement(null, "INFO", "Informatique", null));
-        Specialite specialite = specialiteRepository.save(new Specialite(null, "GL", "Génie Logiciel", departement, null));
-        Niveau niveau = niveauRepository.save(new Niveau(null, "Licence 3", null, null));
+        Departement departement = departementRepository.save(new Departement(null, "INFO", "Informatique"));
+        Specialite specialite = specialiteRepository.save(new Specialite(null, "GL", "Génie Logiciel", departement));
+        Niveau niveau = niveauRepository.save(new Niveau(null, "Licence 3", null));
 
         ParcoursDTO saved = parcoursService.save(new ParcoursDTO(
                 null,
@@ -87,9 +97,9 @@ class ParcoursServiceIntegrationTest {
     void saveShouldRejectInactiveBareme() {
         Bareme baremeInactif = baremeRepository.save(new Bareme(null, "B-INACTIF", "Barème inactif", false, false, null));
 
-        Departement departement = departementRepository.save(new Departement(null, "INFO", "Informatique", null));
-        Specialite specialite = specialiteRepository.save(new Specialite(null, "GL", "Génie Logiciel", departement, null));
-        Niveau niveau = niveauRepository.save(new Niveau(null, "Licence 3", null, null));
+        Departement departement = departementRepository.save(new Departement(null, "INFO", "Informatique"));
+        Specialite specialite = specialiteRepository.save(new Specialite(null, "GL", "Génie Logiciel", departement));
+        Niveau niveau = niveauRepository.save(new Niveau(null, "Licence 3", null));
 
         assertThatThrownBy(() -> parcoursService.save(new ParcoursDTO(
                 null,

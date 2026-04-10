@@ -12,8 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Entity
 @Data
 @NoArgsConstructor
@@ -28,12 +26,4 @@ public class Critere {
     private String libelle;
     /** Catégorie de regroupement du critère (ex. {@code "Comportement professionnel"}). */
     private String categorie;
-
-    /** Associations de ce critère aux différents barèmes avec leurs coefficients respectifs. */
-    @OneToMany(mappedBy = "critere")
-    private List<BaremeCritere> baremeCriteres;
-
-    /** Notes attribuées pour ce critère dans les sessions d'évaluation. */
-    @OneToMany(mappedBy = "critere")
-    private List<Note> notes;
 }

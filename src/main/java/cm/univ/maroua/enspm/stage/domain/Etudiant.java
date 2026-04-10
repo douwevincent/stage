@@ -13,10 +13,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @Entity
 @Data
 @NoArgsConstructor
@@ -41,14 +37,4 @@ public class Etudiant {
     @NotNull
     @Column(unique = true)
     private String matricule;
-
-    /** Inscriptions de l'étudiant aux différents parcours par année académique. */
-    @JsonIgnore
-    @OneToMany(mappedBy = "etudiant")
-    private List<Inscription> inscriptions;
-
-    /** Stages associés à l'étudiant. */
-    @JsonIgnore
-    @OneToMany(mappedBy = "etudiant")
-    private List<Stage> stages;
 }

@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 /**
  * Entreprise d'accueil des stages.
  *
@@ -23,10 +21,4 @@ public class Entreprise {
 
     private String nom;
     private String secteur;
-
-    @OneToMany(mappedBy = "entreprise")
-    private List<Encadreur> encadreurs;
-
-    @OneToMany(mappedBy = "entreprise")
-    private List<Stage> stages;
 }

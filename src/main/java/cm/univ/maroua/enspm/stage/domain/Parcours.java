@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 /**
  * Parcours de formation combinant une specialite et un niveau.
  *
@@ -36,7 +34,4 @@ public class Parcours {
     @ManyToOne
     @JoinColumn(name = "bareme_id")
     private Bareme bareme;
-
-    @OneToMany(mappedBy = "parcours")
-    private List<Inscription> inscriptions;
 }
