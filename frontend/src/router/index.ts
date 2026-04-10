@@ -128,6 +128,16 @@ const router = createRouter({
       component: () => import('@/views/bareme-criteres/BaremeCritereList.vue'),
     },
     {
+      path: '/evaluations/resultats',
+      name: 'evaluation-results',
+      component: () => import('@/views/evaluations/EvaluationResultsList.vue'),
+    },
+    {
+      path: '/evaluations/resultats/:sessionId',
+      name: 'evaluation-result-detail',
+      component: () => import('@/views/evaluations/EvaluationResultDetail.vue'),
+    },
+    {
       path: '/notifications',
       name: 'notifications',
       component: () => import('@/views/notifications/NotificationList.vue'),

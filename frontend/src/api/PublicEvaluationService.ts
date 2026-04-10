@@ -3,12 +3,15 @@ import api from './index'
 export interface PublicEvaluationStageItemDTO {
   stageId: number
   sessionId: number
+  statut: 'EN_ATTENTE' | 'EN_COURS' | 'TERMINEE'
   etudiantNom: string | null
   matricule: string | null
   entrepriseNom: string | null
   dateDebut: string | null
   dateFin: string | null
   dateLimite: string | null
+  totalScore: number
+  maxScore: number
 }
 
 export interface PublicEvaluationCriterionDTO {

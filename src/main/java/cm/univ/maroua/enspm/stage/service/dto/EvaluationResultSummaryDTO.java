@@ -1,22 +1,25 @@
-package cm.univ.maroua.enspm.stage.service.dto.publicevaluation;
+package cm.univ.maroua.enspm.stage.service.dto;
+
+import cm.univ.maroua.enspm.stage.domain.SessionEvaluationStatut;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import cm.univ.maroua.enspm.stage.domain.SessionEvaluationStatut;
 
 /**
- * DTO d'evaluation publique PublicEvaluationStageItemDTO.
+ * Synthese d'evaluation de stage sans detail des notes individuelles.
  */
-public record PublicEvaluationStageItemDTO(
+public record EvaluationResultSummaryDTO(
         Long stageId,
         Long sessionId,
         SessionEvaluationStatut statut,
         String etudiantNom,
         String matricule,
+        String departement,
+        String niveau,
+        String specialite,
         String entrepriseNom,
         LocalDate dateDebut,
         LocalDate dateFin,
-        LocalDate dateLimite,
         Float totalScore,
         Float maxScore) implements Serializable {
 }

@@ -71,8 +71,9 @@ public class PublicEvaluationService {
 
         return sessionEvaluationRepository.findByStageEncadreurIdOrderByStageDateDebutAsc(encadreurId)
                 .stream()
-                .filter(session -> session.getStatut() != SessionEvaluationStatut.TERMINEE)
-                .filter(session -> session.getDateLimite() == null || !session.getDateLimite().isBefore(today))
+            .filter(session -> session.getStatut() == SessionEvaluationStatut.TERMINEE
+                || session.getDateLimite() == null
+                || !session.getDateLimite().isBefore(today))
                 .map(this::toStageItem)
                 .toList();
     }
@@ -265,15 +266,45 @@ public class PublicEvaluationService {
 
     private PublicEvaluationStageItemDTO toStageItem(SessionEvaluation session) {
         Stage stage = requireStage(session);
+        ScoreSummary scoreSummary = computeScoreSummary(session.getId());
         return new PublicEvaluationStageItemDTO(
                 stage.getId(),
                 session.getId(),
+                session.getStatut(),
                 stage.getEtudiant() != null ? stage.getEtudiant().getNom() : null,
                 stage.getEtudiant() != null ? stage.getEtudiant().getMatricule() : null,
                 stage.getEntreprise() != null ? stage.getEntreprise().getNom() : null,
                 stage.getDateDebut(),
                 stage.getDateFin(),
-                session.getDateLimite());
+                session.getDateLimite(),
+                scoreSummary.totalScore(),
+                scoreSummary.maxScore());
+    }
+
+    private ScoreSummary computeScoreSummary(Long sessionId) {
+        if (sessionId == null) {
+            return new ScoreSummary(0f, 0f);
+        }
+
+        List<Note> notes = noteRepository.findBySessionId(sessionId);
+        if (notes.isEmpty()) {
+            return new ScoreSummary(0f, 0f);
+        }
+
+        float totalScore = 0f;
+        float maxScore = 0f;
+        for (Note note : notes) {
+            if (note.getValeur() != null) {
+                totalScore += note.getValeur();
+            }
+            if (note.getBaremeCritere() != null && note.getBaremeCritere().getCoefficient() != null) {
+                maxScore += note.getBaremeCritere().getCoefficient();
+            }
+        }
+        return new ScoreSummary(totalScore, maxScore);
+    }
+
+    private record ScoreSummary(float totalScore, float maxScore) {
     }
 
     private List<PublicEvaluationCategoryDTO> groupByCategory(List<BaremeCritere> baremeCriteres) {

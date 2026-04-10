@@ -47,17 +47,34 @@ const columns: DataTableColumns<PublicEvaluationStageItemDTO> = [
     }
   },
   {
+    title: 'Note totale',
+    key: 'noteTotale',
+    render (row) {
+      if (row.statut !== 'TERMINEE') {
+        return '—'
+      }
+      return `${formatScore(row.totalScore)}/${formatScore(row.maxScore)}`
+    }
+  },
+  {
     title: 'Action',
     key: 'action',
     render (row) {
+      const isDone = row.statut === 'TERMINEE'
       return h(NButton, {
         type: 'primary',
         size: 'small',
+        disabled: isDone,
         onClick: () => openEvaluation(row.stageId)
-      }, { default: () => 'Evaluer' })
+      }, { default: () => isDone ? 'Deja evalue' : 'Evaluer' })
     }
   }
 ]
+
+function formatScore (value: number | null | undefined): string {
+  const safe = Number.isFinite(Number(value)) ? Number(value) : 0
+  return Number.isInteger(safe) ? String(safe) : safe.toFixed(2)
+}
 
 async function loadStages () {
   if (!code.value) {
@@ -73,7 +90,7 @@ async function loadStages () {
     const response = await PublicEvaluationService.getStages(code.value)
     stages.value = response.data ?? []
 
-    if (stages.value.length === 1) {
+    if (stages.value.length === 1 && stages.value[0].statut !== 'TERMINEE') {
       openEvaluation(stages.value[0].stageId)
       return
     }
