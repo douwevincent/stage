@@ -5,6 +5,6 @@ import java.io.Serializable;
 /**
  * DTO EncadreurDTO.
  */
-public record EncadreurDTO(Long id, String nom, String prenom, String email, Long entrepriseId)
+public record EncadreurDTO(Long id, String nom, String telephone, String email, Long entrepriseId)
                 implements Serializable {
 }

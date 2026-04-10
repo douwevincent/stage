@@ -5,5 +5,6 @@ import java.io.Serializable;
 /**
  * DTO BaremeDTO.
  */
-public record BaremeDTO(Long id, String code, String libelle, Boolean actif, Boolean parDefaut) implements Serializable {
+public record BaremeDTO(Long id, String code, String libelle, Boolean actif, Boolean parDefaut, String parDefautUniqueKey)
+				implements Serializable {
 }

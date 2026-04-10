@@ -47,8 +47,8 @@ class BaremeServiceIntegrationTest {
 
     @Test
     void saveShouldKeepOnlyOneDefaultBareme() {
-        BaremeDTO premier = baremeService.save(new BaremeDTO(null, "B1", "Barème 1", true, true));
-        BaremeDTO second = baremeService.save(new BaremeDTO(null, "B2", "Barème 2", true, true));
+        BaremeDTO premier = baremeService.save(new BaremeDTO(null, "B1", "Barème 1", true, true, null));
+        BaremeDTO second = baremeService.save(new BaremeDTO(null, "B2", "Barème 2", true, true, null));
 
         List<Bareme> baremes = baremeRepository.findAll();
 

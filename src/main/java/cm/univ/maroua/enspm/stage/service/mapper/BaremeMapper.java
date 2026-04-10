@@ -9,4 +9,7 @@ import org.mapstruct.Mapper;
  * Mapper MapStruct BaremeMapper.
  */
 public interface BaremeMapper extends EntityMapper<BaremeDTO, Bareme> {
+	BaremeDTO toDto(Bareme entity);
+
+	Bareme toEntity(BaremeDTO dto);
 }
