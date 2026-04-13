@@ -2,8 +2,9 @@
 import { reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { NButton, NCard, NForm, NFormItem, NInput, useMessage } from 'naive-ui'
-import { Mail, Lock, LogIn } from 'lucide-vue-next'
+import { Mail, Lock } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/authStore'
+import EnspmLogo from '@/components/common/EnspmLogo.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -49,9 +50,7 @@ const handleLogin = async () => {
     <div class="relative z-10 w-full max-w-md">
       <!-- En-tête -->
       <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full mb-4">
-          <LogIn class="w-8 h-8 text-white" />
-        </div>
+        <EnspmLogo :size="110" class="mx-auto mb-4" />
         <h1 class="text-3xl font-bold text-gray-800 mb-2">Bienvenue</h1>
         <p class="text-gray-600">Stage Manager ENSPM</p>
       </div>

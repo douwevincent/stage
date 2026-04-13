@@ -11,6 +11,7 @@ import { ref, reactive, computed } from 'vue'
 import { EtudiantService, type EtudiantDTO, type StageDeclarationContextDTO } from '@/api/EtudiantService'
 import { EntrepriseService, type EntrepriseDTO } from '@/api/EntrepriseService'
 import { StageService } from '@/api/StageService'
+import EnspmLogo from '@/components/common/EnspmLogo.vue'
 
 const message = useMessage()
 
@@ -182,6 +183,7 @@ function recommencer () {
     <div style="width: 100%; max-width: 560px">
       <!-- Header -->
       <div class="text-center mb-8">
+        <EnspmLogo :size="104" class="mx-auto mb-4" />
         <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Déclaration de Stage</h1>
         <p class="text-gray-500 dark:text-gray-400 mt-2">Déclarez votre stage auprès de l'établissement</p>
       </div>

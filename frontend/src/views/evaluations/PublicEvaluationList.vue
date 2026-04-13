@@ -4,6 +4,7 @@ import type { DataTableColumns } from 'naive-ui'
 import { computed, h, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { PublicEvaluationService, type PublicEvaluationStageItemDTO } from '@/api/PublicEvaluationService'
+import EnspmLogo from '@/components/common/EnspmLogo.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -131,6 +132,7 @@ onMounted(loadStages)
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-6">
     <div style="width: 100%; max-width: 980px">
       <div class="text-center mb-8">
+        <EnspmLogo :size="104" class="mx-auto mb-4" />
         <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Evaluation des stages</h1>
         <p class="text-gray-500 dark:text-gray-400 mt-2">
           Selectionnez le stage que vous souhaitez evaluer

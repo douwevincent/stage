@@ -79,7 +79,7 @@ onMounted(() => {
 
 <template>
   <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-    <div class="welcome-section">
+    <div class="welcome-section text-center">
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Tableau de bord</h1>
       <p class="text-gray-500 dark:text-gray-400">
         Vue synthétique pour l'année académique active

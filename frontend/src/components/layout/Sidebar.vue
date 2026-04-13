@@ -10,10 +10,10 @@ import {
   Users,
   Briefcase,
   Settings,
-  Layers,
   School,
   BookOpen,
 } from 'lucide-vue-next'
+import EnspmLogo from '@/components/common/EnspmLogo.vue'
 
 const props = defineProps<{
   collapsed: boolean
@@ -217,11 +217,15 @@ const menuOptions = computed<MenuOption[]>(() => [
     class="fixed left-0 top-0 h-screen bg-sidebar-light dark:bg-sidebar-dark transition-all duration-300 z-50 border-r border-gray-100 dark:border-gray-800 flex flex-col"
     :style="{ width: collapsed ? '80px' : '280px' }"
   >
-    <div class="p-6 flex items-center gap-3 border-b border-gray-100 dark:border-gray-800 overflow-hidden whitespace-nowrap">
-      <div class="w-8 h-8 rounded-lg bg-cyan flex items-center justify-center flex-shrink-0 text-white shadow-sm">
-        <Layers :size="20" />
+    <div
+      class="p-4 border-b border-gray-100 dark:border-gray-800 overflow-hidden"
+      :class="collapsed ? 'flex justify-center' : 'flex items-center gap-3 whitespace-nowrap'"
+    >
+      <EnspmLogo :size="collapsed ? 36 : 44" class="flex-shrink-0" />
+      <div v-if="!collapsed" class="min-w-0">
+        <p class="font-manrope font-bold text-lg text-primary dark:text-cyan leading-tight">Stage Manager</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 leading-tight">ENSPM</p>
       </div>
-      <span v-if="!collapsed" class="font-manrope font-bold text-lg text-primary dark:text-cyan">Stage Manager</span>
     </div>
     
     <div class="menu-scroll flex-1 overflow-y-auto py-6 px-3">

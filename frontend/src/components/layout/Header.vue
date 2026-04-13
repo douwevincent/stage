@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { LucideMenu, LucideSearch, LucideSun, LucideMoon, LucideBell, LucideLogOut } from 'lucide-vue-next'
+import { LucideMenu, LucideSun, LucideMoon, LucideBell, LucideLogOut } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/authStore'
 
 defineProps<{
@@ -34,15 +34,9 @@ const handleLogout = async () => {
       >
         <LucideMenu :size="20" />
       </button>
-      
-      <div class="hidden md:flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-full w-[300px] border border-transparent focus-within:border-cyan transition-all">
-        <LucideSearch :size="18" class="text-gray-400" />
-        <input 
-          type="text" 
-          placeholder="Rechercher..." 
-          class="bg-transparent border-none outline-none text-sm w-full text-gray-700 dark:text-gray-300"
-        >
-      </div>
+    </div>
+    <div>
+      <p class="text-3xl text-lime-950 text-shadow-orange-950 font-semibold  dark:text-shadow-none dark:text-cyan mb-4 pt-4">ECOLE NATIONALE SUPÉRIEURE POLYTECHNIQUE DE MAROUA</p>
     </div>
     
     <div class="flex items-center gap-4">
