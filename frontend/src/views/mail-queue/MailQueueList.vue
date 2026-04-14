@@ -4,7 +4,10 @@ import {
   NButton,
   NCard,
   NDataTable,
+  NDescriptions,
+  NDescriptionsItem,
   NInputNumber,
+  NModal,
   NPopconfirm,
   NSpace,
   NSelect,
@@ -27,6 +30,8 @@ const batchRetryLoading = ref(false)
 const purgeLoading = ref(false)
 const deletingId = ref<number | null>(null)
 const retryingId = ref<number | null>(null)
+const showDetailModal = ref(false)
+const selectedMail = ref<MailQueueDTO | null>(null)
 
 const data = ref<MailQueueDTO[]>([])
 const page = ref(1)
@@ -106,10 +111,19 @@ const columns: DataTableColumns<MailQueueDTO> = [
   {
     title: 'Actions',
     key: 'actions',
-    width: 230,
+    width: 320,
     fixed: 'right',
     render: (row) => h(NSpace, { size: 'small' }, {
       default: () => [
+        h(
+          NButton,
+          {
+            size: 'small',
+            type: 'info',
+            onClick: () => openDetails(row)
+          },
+          { default: () => 'Détails' }
+        ),
         h(
           NButton,
           {
@@ -176,6 +190,11 @@ const fetchData = async () => {
 const handleFilterChange = () => {
   page.value = 1
   fetchData()
+}
+
+const openDetails = (mail: MailQueueDTO) => {
+  selectedMail.value = mail
+  showDetailModal.value = true
 }
 
 const handleRetryOne = async (id: number) => {
@@ -302,5 +321,43 @@ onMounted(() => {
         />
       </div>
     </n-card>
+
+    <n-modal
+      v-model:show="showDetailModal"
+      preset="card"
+      title="Détails du mail"
+      class="max-w-3xl"
+      :segmented="{ content: 'soft', footer: 'soft' }"
+    >
+      <n-descriptions label-placement="top" :column="2" bordered>
+        <n-descriptions-item label="Destinataire">
+          {{ selectedMail?.destinataireEmail || '-' }}
+        </n-descriptions-item>
+        <n-descriptions-item label="Statut">
+          {{ selectedMail?.statut || '-' }}
+        </n-descriptions-item>
+        <n-descriptions-item label="Date envoi">
+          {{ formatDate(selectedMail?.dateEnvoi || null) }}
+        </n-descriptions-item>
+        <n-descriptions-item label="Tentatives">
+          {{ selectedMail?.nombreTentatives ?? '-' }}
+        </n-descriptions-item>
+        <n-descriptions-item label="Sujet" :span="2">
+          {{ selectedMail?.sujet || '-' }}
+        </n-descriptions-item>
+        <n-descriptions-item label="Erreur" :span="2">
+          <pre class="whitespace-pre-wrap text-sm m-0">{{ selectedMail?.erreur || '-' }}</pre>
+        </n-descriptions-item>
+        <n-descriptions-item label="Corps du mail" :span="2">
+          <pre class="whitespace-pre-wrap text-sm m-0 max-h-72 overflow-auto">{{ selectedMail?.corps || '-' }}</pre>
+        </n-descriptions-item>
+      </n-descriptions>
+
+      <template #footer>
+        <n-space justify="end">
+          <n-button @click="showDetailModal = false">Fermer</n-button>
+        </n-space>
+      </template>
+    </n-modal>
   </div>
 </template>
