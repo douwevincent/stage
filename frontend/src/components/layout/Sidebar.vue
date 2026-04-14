@@ -41,7 +41,7 @@ function getParentGroupKey (routeKey: string): string | null {
   if (['stages', 'entreprises', 'encadreurs', 'type-stages', 'periode-stages'].includes(routeKey)) {
     return 'stages-group'
   }
-  if (['baremes', 'criteres', 'bareme-criteres', 'evaluation-results'].includes(routeKey)) {
+  if (['baremes', 'criteres', 'bareme-criteres', 'evaluation-results', 'evaluation-export'].includes(routeKey)) {
     return 'evaluation'
   }
   if (['notifications', 'parametres', 'mail-queue'].includes(routeKey)) {
@@ -185,6 +185,10 @@ const menuOptions = computed<MenuOption[]>(() => [
       {
         label: () => h(RouterLink, { to: { name: 'evaluation-results' } }, { default: () => 'Résultats des évaluations' }),
         key: 'evaluation-results'
+      },
+      {
+        label: () => h(RouterLink, { to: { name: 'evaluation-export' } }, { default: () => 'Exporter les evaluations' }),
+        key: 'evaluation-export'
       }
     ]
   },

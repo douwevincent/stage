@@ -90,5 +90,54 @@ export const EvaluationResultService = {
     link.click()
     link.remove()
     window.URL.revokeObjectURL(url)
+  },
+
+  async downloadExportByNiveau (niveauId: number, format: 'pdf' | 'excel'): Promise<void> {
+    await downloadExportFile(
+      `/api/v1/evaluation-exports/by-niveau/${niveauId}/${format}`,
+      `resultats-niveau-${niveauId}.${format === 'pdf' ? 'pdf' : 'xlsx'}`,
+      format
+    )
+  },
+
+  async downloadExportByParcours (parcoursId: number, format: 'pdf' | 'excel'): Promise<void> {
+    await downloadExportFile(
+      `/api/v1/evaluation-exports/by-parcours/${parcoursId}/${format}`,
+      `resultats-parcours-${parcoursId}.${format === 'pdf' ? 'pdf' : 'xlsx'}`,
+      format
+    )
+  },
+
+  async downloadExportByTypeStage (typeStageId: number, format: 'pdf' | 'excel'): Promise<void> {
+    await downloadExportFile(
+      `/api/v1/evaluation-exports/by-type-stage/${typeStageId}/${format}`,
+      `resultats-type-stage-${typeStageId}.${format === 'pdf' ? 'pdf' : 'xlsx'}`,
+      format
+    )
   }
+}
+
+async function downloadExportFile (urlPath: string, fallbackFileName: string, format: 'pdf' | 'excel'): Promise<void> {
+  const response = await api.get(urlPath, {
+    responseType: 'blob'
+  })
+
+  const contentType = format === 'pdf'
+    ? 'application/pdf'
+    : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  const blob = new Blob([response.data], { type: contentType })
+  const url = window.URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = extractFilename(response.headers?.['content-disposition']) ?? fallbackFileName
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  window.URL.revokeObjectURL(url)
+}
+
+function extractFilename (contentDisposition?: string): string | null {
+  if (!contentDisposition) return null
+  const match = contentDisposition.match(/filename="?([^";]+)"?/i)
+  return match?.[1] ?? null
 }

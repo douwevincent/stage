@@ -127,6 +127,10 @@ public class EvaluationPdfService {
         }
     }
 
+    public void buildOfficialHeaderPublic(Document document, Font smallFont) throws Exception {
+        buildOfficialHeader(document, smallFont);
+    }
+
     private void buildOfficialHeader(Document document, Font smallFont) throws Exception {
         // Table 3 colonnes : FR | Logos+Contact | EN
         PdfPTable header = new PdfPTable(new float[]{1f, 0.75f, 1f});

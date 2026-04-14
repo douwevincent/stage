@@ -133,6 +133,11 @@ const router = createRouter({
       component: () => import('@/views/evaluations/EvaluationResultsList.vue'),
     },
     {
+      path: '/evaluations/export',
+      name: 'evaluation-export',
+      component: () => import('@/views/evaluations/EvaluationExportsPage.vue'),
+    },
+    {
       path: '/evaluations/resultats/:sessionId',
       name: 'evaluation-result-detail',
       component: () => import('@/views/evaluations/EvaluationResultDetail.vue'),

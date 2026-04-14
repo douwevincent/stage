@@ -11,7 +11,7 @@ import {
 } from 'naive-ui'
 import type { DataTableColumns } from 'naive-ui'
 import { SearchOutlined } from '@vicons/antd'
-import { Eye, FileText } from 'lucide-vue-next'
+import { Download, Eye, FileText } from 'lucide-vue-next'
 import { computed, h, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { DepartementService } from '@/api/DepartementService'
@@ -163,6 +163,10 @@ function openDetails (sessionId: number) {
   router.push({ name: 'evaluation-result-detail', params: { sessionId } })
 }
 
+function goToExportPage () {
+  router.push({ name: 'evaluation-export' })
+}
+
 async function downloadPdf (sessionId: number) {
   if (downloadingSessionId.value === sessionId) return
   downloadingSessionId.value = sessionId
@@ -252,6 +256,12 @@ onMounted(async () => {
   <div class="space-y-4">
     <div class="flex items-center justify-between">
       <h1 class="text-2xl font-bold">Resultats des evaluations</h1>
+      <NButton type="primary" secondary @click="goToExportPage">
+        <template #icon>
+          <Download :size="16" />
+        </template>
+        Aller a l export
+      </NButton>
     </div>
 
     <NCard>

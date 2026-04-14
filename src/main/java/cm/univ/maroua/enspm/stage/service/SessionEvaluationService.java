@@ -15,6 +15,7 @@ import cm.univ.maroua.enspm.stage.service.dto.EvaluationCriterionDetailDTO;
 import cm.univ.maroua.enspm.stage.service.dto.EvaluationResultDetailDTO;
 import cm.univ.maroua.enspm.stage.service.dto.EvaluationResultSummaryDTO;
 import cm.univ.maroua.enspm.stage.service.dto.SessionEvaluationDTO;
+import cm.univ.maroua.enspm.stage.service.dto.SessionEvaluationExportDTO;
 import cm.univ.maroua.enspm.stage.service.mapper.SessionEvaluationMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -302,6 +303,64 @@ public class SessionEvaluationService {
             return "Autres";
         }
         return category.trim();
+    }
+
+    @Transactional(readOnly = true)
+    public Map<Long, List<SessionEvaluationExportDTO>> getEvaluatedByNiveauIdGroupedByParcours(Long niveauId) {
+        List<SessionEvaluation> sessions = sessionEvaluationRepository.findByNiveauIdAndStatutTerminee(niveauId);
+        return groupByParcoursAndSort(sessions);
+    }
+
+    @Transactional(readOnly = true)
+    public List<SessionEvaluationExportDTO> getEvaluatedByParcoursId(Long parcoursId) {
+        List<SessionEvaluation> sessions = sessionEvaluationRepository.findByParcoursIdAndStatutTerminee(parcoursId);
+        return sessions.stream()
+            .map(this::toExportDTO)
+            .sorted(Comparator.comparing(SessionEvaluationExportDTO::etudiantNom))
+            .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Map<Long, List<SessionEvaluationExportDTO>> getEvaluatedByTypeStageIdGroupedByParcours(Long typeStageId) {
+        List<SessionEvaluation> sessions = sessionEvaluationRepository.findByTypeStageIdAndStatutTerminee(typeStageId);
+        return groupByParcoursAndSort(sessions);
+    }
+
+    private Map<Long, List<SessionEvaluationExportDTO>> groupByParcoursAndSort(List<SessionEvaluation> sessions) {
+        Map<Long, List<SessionEvaluationExportDTO>> grouped = new LinkedHashMap<>();
+        sessions.stream()
+            .map(this::toExportDTO)
+            .sorted(Comparator.comparing(SessionEvaluationExportDTO::parcoursId)
+                .thenComparing(SessionEvaluationExportDTO::etudiantNom))
+            .forEach(dto -> grouped.computeIfAbsent(dto.parcoursId(), k -> new java.util.ArrayList<>()).add(dto));
+        return grouped;
+    }
+
+    private SessionEvaluationExportDTO toExportDTO(SessionEvaluation session) {
+        Stage stage = session.getStage();
+        ScoreSummary scoreSummary = computeScoreSummary(session.getId());
+        Inscription inscription = resolveCurrentInscription(stage);
+
+        String parcoursLabel = inscription != null && inscription.getParcours() != null
+            ? inscription.getParcours().getSpecialite().getIntitule() + " - " + inscription.getParcours().getNiveau().getLibelle()
+            : "N/A";
+        Long parcoursId = inscription != null && inscription.getParcours() != null
+            ? inscription.getParcours().getId()
+            : 0L;
+        String niveauLabel = inscription != null && inscription.getParcours() != null && inscription.getParcours().getNiveau() != null
+            ? inscription.getParcours().getNiveau().getLibelle()
+            : "N/A";
+
+        return new SessionEvaluationExportDTO(
+            session.getId(),
+            stage != null && stage.getEtudiant() != null ? stage.getEtudiant().getMatricule() : null,
+            stage != null && stage.getEtudiant() != null ? stage.getEtudiant().getNom() : null,
+            scoreSummary.totalScore(),
+            scoreSummary.maxScore(),
+            parcoursId,
+            parcoursLabel,
+            niveauLabel
+        );
     }
 
     private record ScoreSummary(float totalScore, float maxScore) {

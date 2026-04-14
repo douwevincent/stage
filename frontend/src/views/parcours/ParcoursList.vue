@@ -124,7 +124,7 @@ const modalSpecialiteOptions = computed(() => {
 const rules: FormRules = {
   specialiteId: { required: true, type: 'number', message: 'La spécialité est requise', trigger: 'change' },
   niveauId: { required: true, type: 'number', message: 'Le niveau est requis', trigger: 'change' },
-  baremeId: { required: true, type: 'number', message: 'Le barème est requis', trigger: 'change' }
+  baremeId: { type: 'number', trigger: 'change' }
 }
 
 const columns: DataTableColumns<ParcoursDTO> = [
@@ -566,6 +566,7 @@ onMounted(() => {
               v-model:value="formModel.baremeId"
               :options="baremeOptions"
               placeholder="Sélectionner un barème"
+              clearable
             />
           </n-form-item>
         </div>

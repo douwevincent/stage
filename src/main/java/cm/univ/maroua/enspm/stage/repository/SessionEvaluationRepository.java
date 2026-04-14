@@ -56,4 +56,38 @@ public interface SessionEvaluationRepository extends JpaRepository<SessionEvalua
                         @Param("specialiteId") Long specialiteId,
                         @Param("q") String q,
                         Pageable pageable);
+
+    @Query("""
+            select se from SessionEvaluation se
+            where se.statut = cm.univ.maroua.enspm.stage.domain.SessionEvaluationStatut.TERMINEE
+                and exists (
+                    select 1 from Inscription i
+                    where i.etudiant.id = se.stage.etudiant.id and i.parcours.niveau.id = :niveauId
+                )
+            order by se.stage.etudiant.nom asc
+            """)
+    List<SessionEvaluation> findByNiveauIdAndStatutTerminee(@Param("niveauId") Long niveauId);
+
+    @Query("""
+            select se from SessionEvaluation se
+            where se.statut = cm.univ.maroua.enspm.stage.domain.SessionEvaluationStatut.TERMINEE
+                and exists (
+                    select 1 from Inscription i
+                    where i.etudiant.id = se.stage.etudiant.id and i.parcours.id = :parcoursId
+                )
+            order by se.stage.etudiant.nom asc
+            """)
+    List<SessionEvaluation> findByParcoursIdAndStatutTerminee(@Param("parcoursId") Long parcoursId);
+
+    @Query("""
+            select se from SessionEvaluation se
+            where se.statut = cm.univ.maroua.enspm.stage.domain.SessionEvaluationStatut.TERMINEE
+                and se.stage.typeStage.id = :typeStageId
+                and exists (
+                    select 1 from Inscription i
+                    where i.etudiant.id = se.stage.etudiant.id
+                )
+            order by se.stage.etudiant.nom asc
+            """)
+    List<SessionEvaluation> findByTypeStageIdAndStatutTerminee(@Param("typeStageId") Long typeStageId);
 }
