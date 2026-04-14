@@ -148,6 +148,12 @@ const router = createRouter({
       component: () => import('@/views/parametres/ParametresList.vue'),
     },
     {
+      path: '/mail-queue',
+      name: 'mail-queue',
+      component: () => import('@/views/mail-queue/MailQueueList.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
       path: '/utilisateurs',
       name: 'users-management',
       component: () => import('@/views/users/UserManagement.vue'),
@@ -178,6 +184,11 @@ router.beforeEach((to) => {
   }
 
   if (to.meta.requiresSuperAdmin && currentRole !== 'SUPER_ADMIN') {
+    return { name: 'dashboard' }
+  }
+
+  const isAdminOrSuperAdmin = currentRole === 'ADMIN' || currentRole === 'SUPER_ADMIN'
+  if (to.meta.requiresAdmin && !isAdminOrSuperAdmin) {
     return { name: 'dashboard' }
   }
 

@@ -8,6 +8,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => Boolean(token.value))
   const isSuperAdmin = computed(() => user.value?.role === 'SUPER_ADMIN')
+  const isAdminOrSuperAdmin = computed(() => {
+    const role = user.value?.role
+    return role === 'ADMIN' || role === 'SUPER_ADMIN'
+  })
 
   function persist() {
     if (token.value) {
@@ -67,6 +71,7 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     isAuthenticated,
     isSuperAdmin,
+    isAdminOrSuperAdmin,
     initialize,
     login,
     logout,

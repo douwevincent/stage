@@ -6,12 +6,14 @@ import cm.univ.maroua.enspm.stage.service.dto.MailQueueDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/admin/mail-queue")
+@PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
 /**
  * Controleur REST MailQueueAdminController.
  */
@@ -33,6 +35,12 @@ public class MailQueueAdminController {
     @PostMapping("/{id}/retry")
     public ResponseEntity<MailQueueDTO> retryOne(@PathVariable Long id) {
         return ResponseEntity.ok(mailQueueService.retry(id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteOne(@PathVariable Long id) {
+        mailQueueService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/retry-failed")

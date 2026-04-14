@@ -44,7 +44,7 @@ function getParentGroupKey (routeKey: string): string | null {
   if (['baremes', 'criteres', 'bareme-criteres', 'evaluation-results'].includes(routeKey)) {
     return 'evaluation'
   }
-  if (['notifications', 'parametres'].includes(routeKey)) {
+  if (['notifications', 'parametres', 'mail-queue'].includes(routeKey)) {
     return 'systeme'
   }
   if (['users-management'].includes(routeKey)) {
@@ -201,6 +201,12 @@ const menuOptions = computed<MenuOption[]>(() => [
         label: () => h(RouterLink, { to: { name: 'parametres' } }, { default: () => 'Paramètres' }),
         key: 'parametres'
       },
+      ...(authStore.isAdminOrSuperAdmin
+        ? [{
+            label: () => h(RouterLink, { to: { name: 'mail-queue' } }, { default: () => 'Mails envoyés' }),
+            key: 'mail-queue'
+          }]
+        : []),
       ...(authStore.isSuperAdmin
         ? [{
             label: () => h(RouterLink, { to: { name: 'users-management' } }, { default: () => 'Utilisateurs' }),

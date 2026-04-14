@@ -49,6 +49,12 @@ public class MailQueueService {
         return toDto(mailQueueRepository.save(mail));
     }
 
+    public void delete(Long id) {
+        MailQueue mail = mailQueueRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Message introuvable: " + id));
+        mailQueueRepository.delete(mail);
+    }
+
     public Map<String, Integer> retryFailedBatch(int limit) {
         int safeLimit = Math.max(1, Math.min(limit, 500));
         List<MailQueue> failed = mailQueueRepository
