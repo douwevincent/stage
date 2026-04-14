@@ -6,6 +6,7 @@ import {
   NDataTable,
   NDescriptions,
   NDescriptionsItem,
+  NInput,
   NInputNumber,
   NModal,
   NPopconfirm,
@@ -39,6 +40,7 @@ const pageSize = ref(10)
 const itemCount = ref(0)
 
 const filterStatut = ref<MailQueueStatutType | null>(null)
+const quickSearch = ref('')
 const purgeOlderThanDays = ref(30)
 
 const statutOptions: SelectOption[] = [
@@ -173,6 +175,20 @@ const pagination = computed(() => ({
   }
 }))
 
+const filteredData = computed(() => {
+  const q = quickSearch.value.trim().toLowerCase()
+  if (!q) {
+    return data.value
+  }
+
+  return data.value.filter((mail) => {
+    const recipient = mail.destinataireEmail?.toLowerCase() || ''
+    const subject = mail.sujet?.toLowerCase() || ''
+    const error = mail.erreur?.toLowerCase() || ''
+    return recipient.includes(q) || subject.includes(q) || error.includes(q)
+  })
+})
+
 const fetchData = async () => {
   loading.value = true
   try {
@@ -277,6 +293,15 @@ onMounted(() => {
 
     <n-card>
       <div class="flex items-end gap-4 flex-wrap">
+        <div class="min-w-[260px]">
+          <p class="mb-1 text-sm text-gray-600">Recherche rapide</p>
+          <n-input
+            v-model:value="quickSearch"
+            clearable
+            placeholder="Destinataire, sujet ou erreur"
+          />
+        </div>
+
         <div class="min-w-[220px]">
           <p class="mb-1 text-sm text-gray-600">Filtrer par statut</p>
           <n-select
@@ -313,7 +338,7 @@ onMounted(() => {
         <n-data-table
           remote
           :columns="columns"
-          :data="data"
+          :data="filteredData"
           :loading="loading"
           :bordered="false"
           :pagination="pagination"
