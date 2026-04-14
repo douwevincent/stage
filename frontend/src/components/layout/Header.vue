@@ -36,7 +36,7 @@ const handleLogout = async () => {
       </button>
     </div>
     <div>
-      <p class="text-3xl text-lime-950 text-shadow-orange-950 font-semibold  dark:text-shadow-none dark:text-cyan mb-4 pt-4">ECOLE NATIONALE SUPÉRIEURE POLYTECHNIQUE DE MAROUA</p>
+      <p class="text-xs lg:text-3xl text-lime-950 text-shadow-orange-950 font-semibold  dark:text-shadow-none dark:text-cyan mb-4 pt-4">ECOLE NATIONALE SUPÉRIEURE POLYTECHNIQUE DE MAROUA</p>
     </div>
     
     <div class="flex items-center gap-4">
