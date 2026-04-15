@@ -24,6 +24,9 @@ export const InscriptionService = {
       anneeAcademiqueId?: number | null
       etudiantId?: number | null
       parcoursId?: number | null
+      departementId?: number | null
+      niveauId?: number | null
+      specialiteId?: number | null
       q?: string
       sort?: string
     }
@@ -32,6 +35,9 @@ export const InscriptionService = {
     if (filters?.anneeAcademiqueId != null) params.anneeAcademiqueId = filters.anneeAcademiqueId
     if (filters?.etudiantId != null) params.etudiantId = filters.etudiantId
     if (filters?.parcoursId != null) params.parcoursId = filters.parcoursId
+    if (filters?.departementId != null) params.departementId = filters.departementId
+    if (filters?.niveauId != null) params.niveauId = filters.niveauId
+    if (filters?.specialiteId != null) params.specialiteId = filters.specialiteId
     if (filters?.q) params.q = filters.q
     if (filters?.sort) params.sort = filters.sort
 

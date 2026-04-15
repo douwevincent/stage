@@ -37,8 +37,8 @@ public class InscriptionService {
     }
 
     @Transactional(readOnly = true)
-    public Page<InscriptionDTO> findAll(Pageable pageable, Long anneeAcademiqueId, Long etudiantId, Long parcoursId,
-            String q) {
+        public Page<InscriptionDTO> findAll(Pageable pageable, Long anneeAcademiqueId, Long etudiantId, Long parcoursId,
+            Long departementId, Long niveauId, Long specialiteId, String q) {
         Specification<Inscription> spec = (root, query, cb) -> cb.conjunction();
 
         if (anneeAcademiqueId != null) {
@@ -51,6 +51,19 @@ public class InscriptionService {
 
         if (parcoursId != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("parcours").get("id"), parcoursId));
+        }
+
+        if (departementId != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("parcours").get("specialite").get("departement").get("id"),
+                    departementId));
+        }
+
+        if (niveauId != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("parcours").get("niveau").get("id"), niveauId));
+        }
+
+        if (specialiteId != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("parcours").get("specialite").get("id"), specialiteId));
         }
 
         if (q != null && !q.isBlank()) {

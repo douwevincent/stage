@@ -41,6 +41,20 @@ export const ParcoursService = {
     })
   },
 
+  async getCatalog () {
+    const firstPageSize = 1000
+    const response = await this.getAll(0, firstPageSize)
+    const content = response.data.content || []
+    const totalElements = response.data.totalElements || response.data.page?.totalElements || content.length
+
+    if (content.length >= totalElements) {
+      return content
+    }
+
+    const fullResponse = await this.getAll(0, totalElements)
+    return fullResponse.data.content || []
+  },
+
   getOne (id: number) {
     return api.get(`/api/v1/parcours/${id}`)
   },

@@ -6,12 +6,13 @@ import {
 import type { FormInst, FormRules, DataTableColumns } from 'naive-ui'
 import { PlusOutlined, SearchOutlined } from '@vicons/antd'
 import { Edit, Trash2 } from 'lucide-vue-next'
-import { ref, h, onMounted, computed, reactive } from 'vue'
+import { ref, h, onMounted, computed, reactive, watch } from 'vue'
 import { ParcoursService, type ParcoursDTO } from '@/api/ParcoursService'
+import { BaremeService, type BaremeDTO } from '@/api/BaremeService'
 import { SpecialiteService, type SpecialiteDTO } from '@/api/SpecialiteService'
 import { NiveauService, type NiveauDTO } from '@/api/NiveauService'
 import { DepartementService, type DepartementDTO } from '@/api/DepartementService'
-import { BaremeService, type BaremeDTO } from '@/api/BaremeService'
+import { mapParcoursCatalog, useParcoursCascade, type ParcoursCatalogEntry } from '@/composables/useParcoursCascade'
 
 const message = useMessage()
 const formRef = ref<FormInst | null>(null)
@@ -29,19 +30,19 @@ const formModel = reactive<ParcoursDTO>({
 })
 
 const departementOptions = ref<OptionItem[]>([])
-const specialiteOptions = ref<SpecialiteOption[]>([])
 const niveauOptions = ref<OptionItem[]>([])
+const specialiteOptions = ref<SpecialiteOption[]>([])
 const baremeOptions = ref<OptionItem[]>([])
 const defaultBaremeId = ref<number | null>(null)
-const parcoursOptions = ref<ParcoursDTO[]>([])
-const selectedDepartementId = ref<number | null>(null)
-const selectedSpecialiteId = ref<number | null>(null)
-const selectedNiveauId = ref<number | null>(null)
+const parcoursCatalog = ref<ParcoursCatalogEntry[]>([])
 const selectedBaremeId = ref<number | null>(null)
 const formDepartementId = ref<number | null>(null)
+const formNiveauId = ref<number | null>(null)
+const formSpecialiteId = ref<number | null>(null)
 const searchQuery = ref('')
 const sortField = ref('specialite.code')
 const sortOrder = ref<'asc' | 'desc'>('asc')
+const filterCascade = useParcoursCascade(parcoursCatalog)
 
 const formatCompositeLabel = (code?: string | null, label?: string | null) => {
   if (code && label) {
@@ -50,66 +51,6 @@ const formatCompositeLabel = (code?: string | null, label?: string | null) => {
 
   return code || label || '-'
 }
-
-const buildUniqueOptions = (
-  items: ParcoursDTO[],
-  valueKey: 'departementId' | 'specialiteId' | 'niveauId',
-  getLabel: (item: ParcoursDTO) => string
-) => {
-  const uniqueOptions = new Map<number, string>()
-
-  items.forEach((item) => {
-    const value = item[valueKey]
-    if (typeof value === 'number' && !uniqueOptions.has(value)) {
-      uniqueOptions.set(value, getLabel(item))
-    }
-  })
-
-  return Array.from(uniqueOptions.entries())
-    .map(([value, label]) => ({ value, label }))
-    .sort((left, right) => left.label.localeCompare(right.label, 'fr', { sensitivity: 'base' }))
-}
-
-const fetchParcoursOptions = async () => {
-  const firstPageSize = 1000
-  const response = await ParcoursService.getAll(0, firstPageSize)
-  const content = response.data.content || []
-  const totalElements = response.data.totalElements || response.data.page?.totalElements || content.length
-
-  if (content.length >= totalElements) {
-    return content
-  }
-
-  const fullResponse = await ParcoursService.getAll(0, totalElements)
-  return fullResponse.data.content || []
-}
-
-const departementFilterOptions = computed(() => buildUniqueOptions(
-  parcoursOptions.value.filter((item) =>
-    (selectedSpecialiteId.value == null || item.specialiteId === selectedSpecialiteId.value) &&
-    (selectedNiveauId.value == null || item.niveauId === selectedNiveauId.value)
-  ),
-  'departementId',
-  (item) => formatCompositeLabel(item.departementCode, item.departementIntitule)
-))
-
-const specialiteFilterOptions = computed(() => buildUniqueOptions(
-  parcoursOptions.value.filter((item) =>
-    (selectedDepartementId.value == null || item.departementId === selectedDepartementId.value) &&
-    (selectedNiveauId.value == null || item.niveauId === selectedNiveauId.value)
-  ),
-  'specialiteId',
-  (item) => formatCompositeLabel(item.specialiteCode, item.specialiteIntitule)
-))
-
-const niveauFilterOptions = computed(() => buildUniqueOptions(
-  parcoursOptions.value.filter((item) =>
-    (selectedDepartementId.value == null || item.departementId === selectedDepartementId.value) &&
-    (selectedSpecialiteId.value == null || item.specialiteId === selectedSpecialiteId.value)
-  ),
-  'niveauId',
-  (item) => item.niveauLibelle || '-'
-))
 
 const modalSpecialiteOptions = computed(() => {
   if (formDepartementId.value == null) {
@@ -233,9 +174,9 @@ const fetchData = async () => {
   loading.value = true
   try {
     const res = await ParcoursService.getAll(page.value - 1, pageSize.value, {
-      departementId: selectedDepartementId.value,
-      specialiteId: selectedSpecialiteId.value,
-      niveauId: selectedNiveauId.value,
+      departementId: filterCascade.departementId.value,
+      specialiteId: filterCascade.specialiteId.value,
+      niveauId: filterCascade.niveauId.value,
       baremeId: selectedBaremeId.value,
       q: searchQuery.value,
       sort: `${sortField.value},${sortOrder.value}`
@@ -254,44 +195,6 @@ const applyServerFilters = () => {
   fetchData()
 }
 
-const handleDepartementFilterUpdate = (value: number | null) => {
-  selectedDepartementId.value = value
-
-  if (
-    selectedSpecialiteId.value != null &&
-    !specialiteFilterOptions.value.some((option) => option.value === selectedSpecialiteId.value)
-  ) {
-    selectedSpecialiteId.value = null
-  }
-
-  if (
-    selectedNiveauId.value != null &&
-    !niveauFilterOptions.value.some((option) => option.value === selectedNiveauId.value)
-  ) {
-    selectedNiveauId.value = null
-  }
-
-  applyServerFilters()
-}
-
-const handleSpecialiteFilterUpdate = (value: number | null) => {
-  selectedSpecialiteId.value = value
-
-  if (
-    selectedNiveauId.value != null &&
-    !niveauFilterOptions.value.some((option) => option.value === selectedNiveauId.value)
-  ) {
-    selectedNiveauId.value = null
-  }
-
-  applyServerFilters()
-}
-
-const handleNiveauFilterUpdate = (value: number | null) => {
-  selectedNiveauId.value = value
-  applyServerFilters()
-}
-
 const handleBaremeFilterUpdate = (value: number | null) => {
   selectedBaremeId.value = value
   applyServerFilters()
@@ -304,14 +207,14 @@ const fetchOptions = async () => {
       SpecialiteService.getAll(0, 200),
       NiveauService.getAll(0, 200),
       BaremeService.getAll(0, 200),
-      fetchParcoursOptions()
+      ParcoursService.getCatalog()
     ])
 
     const departements = departementsRes.data.content || []
     const specialites = specialitesRes.data.content || []
     const niveaux = niveauxRes.data.content || []
     const baremes = (baremesRes.data.content || []).filter((bareme: BaremeDTO) => bareme.actif)
-    parcoursOptions.value = parcoursRes
+    parcoursCatalog.value = mapParcoursCatalog(parcoursRes)
     defaultBaremeId.value = baremes.find((bareme: BaremeDTO) => bareme.parDefaut && typeof bareme.id === 'number')?.id ?? null
 
     departementOptions.value = departements
@@ -360,6 +263,8 @@ const handleAdd = () => {
     baremeId: defaultBaremeId.value
   })
   formDepartementId.value = null
+  formNiveauId.value = null
+  formSpecialiteId.value = null
   showModal.value = true
 }
 
@@ -372,16 +277,9 @@ const handleEdit = (row: ParcoursDTO) => {
     baremeId: row.baremeId
   })
   formDepartementId.value = row.departementId || specialiteOptions.value.find((option) => option.value === row.specialiteId)?.departementId || null
+  formNiveauId.value = row.niveauId || null
+  formSpecialiteId.value = row.specialiteId || null
   showModal.value = true
-}
-
-const handleFormDepartementUpdate = (value: number | null) => {
-  formDepartementId.value = value
-
-  const selectedSpecialite = specialiteOptions.value.find((option) => option.value === formModel.specialiteId)
-  if (selectedSpecialite && selectedSpecialite.departementId !== value) {
-    formModel.specialiteId = null
-  }
 }
 
 const handleSave = async () => {
@@ -430,6 +328,40 @@ onMounted(() => {
   fetchData()
   fetchOptions()
 })
+
+watch(
+  [filterCascade.departementId, filterCascade.niveauId, filterCascade.specialiteId],
+  () => {
+    applyServerFilters()
+  }
+)
+
+watch(
+  [formDepartementId, formNiveauId, formSpecialiteId],
+  () => {
+    const selectedSpecialite = specialiteOptions.value.find((option) => option.value === formSpecialiteId.value)
+    if (selectedSpecialite && formDepartementId.value != null && selectedSpecialite.departementId !== formDepartementId.value) {
+      formSpecialiteId.value = null
+      formModel.specialiteId = null
+    } else {
+      formModel.specialiteId = formSpecialiteId.value
+    }
+
+    formModel.niveauId = formNiveauId.value
+  },
+  { immediate: true }
+)
+
+watch(formSpecialiteId, (value) => {
+  if (value == null) {
+    return
+  }
+
+  const selectedSpecialite = specialiteOptions.value.find((option) => option.value === value)
+  if (selectedSpecialite && selectedSpecialite.departementId != null) {
+    formDepartementId.value = selectedSpecialite.departementId
+  }
+})
 </script>
 
 <template>
@@ -459,29 +391,26 @@ onMounted(() => {
         </div>
         <div class="w-full md:w-64">
           <n-select
-            :value="selectedDepartementId"
-            :options="departementFilterOptions"
+            v-model:value="filterCascade.departementId.value"
+            :options="filterCascade.departementOptions.value"
             placeholder="Filtrer par département"
             clearable
-            @update:value="handleDepartementFilterUpdate"
-          />
-        </div>
-        <div class="w-full md:w-64">
-          <n-select
-            :value="selectedSpecialiteId"
-            :options="specialiteFilterOptions"
-            placeholder="Filtrer par spécialité"
-            clearable
-            @update:value="handleSpecialiteFilterUpdate"
           />
         </div>
         <div class="w-full md:w-56">
           <n-select
-            :value="selectedNiveauId"
-            :options="niveauFilterOptions"
+            v-model:value="filterCascade.niveauId.value"
+            :options="filterCascade.niveauOptions.value"
             placeholder="Filtrer par niveau"
             clearable
-            @update:value="handleNiveauFilterUpdate"
+          />
+        </div>
+        <div class="w-full md:w-64">
+          <n-select
+            v-model:value="filterCascade.specialiteId.value"
+            :options="filterCascade.specialiteOptions.value"
+            placeholder="Filtrer par spécialité"
+            clearable
           />
         </div>
         <div class="w-full md:w-56">
@@ -540,25 +469,26 @@ onMounted(() => {
         <div class="space-y-4">
           <n-form-item label="Département">
             <n-select
-              :value="formDepartementId"
+              v-model:value="formDepartementId"
               :options="departementOptions"
               placeholder="Sélectionner un département"
               clearable
-              @update:value="handleFormDepartementUpdate"
-            />
-          </n-form-item>
-          <n-form-item label="Spécialité" path="specialiteId">
-            <n-select
-              v-model:value="formModel.specialiteId"
-              :options="modalSpecialiteOptions"
-              placeholder="Sélectionner une spécialité"
             />
           </n-form-item>
           <n-form-item label="Niveau" path="niveauId">
             <n-select
-              v-model:value="formModel.niveauId"
+              v-model:value="formNiveauId"
               :options="niveauOptions"
               placeholder="Sélectionner un niveau"
+              clearable
+            />
+          </n-form-item>
+          <n-form-item label="Spécialité" path="specialiteId">
+            <n-select
+              v-model:value="formSpecialiteId"
+              :options="modalSpecialiteOptions"
+              placeholder="Sélectionner une spécialité"
+              clearable
             />
           </n-form-item>
           <n-form-item label="Barème" path="baremeId">

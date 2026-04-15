@@ -6,11 +6,12 @@ import {
 import type { FormInst, FormRules, DataTableColumns } from 'naive-ui'
 import { PlusOutlined, SearchOutlined } from '@vicons/antd'
 import { Edit, Trash2 } from 'lucide-vue-next'
-import { ref, h, onMounted, computed, reactive } from 'vue'
+import { ref, h, onMounted, computed, reactive, watch } from 'vue'
 import { InscriptionService, type InscriptionDTO } from '@/api/InscriptionService'
 import { AnneeAcademiqueService } from '@/api/AnneeAcademiqueService'
 import { EtudiantService } from '@/api/EtudiantService'
 import { ParcoursService } from '@/api/ParcoursService'
+import { mapParcoursCatalog, useParcoursCascade, type ParcoursCatalogEntry } from '@/composables/useParcoursCascade'
 
 const message = useMessage()
 const formRef = ref<FormInst | null>(null)
@@ -26,13 +27,14 @@ const formModel = reactive<InscriptionDTO>({
 
 const anneeOptions = ref<{ label: string, value: number }[]>([])
 const etudiantOptions = ref<{ label: string, value: number }[]>([])
-const parcoursOptions = ref<{ label: string, value: number }[]>([])
+const parcoursCatalog = ref<ParcoursCatalogEntry[]>([])
 const selectedAnneeId = ref<number | null>(null)
 const selectedEtudiantId = ref<number | null>(null)
-const selectedParcoursId = ref<number | null>(null)
 const searchQuery = ref('')
 const sortField = ref('anneeAcademique.libelle')
 const sortOrder = ref<'asc' | 'desc'>('asc')
+const filterCascade = useParcoursCascade(parcoursCatalog)
+const formCascade = useParcoursCascade(parcoursCatalog)
 
 const rules: FormRules = {
   anneeAcademiqueId: {
@@ -159,7 +161,10 @@ const fetchData = async () => {
     const res = await InscriptionService.getAll(page.value - 1, pageSize.value, {
       anneeAcademiqueId: selectedAnneeId.value,
       etudiantId: selectedEtudiantId.value,
-      parcoursId: selectedParcoursId.value,
+      parcoursId: filterCascade.resolvedParcoursId.value,
+      departementId: filterCascade.departementId.value,
+      niveauId: filterCascade.niveauId.value,
+      specialiteId: filterCascade.specialiteId.value,
       q: searchQuery.value,
       sort: `${sortField.value},${sortOrder.value}`
     })
@@ -182,12 +187,12 @@ const fetchOptions = async () => {
     const [anneesRes, etudiantsRes, parcoursRes] = await Promise.all([
       AnneeAcademiqueService.getAll(0, 200),
       EtudiantService.getAll(0, 200),
-      ParcoursService.getAll(0, 200)
+      ParcoursService.getCatalog()
     ])
 
     const annees = anneesRes.data.content || []
     const etudiants = etudiantsRes.data.content || []
-    const parcours = parcoursRes.data.content || []
+    parcoursCatalog.value = mapParcoursCatalog(parcoursRes)
 
     anneeOptions.value = annees.map((a: any) => ({
       label: a.libelle,
@@ -197,11 +202,6 @@ const fetchOptions = async () => {
     etudiantOptions.value = etudiants.map((e: any) => ({
       label: `${e.matricule || ''} ${e.nom || ''}`.trim(),
       value: e.id
-    }))
-
-    parcoursOptions.value = parcours.map((p: any) => ({
-      label: p.libelle || `${p.specialiteCode || p.specialiteId} - ${p.niveauLibelle || p.niveauId}`,
-      value: p.id
     }))
   } catch {
     message.error('Erreur lors du chargement des options')
@@ -255,6 +255,7 @@ const handleAdd = () => {
     etudiantId: null,
     parcoursId: null
   })
+  formCascade.resetSelection()
   showModal.value = true
 }
 
@@ -266,6 +267,7 @@ const handleEdit = (row: InscriptionDTO) => {
     etudiantId: row.etudiantId,
     parcoursId: row.parcoursId
   })
+  formCascade.setSelectionFromParcoursId(row.parcoursId)
   showModal.value = true
 }
 
@@ -312,6 +314,21 @@ onMounted(() => {
   fetchData()
   fetchOptions()
 })
+
+watch(
+  [filterCascade.departementId, filterCascade.niveauId, filterCascade.specialiteId],
+  () => {
+    applyServerFilters()
+  }
+)
+
+watch(
+  [formCascade.departementId, formCascade.niveauId, formCascade.specialiteId, formCascade.resolvedParcoursId],
+  () => {
+    formModel.parcoursId = formCascade.resolvedParcoursId.value
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
@@ -360,11 +377,26 @@ onMounted(() => {
         </div>
         <div class="w-full md:w-64">
           <n-select
-            v-model:value="selectedParcoursId"
-            :options="parcoursOptions"
-            placeholder="Filtrer par parcours"
+            v-model:value="filterCascade.departementId.value"
+            :options="filterCascade.departementOptions.value"
+            placeholder="Filtrer par département"
             clearable
-            @update:value="applyServerFilters"
+          />
+        </div>
+        <div class="w-full md:w-56">
+          <n-select
+            v-model:value="filterCascade.niveauId.value"
+            :options="filterCascade.niveauOptions.value"
+            placeholder="Filtrer par niveau"
+            clearable
+          />
+        </div>
+        <div class="w-full md:w-64">
+          <n-select
+            v-model:value="filterCascade.specialiteId.value"
+            :options="filterCascade.specialiteOptions.value"
+            placeholder="Filtrer par spécialité"
+            clearable
           />
         </div>
         <div class="w-full md:w-56">
@@ -427,11 +459,28 @@ onMounted(() => {
               filterable
             />
           </n-form-item>
-          <n-form-item label="Parcours" path="parcoursId">
+          <n-form-item label="Département">
             <n-select
-              v-model:value="formModel.parcoursId"
-              :options="parcoursOptions"
-              placeholder="Sélectionner un parcours"
+              v-model:value="formCascade.departementId.value"
+              :options="formCascade.departementOptions.value"
+              placeholder="Sélectionner un département"
+              clearable
+            />
+          </n-form-item>
+          <n-form-item label="Niveau">
+            <n-select
+              v-model:value="formCascade.niveauId.value"
+              :options="formCascade.niveauOptions.value"
+              placeholder="Sélectionner un niveau"
+              clearable
+            />
+          </n-form-item>
+          <n-form-item label="Spécialité" path="parcoursId">
+            <n-select
+              v-model:value="formCascade.specialiteId.value"
+              :options="formCascade.specialiteOptions.value"
+              placeholder="Sélectionner une spécialité"
+              clearable
             />
           </n-form-item>
         </div>

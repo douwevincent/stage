@@ -20,6 +20,7 @@ import { AnneeAcademiqueService, type AnneeAcademiqueDTO } from '@/api/AnneeAcad
 import { EtudiantService, type EtudiantDTO } from '@/api/EtudiantService'
 import { InscriptionService, type InscriptionDTO } from '@/api/InscriptionService'
 import { ParcoursService } from '@/api/ParcoursService'
+import { mapParcoursCatalog, useParcoursCascade, type ParcoursCatalogEntry } from '@/composables/useParcoursCascade'
 
 const message = useMessage()
 const route = useRoute()
@@ -40,7 +41,8 @@ const itemCount = ref(0)
 
 const showModal = ref(false)
 const formRef = ref<FormInst | null>(null)
-const parcoursOptions = ref<Array<{ label: string, value: number }>>([])
+const parcoursCatalog = ref<ParcoursCatalogEntry[]>([])
+const formCascade = useParcoursCascade(parcoursCatalog)
 
 const formModel = reactive<{ parcoursId: number | null }>({
   parcoursId: null
@@ -134,12 +136,8 @@ const fetchInscriptions = async () => {
 
 const fetchParcoursOptions = async () => {
   try {
-    const response = await ParcoursService.getAll(0, 200)
-    const rows = response.data.content || []
-    parcoursOptions.value = rows.map((p: any) => ({
-      label: p.libelle || `${p.specialiteCode || p.specialiteId} - ${p.niveauLibelle || p.niveauId}`,
-      value: p.id
-    }))
+    const rows = await ParcoursService.getCatalog()
+    parcoursCatalog.value = mapParcoursCatalog(rows)
   } catch {
     message.error('Erreur lors du chargement des parcours')
   }
@@ -157,6 +155,7 @@ const openInscrireModal = () => {
   }
 
   formModel.parcoursId = null
+  formCascade.resetSelection()
   showModal.value = true
 }
 
@@ -259,6 +258,14 @@ watch(
   }
 )
 
+watch(
+  [formCascade.departementId, formCascade.niveauId, formCascade.specialiteId, formCascade.resolvedParcoursId],
+  () => {
+    formModel.parcoursId = formCascade.resolvedParcoursId.value
+  },
+  { immediate: true }
+)
+
 onMounted(refreshAll)
 </script>
 
@@ -358,12 +365,28 @@ onMounted(refreshAll)
           <n-form-item label="Année académique">
             <span>{{ activeYear?.libelle || '-' }}</span>
           </n-form-item>
-          <n-form-item label="Parcours" path="parcoursId">
+          <n-form-item label="Département">
             <n-select
-              v-model:value="formModel.parcoursId"
-              :options="parcoursOptions"
-              filterable
-              placeholder="Sélectionner un parcours"
+              v-model:value="formCascade.departementId.value"
+              :options="formCascade.departementOptions.value"
+              placeholder="Sélectionner un département"
+              clearable
+            />
+          </n-form-item>
+          <n-form-item label="Niveau">
+            <n-select
+              v-model:value="formCascade.niveauId.value"
+              :options="formCascade.niveauOptions.value"
+              placeholder="Sélectionner un niveau"
+              clearable
+            />
+          </n-form-item>
+          <n-form-item label="Spécialité" path="parcoursId">
+            <n-select
+              v-model:value="formCascade.specialiteId.value"
+              :options="formCascade.specialiteOptions.value"
+              placeholder="Sélectionner une spécialité"
+              clearable
             />
           </n-form-item>
         </div>

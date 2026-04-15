@@ -30,8 +30,12 @@ public class InscriptionController {
             @RequestParam(name = "anneeAcademiqueId", required = false) Long anneeAcademiqueId,
             @RequestParam(name = "etudiantId", required = false) Long etudiantId,
             @RequestParam(name = "parcoursId", required = false) Long parcoursId,
+            @RequestParam(name = "departementId", required = false) Long departementId,
+            @RequestParam(name = "niveauId", required = false) Long niveauId,
+            @RequestParam(name = "specialiteId", required = false) Long specialiteId,
             @RequestParam(name = "q", required = false) String q) {
-        return inscriptionService.findAll(pageable, anneeAcademiqueId, etudiantId, parcoursId, q);
+        return inscriptionService.findAll(pageable, anneeAcademiqueId, etudiantId, parcoursId, departementId, niveauId,
+                specialiteId, q);
     }
 
     @GetMapping("/{id}")
