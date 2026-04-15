@@ -77,18 +77,14 @@ export const useParcoursCascade = (catalog: Ref<ParcoursCatalogEntry[]>) => {
   const pendingParcoursId = ref<number | null>(null)
 
   const departementOptions = computed(() => buildUniqueOptions(
-    catalog.value.filter((item) =>
-      (niveauId.value == null || item.niveauId === niveauId.value) &&
-      (specialiteId.value == null || item.specialiteId === specialiteId.value)
-    ),
+    catalog.value,
     (item) => item.departementId,
     (item) => item.departementLabel
   ))
 
   const niveauOptions = computed(() => buildUniqueOptions(
     catalog.value.filter((item) =>
-      (departementId.value == null || item.departementId === departementId.value) &&
-      (specialiteId.value == null || item.specialiteId === specialiteId.value)
+      departementId.value == null || item.departementId === departementId.value
     ),
     (item) => item.niveauId,
     (item) => item.niveauLabel

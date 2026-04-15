@@ -19,10 +19,19 @@ const showModal = ref(false)
 const modalTitle = ref('')
 const saving = ref(false)
 
-const formModel = reactive<InscriptionDTO>({
+type InscriptionFormModel = InscriptionDTO & {
+  departementId: number | null
+  niveauId: number | null
+  specialiteId: number | null
+}
+
+const formModel = reactive<InscriptionFormModel>({
   anneeAcademiqueId: null,
   etudiantId: null,
-  parcoursId: null
+  parcoursId: null,
+  departementId: null,
+  niveauId: null,
+  specialiteId: null
 })
 
 const annees = ref<any[]>([])
@@ -68,10 +77,10 @@ const rules: FormRules = {
     message: 'Le niveau est requis',
     trigger: 'change'
   },
-  parcoursId: {
+  specialiteId: {
     required: true,
     type: 'number',
-    message: 'Le parcours est requis',
+    message: 'La spécialité est requise',
     trigger: 'change'
   }
 }
@@ -298,9 +307,13 @@ const handleAdd = () => {
     id: undefined,
     anneeAcademiqueId: defaultAnneeId.value,
     etudiantId: null,
-    parcoursId: null
+    parcoursId: null,
+    departementId: null,
+    niveauId: null,
+    specialiteId: null
   })
   formCascade.resetSelection()
+  formRef.value?.restoreValidation()
   showModal.value = true
 }
 
@@ -310,24 +323,24 @@ const handleEdit = (row: InscriptionDTO) => {
     id: row.id,
     anneeAcademiqueId: row.anneeAcademiqueId,
     etudiantId: row.etudiantId,
-    parcoursId: row.parcoursId
+    parcoursId: row.parcoursId,
+    departementId: null,
+    niveauId: null,
+    specialiteId: null
   })
   formCascade.setSelectionFromParcoursId(row.parcoursId)
+  formRef.value?.restoreValidation()
   showModal.value = true
 }
 
 const handleSave = async () => {
-  if (formCascade.departementId.value === null) {
-    message.error('Le département est requis')
-    return
-  }
-  if (formCascade.niveauId.value === null) {
-    message.error('Le niveau est requis')
-    return
-  }
-
   formRef.value?.validate(async (errors) => {
     if (!errors) {
+      if (formModel.parcoursId == null) {
+        message.error('La spécialité est requise')
+        return
+      }
+
       saving.value = true
       try {
         const isDuplicate = await hasDuplicateInscription()
@@ -377,8 +390,44 @@ watch(
 )
 
 watch(
+  () => formModel.departementId,
+  (value) => {
+    if (formCascade.departementId.value !== value) {
+      formCascade.departementId.value = value
+    }
+  }
+)
+
+watch(
+  () => formModel.niveauId,
+  (value) => {
+    if (formCascade.niveauId.value !== value) {
+      formCascade.niveauId.value = value
+    }
+  }
+)
+
+watch(
+  () => formModel.specialiteId,
+  (value) => {
+    if (formCascade.specialiteId.value !== value) {
+      formCascade.specialiteId.value = value
+    }
+  }
+)
+
+watch(
   [formCascade.departementId, formCascade.niveauId, formCascade.specialiteId, formCascade.resolvedParcoursId],
   () => {
+    if (formModel.departementId !== formCascade.departementId.value) {
+      formModel.departementId = formCascade.departementId.value
+    }
+    if (formModel.niveauId !== formCascade.niveauId.value) {
+      formModel.niveauId = formCascade.niveauId.value
+    }
+    if (formModel.specialiteId !== formCascade.specialiteId.value) {
+      formModel.specialiteId = formCascade.specialiteId.value
+    }
     formModel.parcoursId = formCascade.resolvedParcoursId.value
   },
   { immediate: true }
@@ -502,7 +551,7 @@ watch(
           </n-form-item>
           <n-form-item label="Département" path="departementId">
             <n-select
-              v-model:value="formCascade.departementId.value"
+              v-model:value="formModel.departementId"
               :options="formCascade.departementOptions.value"
               placeholder="Sélectionner un département"
               clearable
@@ -510,15 +559,15 @@ watch(
           </n-form-item>
           <n-form-item label="Niveau" path="niveauId">
             <n-select
-              v-model:value="formCascade.niveauId.value"
+              v-model:value="formModel.niveauId"
               :options="formCascade.niveauOptions.value"
               placeholder="Sélectionner un niveau"
               clearable
             />
           </n-form-item>
-          <n-form-item label="Spécialité" path="parcoursId">
+          <n-form-item label="Spécialité" path="specialiteId">
             <n-select
-              v-model:value="formCascade.specialiteId.value"
+              v-model:value="formModel.specialiteId"
               :options="formCascade.specialiteOptions.value"
               placeholder="Sélectionner une spécialité"
               :disabled="!isFormDeptAndNiveauDefined"
