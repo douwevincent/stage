@@ -25,28 +25,47 @@ const formModel = reactive<InscriptionDTO>({
   parcoursId: null
 })
 
+const annees = ref<any[]>([])
 const anneeOptions = ref<{ label: string, value: number }[]>([])
 const etudiantOptions = ref<{ label: string, value: number }[]>([])
 const parcoursCatalog = ref<ParcoursCatalogEntry[]>([])
 const selectedAnneeId = ref<number | null>(null)
-const selectedEtudiantId = ref<number | null>(null)
 const searchQuery = ref('')
-const sortField = ref('anneeAcademique.libelle')
+const sortField = ref('etudiant.nom')
 const sortOrder = ref<'asc' | 'desc'>('asc')
 const filterCascade = useParcoursCascade(parcoursCatalog)
 const formCascade = useParcoursCascade(parcoursCatalog)
 
+const defaultAnneeId = computed(() => {
+  const activeAnnee = annees.value.find((a: any) => a.actif === true)
+  return activeAnnee?.id || null
+})
+
+const isFormDeptAndNiveauDefined = computed(() => {
+  return formCascade.departementId.value !== null && formCascade.niveauId.value !== null
+})
+
+const isFilterDeptAndNiveauDefined = computed(() => {
+  return filterCascade.departementId.value !== null && filterCascade.niveauId.value !== null
+})
+
 const rules: FormRules = {
-  anneeAcademiqueId: {
-    required: true,
-    type: 'number',
-    message: 'L\'année académique est requise',
-    trigger: 'change'
-  },
   etudiantId: {
     required: true,
     type: 'number',
     message: 'L\'étudiant est requis',
+    trigger: 'change'
+  },
+  departementId: {
+    required: true,
+    type: 'number',
+    message: 'Le département est requis',
+    trigger: 'change'
+  },
+  niveauId: {
+    required: true,
+    type: 'number',
+    message: 'Le niveau est requis',
     trigger: 'change'
   },
   parcoursId: {
@@ -57,32 +76,60 @@ const rules: FormRules = {
   }
 }
 
+const parcoursMetaMap = computed(() => {
+  const map = new Map<number, { departementCode: string, niveauLibelle: string, specialiteCode: string }>()
+  parcoursCatalog.value.forEach((entry) => {
+    map.set(entry.id, {
+      departementCode: entry.departementLabel || '-',
+      niveauLibelle: entry.niveauLabel || '-',
+      specialiteCode: entry.specialiteLabel || '-'
+    })
+  })
+  return map
+})
+
 const columns: DataTableColumns<InscriptionDTO> = [
   {
-    title: 'Année Académique',
-    key: 'anneeAcademiqueLibelle',
-    minWidth: 180,
+    title: 'Matricule',
+    key: 'etudiantMatricule',
+    minWidth: 120,
     render (row) {
-      return row.anneeAcademiqueLibelle || row.anneeAcademiqueId || '-'
+      return row.etudiantMatricule || '-'
     }
   },
   {
-    title: 'Étudiant',
+    title: 'Nom',
     key: 'etudiantNom',
-    minWidth: 220,
+    minWidth: 150,
     render (row) {
-      if (row.etudiantMatricule || row.etudiantNom) {
-        return `${row.etudiantMatricule || ''} ${row.etudiantNom || ''}`.trim()
-      }
-      return row.etudiantId || '-'
+      return row.etudiantNom || '-'
     }
   },
   {
-    title: 'Parcours',
-    key: 'parcoursLibelle',
-    minWidth: 220,
+    title: 'Département',
+    key: 'parcoursId',
+    minWidth: 120,
     render (row) {
-      return row.parcoursLibelle || row.parcoursId || '-'
+      const meta = parcoursMetaMap.value.get(row.parcoursId || 0)
+      return meta?.departementCode || '-'
+    }
+  },
+  {
+    title: 'Niveau',
+    key: 'parcoursNiveauLibelle',
+    minWidth: 120,
+    render (row) {
+      const meta = parcoursMetaMap.value.get(row.parcoursId || 0)
+      return meta?.niveauLibelle || '-'
+    }
+  },
+  {
+    title: 'Spécialité',
+    key: 'parcoursSpecialiteCode',
+    minWidth: 150,
+    render (row) {
+      const meta = parcoursMetaMap.value.get(row.parcoursId || 0)
+      return meta?.specialiteCode || '-'
     }
   },
   {
@@ -129,7 +176,6 @@ const page = ref(1)
 const pageSize = ref(10)
 const itemCount = ref(0)
 const sortFieldOptions = [
-  { label: 'Année académique', value: 'anneeAcademique.libelle' },
   { label: 'Étudiant', value: 'etudiant.nom' },
   { label: 'Parcours', value: 'parcours.specialite.code' }
 ]
@@ -160,7 +206,6 @@ const fetchData = async () => {
   try {
     const res = await InscriptionService.getAll(page.value - 1, pageSize.value, {
       anneeAcademiqueId: selectedAnneeId.value,
-      etudiantId: selectedEtudiantId.value,
       parcoursId: filterCascade.resolvedParcoursId.value,
       departementId: filterCascade.departementId.value,
       niveauId: filterCascade.niveauId.value,
@@ -190,11 +235,11 @@ const fetchOptions = async () => {
       ParcoursService.getCatalog()
     ])
 
-    const annees = anneesRes.data.content || []
+    annees.value = anneesRes.data.content || []
     const etudiants = etudiantsRes.data.content || []
     parcoursCatalog.value = mapParcoursCatalog(parcoursRes)
 
-    anneeOptions.value = annees.map((a: any) => ({
+    anneeOptions.value = annees.value.map((a: any) => ({
       label: a.libelle,
       value: a.id
     }))
@@ -251,7 +296,7 @@ const handleAdd = () => {
   modalTitle.value = 'Ajouter une Inscription'
   Object.assign(formModel, {
     id: undefined,
-    anneeAcademiqueId: null,
+    anneeAcademiqueId: defaultAnneeId.value,
     etudiantId: null,
     parcoursId: null
   })
@@ -272,6 +317,15 @@ const handleEdit = (row: InscriptionDTO) => {
 }
 
 const handleSave = async () => {
+  if (formCascade.departementId.value === null) {
+    message.error('Le département est requis')
+    return
+  }
+  if (formCascade.niveauId.value === null) {
+    message.error('Le niveau est requis')
+    return
+  }
+
   formRef.value?.validate(async (errors) => {
     if (!errors) {
       saving.value = true
@@ -367,16 +421,6 @@ watch(
         </div>
         <div class="w-full md:w-64">
           <n-select
-            v-model:value="selectedEtudiantId"
-            :options="etudiantOptions"
-            placeholder="Filtrer par étudiant"
-            clearable
-            filterable
-            @update:value="applyServerFilters"
-          />
-        </div>
-        <div class="w-full md:w-64">
-          <n-select
             v-model:value="filterCascade.departementId.value"
             :options="filterCascade.departementOptions.value"
             placeholder="Filtrer par département"
@@ -396,6 +440,7 @@ watch(
             v-model:value="filterCascade.specialiteId.value"
             :options="filterCascade.specialiteOptions.value"
             placeholder="Filtrer par spécialité"
+            :disabled="!isFilterDeptAndNiveauDefined"
             clearable
           />
         </div>
@@ -423,7 +468,7 @@ watch(
         :loading="loading"
         :bordered="false"
         :pagination="pagination"
-        :scroll-x="980"
+        :scroll-x="1200"
       />
     </n-card>
 
@@ -444,13 +489,9 @@ watch(
         require-mark-placement="right-hanging"
       >
         <div class="space-y-4">
-          <n-form-item label="Année académique" path="anneeAcademiqueId">
-            <n-select
-              v-model:value="formModel.anneeAcademiqueId"
-              :options="anneeOptions"
-              placeholder="Sélectionner une année académique"
-            />
-          </n-form-item>
+          <div class="text-xs text-gray-500 mb-2">
+            Année académique: {{ anneeOptions.find(opt => opt.value === formModel.anneeAcademiqueId)?.label || 'Non disponible' }}
+          </div>
           <n-form-item label="Étudiant" path="etudiantId">
             <n-select
               v-model:value="formModel.etudiantId"
@@ -459,7 +500,7 @@ watch(
               filterable
             />
           </n-form-item>
-          <n-form-item label="Département">
+          <n-form-item label="Département" path="departementId">
             <n-select
               v-model:value="formCascade.departementId.value"
               :options="formCascade.departementOptions.value"
@@ -467,7 +508,7 @@ watch(
               clearable
             />
           </n-form-item>
-          <n-form-item label="Niveau">
+          <n-form-item label="Niveau" path="niveauId">
             <n-select
               v-model:value="formCascade.niveauId.value"
               :options="formCascade.niveauOptions.value"
@@ -480,6 +521,7 @@ watch(
               v-model:value="formCascade.specialiteId.value"
               :options="formCascade.specialiteOptions.value"
               placeholder="Sélectionner une spécialité"
+              :disabled="!isFormDeptAndNiveauDefined"
               clearable
             />
           </n-form-item>

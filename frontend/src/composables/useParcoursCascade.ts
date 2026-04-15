@@ -29,13 +29,7 @@ export interface ParcoursCascadeState {
 
 const compareLabels = (left: string, right: string) => left.localeCompare(right, 'fr', { sensitivity: 'base' })
 
-const formatCompositeLabel = (code?: string | null, label?: string | null) => {
-  if (code && label) {
-    return `${code} - ${label}`
-  }
-
-  return code || label || '-'
-}
+const formatCodeLabel = (code?: string | null, label?: string | null) => code || label || '-'
 
 const buildUniqueOptions = (
   items: ParcoursCatalogEntry[],
@@ -67,12 +61,12 @@ export const mapParcoursCatalog = (items: ParcoursDTO[]) => {
     .map((item) => ({
       id: item.id,
       departementId: item.departementId,
-      departementLabel: formatCompositeLabel(item.departementCode, item.departementIntitule),
+      departementLabel: formatCodeLabel(item.departementCode, item.departementIntitule),
       niveauId: item.niveauId,
       niveauLabel: item.niveauLibelle || '-',
       specialiteId: item.specialiteId,
-      specialiteLabel: formatCompositeLabel(item.specialiteCode, item.specialiteIntitule),
-      parcoursLabel: item.libelle || `${formatCompositeLabel(item.specialiteCode, item.specialiteIntitule)} - ${item.niveauLibelle || '-'}`
+      specialiteLabel: formatCodeLabel(item.specialiteCode, item.specialiteIntitule),
+      parcoursLabel: item.libelle || `${formatCodeLabel(item.specialiteCode, item.specialiteIntitule)} - ${item.niveauLibelle || '-'}`
     }))
 }
 

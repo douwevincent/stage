@@ -44,13 +44,7 @@ const sortField = ref('specialite.code')
 const sortOrder = ref<'asc' | 'desc'>('asc')
 const filterCascade = useParcoursCascade(parcoursCatalog)
 
-const formatCompositeLabel = (code?: string | null, label?: string | null) => {
-  if (code && label) {
-    return `${code} - ${label}`
-  }
-
-  return code || label || '-'
-}
+const formatCodeLabel = (code?: string | null, label?: string | null) => code || label || '-'
 
 const modalSpecialiteOptions = computed(() => {
   if (formDepartementId.value == null) {
@@ -74,7 +68,7 @@ const columns: DataTableColumns<ParcoursDTO> = [
     key: 'departementCode',
     minWidth: 220,
     render (row) {
-      return formatCompositeLabel(row.departementCode, row.departementIntitule)
+      return row.departementCode || row.departementIntitule || '-'
     }
   },
   {
@@ -82,7 +76,7 @@ const columns: DataTableColumns<ParcoursDTO> = [
     key: 'specialiteCode',
     minWidth: 180,
     render (row) {
-      return formatCompositeLabel(row.specialiteCode, row.specialiteIntitule)
+      return row.specialiteCode || row.specialiteIntitule || '-'
     }
   },
   {
@@ -220,7 +214,7 @@ const fetchOptions = async () => {
     departementOptions.value = departements
       .filter((departement: DepartementDTO) => typeof departement.id === 'number')
       .map((departement: DepartementDTO) => ({
-        label: formatCompositeLabel(departement.code, departement.intitule),
+        label: formatCodeLabel(departement.code, departement.intitule),
         value: departement.id as number
       }))
       .sort((left: OptionItem, right: OptionItem) => left.label.localeCompare(right.label, 'fr', { sensitivity: 'base' }))
@@ -228,7 +222,7 @@ const fetchOptions = async () => {
     specialiteOptions.value = specialites
       .filter((specialite: SpecialiteDTO) => typeof specialite.id === 'number')
       .map((specialite: SpecialiteDTO) => ({
-        label: formatCompositeLabel(specialite.code, specialite.intitule),
+        label: formatCodeLabel(specialite.code, specialite.intitule),
         value: specialite.id as number,
         departementId: specialite.departementId
       }))
