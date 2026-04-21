@@ -4,8 +4,8 @@
 
 - Application: Stage Manager ENSPM
 - Document: Manuel Utilisateur Frontend (version courte)
-- Version: 1.0
-- Date d'édition: 15 avril 2026
+- Version: 1.2
+- Date d'édition: 21 avril 2026
 - Statut: guide opérationnel rapide
 - Public cible: utilisateurs métier (scolarité, administration)
 - Usage: support quotidien imprimable (lecture rapide)
@@ -22,29 +22,20 @@
 
 ---
 
-## 0. Captures essentielles
+## 0. Index des captures
 
-Deposez les images dans `docs/images/manuel-court/`.
+Déposez les images dans `docs/images/manuel-court/`.
 Convention de nommage: voir `docs/images/README.md`.
-Ordre de prise recommande: [docs/images/checklist-captures.md](images/checklist-captures.md)
+Ordre de prise recommandé: [docs/images/checklist-captures.md](images/checklist-captures.md)
 
-### 0.1 Connexion
-![Connexion](images/manuel-court/01-login.png)
-
-### 0.2 Navigation principale
-![Navigation principale](images/manuel-court/02-navigation.png)
-
-### 0.3 Inscriptions
-![Inscriptions](images/manuel-court/03-inscriptions.png)
-
-### 0.4 Stages
-![Stages](images/manuel-court/04-stages.png)
-
-### 0.5 Evaluations
-![Evaluations](images/manuel-court/05-evaluations.png)
-
-### 0.6 Systeme
-![Systeme](images/manuel-court/06-systeme.png)
+1. `01-login.png` -> section 1.1 Se connecter
+2. `02-navigation.png` -> section 2 Navigation
+3. `03-inscriptions.png` -> section 3.2 Inscrire un étudiant
+4. `04-stages.png` -> section 3.3 Créer et traiter un stage
+5. `05-evaluations.png` -> section 3.4 Produire les résultats d'évaluation
+6. `06-systeme.png` -> section 4 Module Système
+7. `07-public-stage-declaration-etape-1.png` -> section 5.1 Déclaration étudiant, étape 1
+8. `08-public-stage-declaration-etape-2.png` -> section 5.1 Déclaration étudiant, étape 2
 
 ## 1. Démarrage rapide
 
@@ -55,6 +46,9 @@ Ordre de prise recommande: [docs/images/checklist-captures.md](images/checklist-
 
 Résultat attendu:
 - Ouverture du Tableau de Bord.
+
+Capture(s) intégrée(s):
+![Connexion](images/manuel-court/01-login.png)
 
 ### 1.2 Se déconnecter
 1. Cliquer sur l'icône de déconnexion en haut à droite.
@@ -79,6 +73,9 @@ Comportements communs:
 - Filtres + recherche: restreignent la liste.
 - Pagination: change de page et de taille (10/20/50).
 
+Capture(s) intégrée(s):
+![Navigation principale](images/manuel-court/02-navigation.png)
+
 ## 3. Parcours métier essentiels
 
 ### 3.1 Préparer l'année académique
@@ -102,6 +99,9 @@ Contrôles importants:
 - La spécialité est activée seulement après département + niveau.
 - Les doublons sont bloqués automatiquement.
 
+Capture(s) intégrée(s):
+![Inscriptions](images/manuel-court/03-inscriptions.png)
+
 ### 3.3 Créer et traiter un stage
 Objectif: enregistrer un stage puis le qualifier.
 
@@ -112,6 +112,9 @@ Objectif: enregistrer un stage puis le qualifier.
 5. Si besoin: Assigner étudiant et Assigner encadreur.
 6. Traiter le statut (Valider/Rejeter) selon le workflow.
 
+Capture(s) intégrée(s):
+![Stages](images/manuel-court/04-stages.png)
+
 ### 3.4 Produire les résultats d'évaluation
 Objectif: consulter et exporter les résultats.
 
@@ -119,7 +122,10 @@ Objectif: consulter et exporter les résultats.
 2. Appliquer les filtres (département, niveau, spécialité).
 3. Ouvrir Details pour analyser une session.
 4. Cliquer sur Fiche PDF pour un export unitaire.
-5. Aller à Exporter les evaluations pour export global (PDF/Excel).
+5. Aller à Exporter les évaluations pour export global (PDF/Excel).
+
+Capture(s) intégrée(s):
+![Évaluations](images/manuel-court/05-evaluations.png)
 
 ## 4. Module Système (admin)
 
@@ -145,18 +151,44 @@ Objectif: consulter et exporter les résultats.
 - Réinitialiser mot de passe.
 - Supprimer un compte (hors compte connecté).
 
-## 5. Parcours public encadreur
+Capture(s) intégrée(s):
+![Système](images/manuel-court/06-systeme.png)
 
-### 5.1 Accéder au lien public
+## 5. Parcours publics
+
+### 5.1 Déclaration de stage étudiant (2 étapes)
+
+Étape 1: Identification
+1. Ouvrir le lien public de déclaration.
+2. Saisir le Numéro Matricule.
+3. Cliquer sur Vérifier et continuer.
+
+Capture(s) intégrée(s):
+![Déclaration stage étudiant - étape 1](images/manuel-court/07-public-stage-declaration-etape-1.png)
+
+Étape 2: Détails du stage
+1. Vérifier l'étudiant identifié puis renseigner les informations de stage (Entreprise, Ville, Adresse, dates).
+2. Joindre l'Autorisation de stage.
+3. Vérifier les données puis cliquer sur Déclarer le stage.
+
+Capture(s) intégrée(s):
+![Déclaration stage étudiant - étape 2](images/manuel-court/08-public-stage-declaration-etape-2.png)
+
+Résultat attendu:
+- Message Stage déclaré avec succès.
+
+### 5.2 Parcours public encadreur
+
+### 5.2.1 Accéder au lien public
 1. Ouvrir le lien reçu (avec code).
 2. Choisir le stage à évaluer.
-3. Cliquer sur Evaluer.
+3. Cliquer sur « Evaluer ».
 
-### 5.2 Soumettre une évaluation
+### 5.2.2 Soumettre une évaluation
 1. Renseigner chaque note par critère.
 2. Respecter 0 <= note <= coefficient.
 3. Ajouter un commentaire optionnel.
-4. Cliquer sur Soumettre l'evaluation.
+4. Cliquer sur « Soumettre l'evaluation ».
 
 Résultat attendu:
 - Confirmation d'enregistrement.
@@ -183,6 +215,10 @@ Action: vérifier vos permissions.
 Cause: lien invalide, expiré ou déjà utilisé.
 Action: demander un nouveau lien.
 
+### 6.6 Déclaration de stage impossible à soumettre
+Cause: matricule invalide, champs obligatoires manquants ou autorisation non jointe.
+Action: cliquer sur Vérifier et continuer après correction du matricule, compléter les champs signalés, puis relancer Déclarer le stage.
+
 ## 7. Checklist rapide avant clôture quotidienne
 
 1. Vérifier les stages en attente de validation.
@@ -194,3 +230,8 @@ Action: demander un nouveau lien.
 ## 8. Références documentaires
 - Manuel complet: docs/manuel-utilisateur-frontend.md
 - Ce guide court: docs/manuel-utilisateur-frontend-court.md
+
+## 9. Journal des mises à jour
+- v1.2: réorganisation du document en mode inline complet (captures intégrées dans les sections métier).
+- v1.1: ajout du parcours public de déclaration de stage étudiant en 2 étapes avec captures dédiées.
+- v1.0: version initiale du guide court.
