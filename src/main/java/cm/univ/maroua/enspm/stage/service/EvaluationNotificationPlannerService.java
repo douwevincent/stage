@@ -21,12 +21,18 @@ import java.util.Locale;
  * Détecte les notifications dues aujourd'hui et enfile un message en attente
  * pour chaque stage non noté concerné.
  *
- * <p>Règle de déclenchement : une {@link Notification} active est due aujourd'hui si
- * {@code dateReference + offsetDays == today}, où dateReference est la date réelle
- * de début ou de fin du stage selon le type de notification.</p>
+ * <p>
+ * Règle de déclenchement : une {@link Notification} active est due aujourd'hui
+ * si
+ * {@code dateReference + offsetDays == today}, où dateReference est la date
+ * réelle
+ * de début ou de fin du stage selon le type de notification.
+ * </p>
  *
- * <p>Anti-doublon : un seul message par triplet (encadreur, stage, notification)
- * grâce à la contrainte unique sur la table {@code mail_queue}.</p>
+ * <p>
+ * Anti-doublon : un seul message par triplet (encadreur, stage, notification)
+ * grâce à la contrainte unique sur la table {@code mail_queue}.
+ * </p>
  */
 @Service
 public class EvaluationNotificationPlannerService {
@@ -34,11 +40,9 @@ public class EvaluationNotificationPlannerService {
     private static final Logger log = LoggerFactory.getLogger(EvaluationNotificationPlannerService.class);
 
     private static final String SUJET_DEFAUT = "Rappel : évaluation des stages en attente";
-    private static final String CORPS_DEFAUT  =
-            "Bonjour,\n\nCertains stages dont vous êtes encadreur n'ont pas encore été évalués. "
+    private static final String CORPS_DEFAUT = "Bonjour,\n\nCertains stages dont vous êtes encadreur n'ont pas encore été évalués. "
             + "Merci de vous connecter à la plateforme pour saisir vos notes.\n\nCordialement.";
-    private static final DateTimeFormatter DATE_FR_FORMATTER =
-            DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.FRANCE);
+    private static final DateTimeFormatter DATE_FR_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.FRANCE);
 
     @Value("${app.base-url:http://localhost:8080}")
     private String baseUrl;
@@ -93,16 +97,29 @@ public class EvaluationNotificationPlannerService {
     // Logique interne
     // -----------------------------------------------------------------------
 
-    @SuppressWarnings("deprecation")
     private int traiterNotification(Notification notification, LocalDate today, String sujet, String corps) {
         Long typeStageId = notification.getTypeStage().getId();
+        // DEBUT_STAGE
+        // FIN_STAGE
+        // JOURS_AVANT_FIN_STAGE
+        // JOURS_APRES_FIN_STAGE
         LocalDate referenceDate = today.minusDays(notification.getOffsetDays());
 
         List<Stage> stagesDues = switch (notification.getReferenceDateType()) {
-            case DEBUT_STAGE, DEBUT_PERIODE -> stageRepository
-                    .findStagesNonNotesPourDebutStage(typeStageId, referenceDate);
-            case FIN_STAGE, FIN_PERIODE, JOURS_AVANT_FIN_STAGE, JOURS_APRES_FIN_STAGE -> stageRepository
-                    .findStagesNonNotesPourFinStage(typeStageId, referenceDate);
+            case DEBUT_STAGE -> {
+                yield stageRepository
+                        .findStagesNonNotesPourDebutStage(typeStageId, referenceDate);
+            }
+            case FIN_STAGE, JOURS_AVANT_FIN_STAGE -> {
+                referenceDate = today.plusDays(notification.getOffsetDays());
+                yield stageRepository
+                        .findStagesNonNotesPourFinStage(typeStageId, referenceDate);
+            }
+            case JOURS_APRES_FIN_STAGE -> {
+                referenceDate = today.minusDays(notification.getOffsetDays());
+                yield stageRepository
+                        .findStagesNonNotesPourFinStage(typeStageId, referenceDate);
+            }
             default -> {
                 log.debug("Type de référence {} non supporté pour les notifications encadreurs, ignoré.",
                         notification.getReferenceDateType());
