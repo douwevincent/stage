@@ -211,12 +211,18 @@ public class StageService {
 
         String cheminAutorisation = null;
         if (autorisation != null && !autorisation.isEmpty()) {
+            validateUploadedFile(autorisation);
             Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
             Files.createDirectories(uploadPath);
             String originalName = StringUtils.cleanPath(
                     autorisation.getOriginalFilename() != null ? autorisation.getOriginalFilename() : "file");
-            String fileName = System.currentTimeMillis() + "_" + originalName;
-            Path filePath = uploadPath.resolve(fileName);
+            // Strip path separators that survive cleanPath on some platforms
+            String safeName = Paths.get(originalName).getFileName().toString();
+            String fileName = System.currentTimeMillis() + "_" + safeName;
+            Path filePath = uploadPath.resolve(fileName).normalize();
+            if (!filePath.startsWith(uploadPath)) {
+                throw new IllegalArgumentException("Chemin de fichier invalide");
+            }
             Files.copy(autorisation.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
             cheminAutorisation = fileName;
         }
@@ -434,6 +440,39 @@ public class StageService {
 
     public void delete(Long id) {
         stageRepository.deleteById(id);
+    }
+
+    /**
+     * Valide que le fichier televerse est d'un type autorise (PDF ou image).
+     *
+     * @param file fichier a valider
+     * @throws IllegalArgumentException si le type MIME ou l'extension est refuse
+     */
+    private void validateUploadedFile(MultipartFile file) throws IOException {
+        // Whitelist of permitted MIME types for internship authorisation documents
+        java.util.Set<String> allowedMimeTypes = java.util.Set.of(
+                "application/pdf",
+                "image/jpeg",
+                "image/png"
+        );
+        java.util.Set<String> allowedExtensions = java.util.Set.of("pdf", "jpg", "jpeg", "png");
+
+        String contentType = file.getContentType();
+        if (contentType == null || !allowedMimeTypes.contains(contentType.toLowerCase())) {
+            throw new IllegalArgumentException(
+                    "Type de fichier non autorisé. Seuls les PDF et images (JPEG, PNG) sont acceptés.");
+        }
+
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename != null) {
+            String ext = originalFilename.contains(".")
+                    ? originalFilename.substring(originalFilename.lastIndexOf('.') + 1).toLowerCase()
+                    : "";
+            if (!allowedExtensions.contains(ext)) {
+                throw new IllegalArgumentException(
+                        "Extension de fichier non autorisée. Extensions acceptées : pdf, jpg, jpeg, png.");
+            }
+        }
     }
 }
 

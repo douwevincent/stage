@@ -52,10 +52,18 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+                        // Static frontend resources and SPA entry point
+                        .requestMatchers("/", "/index.html", "/favicon.svg", "/icons.svg", "/logo-enspm.png").permitAll()
+                        .requestMatchers("/assets/**", "/css/**", "/js/**").permitAll()
+                        // Public API endpoints
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/stages/declarer").permitAll()
                         .requestMatchers("/api/v1/public/evaluations/**").permitAll()
+                        // Role-restricted API endpoints
                         .requestMatchers("/api/v1/users/**").hasRole("SUPER_ADMIN")
+                        // All other /api/** calls require a valid authenticated session
+                        .requestMatchers("/api/**").authenticated()
+                        // SPA history-mode fallback routes
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
