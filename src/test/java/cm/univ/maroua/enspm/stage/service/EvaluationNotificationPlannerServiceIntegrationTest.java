@@ -59,6 +59,9 @@ class EvaluationNotificationPlannerServiceIntegrationTest {
     private SessionEvaluationRepository sessionEvaluationRepository;
 
         @Autowired
+        private AppSettingRepository appSettingRepository;
+
+        @Autowired
         private NoteRepository noteRepository;
 
         @Autowired
@@ -151,8 +154,54 @@ class EvaluationNotificationPlannerServiceIntegrationTest {
         assertThat(sessionEvaluationRepository.findByStageId(stage.getId()))
                 .get()
                 .extracting(SessionEvaluation::getDateLimite)
-                .isEqualTo(today);
+                                .isEqualTo(today.plusDays(14));
     }
+
+        @Test
+        void planifier_dateLimite_utiliseDelaiConfigure() {
+                LocalDate today = LocalDate.now();
+                notificationRepository.save(
+                                new Notification(null, typeStage, NotificationReferenceDateType.FIN_STAGE, 0, true));
+
+                Stage stage = creerStageNonNote(encadreur, etudiant, entreprise, annee, today.minusDays(8), today);
+                creerInscription(etudiant, annee, niveau);
+
+                appSettingRepository.findByCle("EVALUATION_DELAY_DAYS").ifPresent(setting -> {
+                        setting.setValeur("7");
+                        appSettingRepository.save(setting);
+                });
+
+                int nbEnfiles = plannerService.planifier();
+
+                assertThat(nbEnfiles).isEqualTo(1);
+                assertThat(sessionEvaluationRepository.findByStageId(stage.getId()))
+                                .get()
+                                .extracting(SessionEvaluation::getDateLimite)
+                                .isEqualTo(today.plusDays(7));
+        }
+
+        @Test
+        void planifier_dateLimite_fallbackQuandDelaiInvalide() {
+                LocalDate today = LocalDate.now();
+                notificationRepository.save(
+                                new Notification(null, typeStage, NotificationReferenceDateType.FIN_STAGE, 0, true));
+
+                Stage stage = creerStageNonNote(encadreur, etudiant, entreprise, annee, today.minusDays(8), today);
+                creerInscription(etudiant, annee, niveau);
+
+                appSettingRepository.findByCle("EVALUATION_DELAY_DAYS").ifPresent(setting -> {
+                        setting.setValeur("abc");
+                        appSettingRepository.save(setting);
+                });
+
+                int nbEnfiles = plannerService.planifier();
+
+                assertThat(nbEnfiles).isEqualTo(1);
+                assertThat(sessionEvaluationRepository.findByStageId(stage.getId()))
+                                .get()
+                                .extracting(SessionEvaluation::getDateLimite)
+                                .isEqualTo(today.plusDays(14));
+        }
 
     @Test
         void planifier_neDoitPasEnfilerSiNotificationNonDue() {

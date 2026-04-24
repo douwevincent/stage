@@ -43,6 +43,7 @@ public class EvaluationNotificationPlannerService {
     private static final String CORPS_DEFAUT = "Bonjour,\n\nCertains stages dont vous êtes encadreur n'ont pas encore été évalués. "
             + "Merci de vous connecter à la plateforme pour saisir vos notes.\n\nCordialement.";
     private static final DateTimeFormatter DATE_FR_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.FRANCE);
+        private static final int EVALUATION_DELAY_DAYS_FALLBACK = 14;
 
     @Value("${app.base-url:http://localhost:8080}")
     private String baseUrl;
@@ -83,7 +84,7 @@ public class EvaluationNotificationPlannerService {
                 .stream()
                 .filter(Notification::getActif)
                 .toList();
-
+        log.debug("J'ai eu {} notifications ", notifications.size());
         int total = 0;
         for (Notification notification : notifications) {
             total += traiterNotification(notification, today, sujet, corps);
@@ -103,20 +104,27 @@ public class EvaluationNotificationPlannerService {
         // FIN_STAGE
         // JOURS_AVANT_FIN_STAGE
         // JOURS_APRES_FIN_STAGE
-        LocalDate referenceDate = today.minusDays(notification.getOffsetDays());
+        
 
         List<Stage> stagesDues = switch (notification.getReferenceDateType()) {
             case DEBUT_STAGE -> {
+                LocalDate referenceDate = today.minusDays(notification.getOffsetDays());
+                log.debug("Notification {} : recherche des stages non notés pour début de stage à la date {}",
+                        notification.getReferenceDateType(), referenceDate);
                 yield stageRepository
                         .findStagesNonNotesPourDebutStage(typeStageId, referenceDate);
             }
-            case FIN_STAGE, JOURS_AVANT_FIN_STAGE -> {
-                referenceDate = today.plusDays(notification.getOffsetDays());
+            case FIN_STAGE, JOURS_AVANT_FIN_STAGE -> {                
+                LocalDate referenceDate = today.plusDays(notification.getOffsetDays());
+                log.debug("Notification {} : recherche des stages non notés pour fin de stage à la date {}",
+                        notification.getReferenceDateType(), referenceDate);
                 yield stageRepository
                         .findStagesNonNotesPourFinStage(typeStageId, referenceDate);
             }
             case JOURS_APRES_FIN_STAGE -> {
-                referenceDate = today.minusDays(notification.getOffsetDays());
+                LocalDate referenceDate = today.minusDays(notification.getOffsetDays());
+                log.debug("Notification {} : recherche des stages non notés pour fin de stage à la date {}",
+                        notification.getReferenceDateType(), referenceDate);
                 yield stageRepository
                         .findStagesNonNotesPourFinStage(typeStageId, referenceDate);
             }
@@ -156,7 +164,8 @@ public class EvaluationNotificationPlannerService {
             return 0;
         }
 
-        SessionEvaluation session = sessionEvaluationService.ensureSessionWithCode(stage, stage.getDateFin());
+        LocalDate dateLimite = resolveSessionDeadline(stage);
+        SessionEvaluation session = sessionEvaluationService.ensureSessionWithCode(stage, dateLimite);
 
         // Intégrer le lien dans le corps du message
         String prefixeUrl = resolvePublicEvaluationUrlPrefix();
@@ -224,6 +233,34 @@ public class EvaluationNotificationPlannerService {
             log.debug("MAIL_PUBLIC_EVALUATION_URL_PREFIX non configuré, fallback sur app.base-url.");
         }
         return trimTrailingSlash(baseUrl);
+    }
+
+    private LocalDate resolveSessionDeadline(Stage stage) {
+        if (stage == null || stage.getDateFin() == null) {
+            return null;
+        }
+        return stage.getDateFin().plusDays(resolveEvaluationDelayDays());
+    }
+
+    private int resolveEvaluationDelayDays() {
+        try {
+            String val = appSettingService.getRawValue("EVALUATION_DELAY_DAYS");
+            if (val == null || val.isBlank()) {
+                log.debug("EVALUATION_DELAY_DAYS vide/non configure, fallback {} jours.", EVALUATION_DELAY_DAYS_FALLBACK);
+                return EVALUATION_DELAY_DAYS_FALLBACK;
+            }
+            int delay = Integer.parseInt(val.trim());
+            if (delay < 1) {
+                log.debug("EVALUATION_DELAY_DAYS={} invalide, fallback {} jours.", delay,
+                        EVALUATION_DELAY_DAYS_FALLBACK);
+                return EVALUATION_DELAY_DAYS_FALLBACK;
+            }
+            return delay;
+        } catch (Exception e) {
+            log.debug("Impossible de resoudre EVALUATION_DELAY_DAYS, fallback {} jours.",
+                    EVALUATION_DELAY_DAYS_FALLBACK);
+            return EVALUATION_DELAY_DAYS_FALLBACK;
+        }
     }
 
     private String applySupportedPlaceholders(String body, Encadreur encadreur, LocalDate dateLimite) {
