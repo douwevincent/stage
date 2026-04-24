@@ -15,6 +15,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDate;
 
@@ -51,10 +52,12 @@ public class Stage {
 
     /** Date de début effective du stage. */
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "UTC")
     private LocalDate dateDebut;
 
     /** Date de fin effective du stage. */
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "UTC")
     private LocalDate dateFin;
 
     /** Année académique à laquelle appartient ce stage. */

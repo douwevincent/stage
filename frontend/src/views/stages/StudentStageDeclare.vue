@@ -11,6 +11,7 @@ import { ref, reactive, computed } from 'vue'
 import { EtudiantService, type EtudiantDTO, type StageDeclarationContextDTO } from '@/api/EtudiantService'
 import { EntrepriseService, type EntrepriseDTO } from '@/api/EntrepriseService'
 import { StageService } from '@/api/StageService'
+import * as dateUtils from '@/utils/dateUtils'
 import EnspmLogo from '@/components/common/EnspmLogo.vue'
 
 const message = useMessage()
@@ -40,8 +41,8 @@ async function verifierMatricule () {
     const res = await EtudiantService.getStageDeclarationContext(matriculeForm.matricule.trim())
     declarationContext.value = res.data
     validatedEtudiant.value = res.data.etudiant
-    stageForm.dateDebut = res.data.dateDebut ? new Date(res.data.dateDebut).getTime() : null
-    stageForm.dateFin = res.data.dateFin ? new Date(res.data.dateFin).getTime() : null
+    stageForm.dateDebut = dateUtils.parseApiDate(res.data.dateDebut) ?? null
+    stageForm.dateFin = dateUtils.parseApiDate(res.data.dateFin) ?? null
     currentStep.value = 1
   } catch (err: any) {
     if (err?.response?.status === 404) {
@@ -137,20 +138,26 @@ async function declarerStage () {
   }
   submitting.value = true
   try {
-    const toDate = (ts: number | null) =>
-      ts ? new Date(ts).toISOString().split('T')[0] : ''
+      const dateDebut = dateUtils.formatDateForApi(stageForm.dateDebut)
+      const dateFin = dateUtils.formatDateForApi(stageForm.dateFin)
+    
+      if (!dateDebut || !dateFin) {
+        message.error('Les dates de début et fin sont obligatoires')
+        submitting.value = false
+        return
+      }
 
-    await StageService.declarer({
-      etudiantMatricule: matriculeForm.matricule.trim(),
-      entrepriseId: stageForm.entrepriseId,
-      entrepriseNom: stageForm.entrepriseInput.trim(),
-      entrepriseSecteur: stageForm.entrepriseSecteur || undefined,
-      ville: stageForm.ville,
-      adresse: stageForm.adresse,
-      dateDebut: toDate(stageForm.dateDebut),
-      dateFin: toDate(stageForm.dateFin),
-      autorisation: uploadedFile.value,
-    })
+      await StageService.declarer({
+        etudiantMatricule: matriculeForm.matricule.trim(),
+        entrepriseId: stageForm.entrepriseId,
+        entrepriseNom: stageForm.entrepriseInput || null,
+        entrepriseSecteur: stageForm.entrepriseSecteur || null,
+        ville: stageForm.ville,
+        adresse: stageForm.adresse,
+        dateDebut,
+        dateFin,
+        autorisation: uploadedFile.value,
+      })
     success.value = true
   } catch (err: any) {
     const msg = err?.response?.data?.message ?? err?.response?.data ?? 'Erreur lors de la déclaration'

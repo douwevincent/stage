@@ -12,6 +12,7 @@
     "@vicons/antd": "^0.13.0",
     "@vicons/utils": "^0.1.4",
     "axios": "^1.13.6",
+    "dayjs": "^1.11.10",
     "exceljs": "^4.4.0",
     "lucide-vue-next": "^1.0.0",
     "naive-ui": "^2.44.1",

@@ -15,6 +15,7 @@ import { EtudiantService } from '@/api/EtudiantService'
 import { EncadreurService } from '@/api/EncadreurService'
 import { TypeStageService, type TypeStageDTO } from '@/api/TypeStageService'
 import { PeriodeStageService } from '@/api/PeriodeStageService'
+import * as dateUtils from '@/utils/dateUtils'
 
 const message = useMessage()
 const formRef = ref<FormInst | null>(null)
@@ -142,8 +143,8 @@ async function prefillDatesFromPeriodeStage (typeStageId: number | null) {
 
   try {
     const res = await PeriodeStageService.getActiveByTypeStageId(typeStageId)
-    formModel.dateDebut = res.data?.dateDebut ? new Date(res.data.dateDebut).getTime() : null
-    formModel.dateFin = res.data?.dateFin ? new Date(res.data.dateFin).getTime() : null
+    formModel.dateDebut = dateUtils.parseApiDate(res.data?.dateDebut) ?? null
+    formModel.dateFin = dateUtils.parseApiDate(res.data?.dateFin) ?? null
   } catch (err: any) {
     formModel.dateDebut = null
     formModel.dateFin = null
@@ -456,8 +457,8 @@ function handleEdit (row: StageDTO) {
     entrepriseInput: row.entrepriseNom ?? '',
     ville: row.ville ?? '',
     adresse: row.adresse ?? '',
-    dateDebut: row.dateDebut ? new Date(row.dateDebut).getTime() : null,
-    dateFin: row.dateFin ? new Date(row.dateFin).getTime() : null,
+    dateDebut: dateUtils.parseApiDate(row.dateDebut) ?? null,
+    dateFin: dateUtils.parseApiDate(row.dateFin) ?? null,
   })
   if (row.etudiantId && (row.etudiantMatricule || row.etudiantNom)) {
     etudiantOptions.value = [{
@@ -625,9 +626,6 @@ async function handleSave () {
       entrepriseId = res.data.id ?? null
     }
 
-    const toDate = (ts: number | null) =>
-      ts ? new Date(ts).toISOString().split('T')[0] : null
-
     const payload: StageDTO = {
       id: formModel.id ?? undefined,
       etudiantId: formModel.etudiantId,
@@ -635,8 +633,8 @@ async function handleSave () {
       entrepriseId,
       ville: formModel.ville,
       adresse: formModel.adresse,
-      dateDebut: toDate(formModel.dateDebut),
-      dateFin: toDate(formModel.dateFin),
+      dateDebut: dateUtils.formatDateForApi(formModel.dateDebut),
+      dateFin: dateUtils.formatDateForApi(formModel.dateFin),
     }
 
     if (payload.id) {
